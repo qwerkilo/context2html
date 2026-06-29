@@ -98,7 +98,7 @@ argument-hint: "调研内容描述或文件路径？"
 
 工具：完成全文后对照 `references/humanize_matrix.md` 中的 20 条案例逐条微调。
 
-- 🛑 STOP：逐段对照 D1-D5 检查完成，确认正文没有 AI 味，用户确认后再继续。
+- 🛑 STOP：已逐条确认 D1-D5 规则，理解每维度约束。用户确认后再开始正文写作。
 
 ### Step 3: 生成 HTML
 
@@ -110,7 +110,7 @@ argument-hint: "调研内容描述或文件路径？"
    · 预览主题：打开 `examples/report-themes.html` 敲 T 键循环对比
 3. 填充封面元数据（标题、日期、作者、数据来源）
 4. 编写摘要 + 每章正文（中英双语 `data-lang="zh"` + `data-lang="en"`）— **写作时全程应用 Step 2.5 的 D1-D5 约束**
-   🛑 STOP：展示正文框架给用户确认。用户确认后再合并组件。
+   🛑 STOP：展示正文框架 + 逐段 D1-D5 自检结果给用户确认。用户确认后再合并组件。
 5. 从 `components/NN-name.md` 复制所选组件的 HTML + CSS + JS 合并到报告中：
    · 组件代码不兼容（缺 JS 依赖）→ 切换到简化版（纯 CSS 变体或文字替代）
    · 结构 HTML：复制文件中 ````html` 代码块
