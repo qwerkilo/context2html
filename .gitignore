@@ -7,4 +7,3 @@ node_modules/
 *.log
 docs/
 .cortexkit/
-AGENTS.md
