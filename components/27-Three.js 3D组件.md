@@ -1,6 +1,6 @@
 ### 27. Three.js 3D 组件
 
-使用 Three.js 在课程中渲染 3D 场景，适合展示地理/贸易网络、三维数据可视化、结构/架构图。
+使用 Three.js 在报告中渲染 3D 场景，适合展示地理/贸易网络、三维数据可视化、结构/架构图。
 
 #### 渲染后端策略
 
@@ -39,10 +39,10 @@ import { Fn, uniform, time, color, uv } from 'three/tsl';
 
 #### 使用规则
 
-- Three.js 默认接管鼠标事件，与课程 `← →` 键盘导航冲突时需在场景容器上加 `tabindex` 隔离
+- Three.js 默认接管鼠标事件，与报告 `← →` 键盘导航冲突时需在场景容器上加 `tabindex` 隔离
 - 每个场景唯一 `id`，`height` 建议 300-450px
 - Three.js 渲染异步，用 `window.requestAnimationFrame` 循环
-- 销毁：课程切换时需 `renderer.dispose()` 释放 GPU 资源
+- 销毁：报告切换或页面卸载时需 `renderer.dispose()` 释放 GPU 资源
 - 检测 WebGPU：`typeof navigator !== 'undefined' && navigator.gpu`
 - importmap 方式下代码需放在 `<script type="module">` 中
 

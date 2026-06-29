@@ -62,7 +62,7 @@ CSS：
 .tab-btn:active { transform: scale(0.97); }
 ```
 
-JS（与其他 PPT 增强 JS 一起放在课程末尾 `<script>` 中）：
+JS（与其他 PPT 增强 JS 一起放在报告末尾 `<script>` 中）：
 ```html
 <script>
 // Tab 切换面板

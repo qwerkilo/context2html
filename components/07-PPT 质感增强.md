@@ -1,214 +1,16 @@
 ### 7. PPT 质感增强（纵向滚读 + 动画 + 主题切换）
 
-在保持纵向滚读结构的基础上，添加 PPT 级的视觉品质。以下三个能力需要添加到每个课程的 `<head>` 中（CSS + JS）。
+在保持纵向滚读结构的基础上，添加 PPT 级的视觉品质。以下三个能力已内置在 report-starter.html 的模板中（CSS + JS）。
 
 #### 7.1 主题切换（T 键 + localStorage 持久化）
 
-键盘按 `T` 键循环切换主题。用户选择的主题自动保存到 `localStorage`，刷新页面或切换课程后保留。
+键盘按 `T` 键循环切换主题。所有主题 CSS 变量集中管理在 `theme/report-themes.css`（自动生成，禁止手改）。用户选择的主题自动保存到 `localStorage`，刷新页面后保留。
 
-默认包含以下主题（来自 `theme/*/DESIGN.md`），每个主题控制 12 个 CSS 变量：
+主题列表（20 个）：`warm`, `apple`, `minimax`, `nvidia`, `spotify`, `tesla`, `airbnb`, `airtable`, `binance`, `bmw-m`, `claude`, `cursor`, `dell-1996`, `figma`, `hp`, `ibm`, `nike`, `notion`, `x.ai`, `zapier`
 
-```css
-:root {
-  --bg: #faf9f7; --text: #1a1a1a; --accent: #c0392b;
-  --accent-text: #ffffff; --surface: #f5f0eb; --border: #ddd8d0;
-  --surface-raised: #ece6dd; --muted: #888;
-  --link: #c0392b; --success: #16a34a; --warning: #d97706; --error: #dc2626;
-  --font: "Noto Serif CJK SC",Georgia,"Times New Roman",serif;
-  --font-h: "Noto Serif CJK SC",Georgia,"Times New Roman",serif;
-  --lh: 1.8; --h1-size: 2rem; --h2-size: 1.3rem;
-  --body-size: 1rem; --small-size: 0.85rem;
-  --radius: 8px; --anim-dur: 0.3s; --anim-y: 18px;
-  --h2-border: 1px solid #ddd; --h1-size: 2rem;
-}
-[data-theme="airbnb"] {
-  --bg: #ffffff; --text: #222222; --accent: #ff385c;
-  --accent-text: #ffffff; --surface: #ffffff; --border: #dddddd;
-  --surface-raised: #f2f2f2; --muted: #6a6a6a;
-  --link: #ff385c; --success: #16a34a; --warning: #d97706; --error: #dc2626;
-  --font: "Airbnb Cereal VF",sans-serif; --font-h: "Airbnb Cereal VF",sans-serif;
-  --lh: 1.25;
-}
+完整实现见 `templates/report-starter.html` 的 JS 块（`tp-btn-toggle` 打开面板 → `tp-item` 主题选择 → T 键切换 + localStorage 持久化）。
 
-[data-theme="airtable"] {
-  --bg: #ffffff; --text: #181d26; --accent: #181d26;
-  --accent-text: #ffffff; --surface: #f8fafc; --border: #dddddd;
-  --surface-raised: #e0e2e6; --muted: #41454d;
-  --link: #1b61c9; --success: #006400; --warning: #d97706; --error: #dc2626;
-  --font: "Inter Display",sans-serif; --font-h: "Inter Display",sans-serif;
-  --lh: 1.3;
-}
-
-[data-theme="apple"] {
-  --bg: #ffffff; --text: #1d1d1f; --accent: #0066cc;
-  --accent-text: #ffffff; --surface: #f5f5f7; --border: #e0e0e0;
-  --surface-raised: #f5f5f7; --muted: #666666;
-  --link: #0066cc; --success: #16a34a; --warning: #d97706; --error: #dc2626;
-  --font: "SF Pro Text",sans-serif; --font-h: "SF Pro Text",sans-serif;
-  --lh: 1.5; --radius: 12px; --anim-dur: 0.8s; --anim-y: 20px;
-}
-
-[data-theme="binance"] {
-  --bg: #ffffff; --text: #181a20; --accent: #fcd535;
-  --accent-text: #181a20; --surface: #f5f5f5; --border: #e0e0e0;
-  --surface-raised: #f5f5f5; --muted: #707a8a;
-  --link: #fcd535; --success: #16a34a; --warning: #d97706; --error: #dc2626;
-  --font: "BinanceNova",sans-serif; --font-h: "BinancePlex",sans-serif;
-  --lh: 1.4;
-}
-
-[data-theme="bmw-m"] {
-  --bg: #000000; --text: #ffffff; --accent: #ffffff;
-  --accent-text: #000000; --surface: #1a1a1a; --border: #3c3c3c;
-  --surface-raised: #262626; --muted: #7e7e7e;
-  --link: #ffffff; --success: #0fa336; --warning: #f4b400; --error: #dc2626;
-  --font: "BMWTypeNextLatin",sans-serif; --font-h: "BMWTypeNextLatin",sans-serif;
-  --lh: 1.4;
-}
-
-[data-theme="claude"] {
-  --bg: #faf9f5; --text: #141413; --accent: #cc785c;
-  --accent-text: #ffffff; --surface: #efe9de; --border: #e6dfd8;
-  --surface-raised: #efe9de; --muted: #6c6a64;
-  --link: #cc785c; --success: #5db872; --warning: #d4a017; --error: #c64545;
-  --font: "StyreneB",sans-serif; --font-h: "Copernicus",sans-serif;
-  --lh: 1.4;
-}
-
-[data-theme="cursor"] {
-  --bg: #f7f7f4; --text: #26251e; --accent: #f54e00;
-  --accent-text: #ffffff; --surface: #ffffff; --border: #e6e5e0;
-  --surface-raised: #e6e5e0; --muted: #807d72;
-  --link: #f54e00; --success: #16a34a; --warning: #d97706; --error: #dc2626;
-  --font: "CursorGothic",sans-serif; --font-h: "CursorGothic",sans-serif;
-  --lh: 1.4;
-}
-
-[data-theme="dell-1996"] {
-  --bg: #ffffff; --text: #000000; --accent: #e91d2a;
-  --accent-text: #ffffff; --surface: #ffffff; --border: #e0e0e0;
-  --surface-raised: #ffffff; --muted: #666666;
-  --link: #0000ee; --success: #16a34a; --warning: #d97706; --error: #dc2626;
-  --font: "Times New Roman",sans-serif; --font-h: "Helvetica",sans-serif;
-  --lh: 1.35;
-}
-
-[data-theme="figma"] {
-  --bg: #ffffff; --text: #000000; --accent: #000000;
-  --accent-text: #ffffff; --surface: #f7f7f5; --border: #e6e6e6;
-  --surface-raised: #f7f7f5; --muted: #666666;
-  --link: #000000; --success: #16a34a; --warning: #d97706; --error: #dc2626;
-  --font: "figmaMono",sans-serif; --font-h: "figmaSans",sans-serif;
-  --lh: 1.5;
-}
-
-[data-theme="hp"] {
-  --bg: #ffffff; --text: #1a1a1a; --accent: #024ad8;
-  --accent-text: #ffffff; --surface: #f5f5f5; --border: #e8e8e8;
-  --surface-raised: #f5f5f5; --muted: #666666;
-  --link: #024ad8; --success: #16a34a; --warning: #d97706; --error: #b3262b;
-  --font: "Forma DJR Micro",sans-serif; --font-h: "Forma DJR Micro",sans-serif;
-  --lh: 1.17;
-}
-
-[data-theme="ibm"] {
-  --bg: #ffffff; --text: #161616; --accent: #0f62fe;
-  --accent-text: #ffffff; --surface: #f5f5f5; --border: #e0e0e0;
-  --surface-raised: #f5f5f5; --muted: #525252;
-  --link: #0f62fe; --success: #16a34a; --warning: #d97706; --error: #dc2626;
-  --font: "IBM Plex Sans",sans-serif; --font-h: "IBM Plex Sans",sans-serif;
-  --lh: 1.33;
-}
-
-[data-theme="minimax"] {
-  --bg: #ffffff; --text: #0a0a0a; --accent: #0a0a0a;
-  --accent-text: #ffffff; --surface: #f2f3f5; --border: #e5e7eb;
-  --surface-raised: #f2f3f5; --muted: #a8aab2;
-  --link: #0a0a0a; --success: #16a34a; --warning: #d97706; --error: #dc2626;
-  --font: "DM Sans",sans-serif; --font-h: "DM Sans",sans-serif;
-  --lh: 1.6; --radius: 8px; --anim-dur: 0.35s; --anim-y: 30px; --h2-border: none; --h1-size: 2.4rem;
-}
-
-[data-theme="nike"] {
-  --bg: #ffffff; --text: #111111; --accent: #111111;
-  --accent-text: #ffffff; --surface: #f5f5f5; --border: #cacacb;
-  --surface-raised: #f5f5f5; --muted: #666666;
-  --link: #111111; --success: #007d48; --warning: #d97706; --error: #dc2626;
-  --font: "Helvetica Now Text Medium",sans-serif; --font-h: "Helvetica Now Display Medium",sans-serif;
-  --lh: 1.5;
-}
-
-[data-theme="notion"] {
-  --bg: #ffffff; --text: #1a1a1a; --accent: #5645d4;
-  --accent-text: #ffffff; --surface: #fafaf9; --border: #e5e3df;
-  --surface-raised: #fafaf9; --muted: #bbb8b1;
-  --link: #0075de; --success: #16a34a; --warning: #d97706; --error: #dc2626;
-  --font: "Notion Sans",sans-serif; --font-h: "Notion Sans",sans-serif;
-  --lh: 1.4;
-}
-
-[data-theme="nvidia"] {
-  --bg: #ffffff; --text: #000000; --accent: #76b900;
-  --accent-text: #000000; --surface: #f7f7f7; --border: #cccccc;
-  --surface-raised: #1a1a1a; --muted: #666666;
-  --link: #0046a4; --success: #16a34a; --warning: #df6500; --error: #e52020;
-  --font: "NVIDIA-EMEA",sans-serif; --font-h: "NVIDIA-EMEA",sans-serif;
-  --lh: 1.55; --radius: 2px; --anim-dur: 0s; --anim-y: 0px; --h2-border: 2px solid var(--accent); --h1-size: 1.9rem;
-}
-
-[data-theme="x.ai"] {
-  --bg: #0a0a0a; --text: #ffffff; --accent: #ffffff;
-  --accent-text: #0a0a0a; --surface: #f5f5f5; --border: #212327;
-  --surface-raised: #f5f5f5; --muted: #666666;
-  --link: #ffffff; --success: #16a34a; --warning: #d97706; --error: #dc2626;
-  --font: "GeistMono",sans-serif; --font-h: "universalSans",sans-serif;
-  --lh: 1.6;
-}
-
-[data-theme="zapier"] {
-  --bg: #fffefb; --text: #201515; --accent: #ff4f00;
-  --accent-text: #fffefb; --surface: #f5f5f5; --border: #e0e0e0;
-  --surface-raised: #f5f5f5; --muted: #666666;
-  --link: #ff4f00; --success: #16a34a; --warning: #d97706; --error: #dc2626;
-  --font: "Degular Display",sans-serif; --font-h: "Inter",sans-serif;
-  --lh: 1.6;
-}
-
-`
- 正文字体 | Noto Serif | SF Pro Text | DM Sans | Inter |
-| `--font-h` | 标题字体 | Noto Serif | SF Pro Display | DM Sans | Inter |
-| `--lh` | 行高 | 1.8 | 1.9 | 1.7 | 1.6 |
-| `--h1-size` | 大标题 | 2rem | 2.1rem | 2.4rem | 1.9rem |
-| `--h2-border` | h2 下划线 | 1px 灰 | 1px 浅灰 | 无边框 | 2px 强调色粗线 |
-| `--radius` | 组件圆角 | 8px | 12px | 8px | 2px |
-| `--anim-dur` | 动画时长 | 0.6s | 0.8s | 0.35s | 0s（无动画） |
-| `--anim-y` | 动画位移 | 24px | 20px | 30px | 0px |
-
-主题详情参考 `theme/{apple|minimax|nvidia}/DESIGN.md`。
-
-页面加载时从 `localStorage` 读取主题，无记录则用默认 `warm`：
-
-```js
-(function(){
-  var t=['warm','apple','minimax','nvidia','airbnb','airtable','binance','bmw-m','claude','cursor','dell-1996','figma','hp','ibm','nike','notion','x.ai','zapier'];
-  var saved=localStorage.getItem('theme');
-  if(saved&&t.indexOf(saved)>-1){document.documentElement.dataset.theme=saved;}
-})();
-```
-
-T 键切换并保存：
-
-```js
-const themes = ['warm', 'apple', 'minimax', 'nvidia'];
-let ti = themes.indexOf(document.documentElement.dataset.theme) || 0;
-document.addEventListener('keydown', e => {
-  if (e.key === 't' && !e.ctrlKey && !e.metaKey) {
-    ti = (ti + 1) % themes.length;
-    document.documentElement.dataset.theme = themes[ti];
-    localStorage.setItem('theme', themes[ti]);
-  }
-});
-```
+主题 CSS 变更时运行 `python scripts/generate-theme-css.py` 重新生成。
 
 #### 7.2 入场动画（滚动触发）
 
@@ -260,7 +62,7 @@ document.addEventListener('keydown', e => {
 
 #### 7.4 内容密度规范（区别于纯 PPT）
 
-纵向滚读的课程每屏要有"视觉呼吸"：
+纵向滚读的报告每屏要有"视觉呼吸"：
 - 每两个 h2 之间至少插入 1 个视觉组件（SVG / 时间线 / 条形图 / 对比表）
 - 连续文本不超过 4 段
 - 段落中不使用过多的引用或信息框——每个 `.info-box` / `.warning-box` 之间至少隔 1 段
@@ -301,7 +103,7 @@ HTML（放在 `<body>` 末尾，JS 之前）——使用组合工具栏（<svg v
 <nav class="toc-panel"><ul class="toc-list"></ul></nav>
 ```
 
-CSS（放在课程 `<style>` 中）——工具栏 + 主题面板 + TOC 共用样式：
+CSS（放在报告 `<style>` 中）——工具栏 + 主题面板 + TOC 共用样式：
 ```css
 .ui-toolbar { position: fixed; bottom: 20px; right: 20px; z-index: 999; display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: rgba(255,255,255,0.85); backdrop-filter: blur(6px); border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 .tp-btn-toggle, .toc-btn { background: none; border: none; font-size: 1.1rem; cursor: pointer; padding: 0 2px; line-height: 1; opacity: 0.6; transition: opacity 0.2s ease; color: var(--text); }
@@ -345,7 +147,7 @@ document.querySelector('.toc-panel').classList.remove('open');}});}
 
 #### 7.6 JS 运行时模板
 
-课程末尾的 `<script>` 块（在 quiz JS 之后）追加：
+报告末尾的 `<script>` 块追加：
 
 ```html
 <script>
@@ -399,7 +201,7 @@ var n=e.key==='ArrowRight'?Math.min(c+1,s.length-1):Math.max(c-1,0);if(n>=0&&s[n
 - **IntersectionObserver 不支持的浏览器**（IE11、旧 Safari）：catch 块将所有 `[data-anim]` 元素的 opacity 设为 1、transform 取消，用户看到的是静态完整页面
 - **smooth scroll 不支持**：浏览器自动降级为 instant scroll
 - **T 键切主题不支持**：静默失败，用户停留在默认主题
-- 降级设计的核心原则：**JS 增强不影响基本可用性**——所有降级情况下，课程内容仍然是完整可读的
+- 降级设计的核心原则：**JS 增强不影响基本可用性**——所有降级情况下，报告内容仍然是完整可读的
 
 /* ===== 主题切换过渡动画 ===== */
 body { transition: background-color 0.35s ease-out, color 0.35s ease-out; }

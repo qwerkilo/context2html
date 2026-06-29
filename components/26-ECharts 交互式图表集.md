@@ -6,7 +6,7 @@
 
 ECharts 库需要独立下载到本地 `libs/` 目录。两种加载方式：
 
-**离线加载（推荐）** — 在课程中使用前先准备好本地文件：
+**离线加载（推荐）** — 在报告中使用前先准备好本地文件：
 
 ```bash
 # PowerShell（Windows）
@@ -17,7 +17,7 @@ mkdir -p libs && curl -Lo libs/echarts.min.js https://cdn.jsdelivr.net/npm/echar
 ```
 
 ```html
-<!-- 课程中引用本地文件 -->
+<!-- 报告中引用本地文件 -->
 <script src="libs/echarts.min.js"></script>
 ```
 
