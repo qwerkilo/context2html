@@ -82,12 +82,14 @@ HTML（放在 `<body>` 末尾，JS 之前）——使用组合工具栏（<svg v
   <div class="tp-grid" role="listbox" aria-label="选择主题">
     <button class="tp-item active" data-theme="warm" style="--tp-color:#c0392b;">暖色</button>
     <button class="tp-item" data-theme="apple" style="--tp-color:#0066cc;">Apple</button>
-    <button class="tp-item" data-theme="minimax" style="--tp-color:#ff5530;">Minimax</button>
+    <button class="tp-item" data-theme="minimax" style="--tp-color:#0a0a0a;">Minimax</button>
     <button class="tp-item" data-theme="nvidia" style="--tp-color:#76b900;">NVIDIA</button>
+    <button class="tp-item" data-theme="spotify" style="--tp-color:#1ed760;">Spotify</button>
+    <button class="tp-item" data-theme="tesla" style="--tp-color:#3e6ae1;">Tesla</button>
     <button class="tp-item" data-theme="airbnb" style="--tp-color:#ff385c;">Airbnb</button>
     <button class="tp-item" data-theme="airtable" style="--tp-color:#181d26;">Airtable</button>
     <button class="tp-item" data-theme="binance" style="--tp-color:#fcd535;">Binance</button>
-    <button class="tp-item" data-theme="bmw-m" style="--tp-color:#3c3c3c;">BMW M</button>
+    <button class="tp-item" data-theme="bmw-m" style="--tp-color:#ffffff;">BMW M</button>
     <button class="tp-item" data-theme="claude" style="--tp-color:#cc785c;">Claude</button>
     <button class="tp-item" data-theme="cursor" style="--tp-color:#f54e00;">Cursor</button>
     <button class="tp-item" data-theme="dell-1996" style="--tp-color:#e91d2a;">Dell 1996</button>
@@ -96,7 +98,7 @@ HTML（放在 `<body>` 末尾，JS 之前）——使用组合工具栏（<svg v
     <button class="tp-item" data-theme="ibm" style="--tp-color:#0f62fe;">IBM</button>
     <button class="tp-item" data-theme="nike" style="--tp-color:#111111;">Nike</button>
     <button class="tp-item" data-theme="notion" style="--tp-color:#5645d4;">Notion</button>
-    <button class="tp-item" data-theme="x.ai" style="--tp-color:#636363;">x.ai</button>
+    <button class="tp-item" data-theme="x.ai" style="--tp-color:#ffffff;">x.ai</button>
     <button class="tp-item" data-theme="zapier" style="--tp-color:#ff4f00;">Zapier</button>
   </div>
 </nav>
@@ -152,7 +154,7 @@ document.querySelector('.toc-panel').classList.remove('open');}});}
 ```html
 <script>
 // PPT 质感增强 — 含降级处理
-(function(){var t=['warm','apple','minimax','nvidia'];try{var s=localStorage.getItem('theme');if(s&&t.indexOf(s)>-1){document.documentElement.dataset.theme=s;}}catch(e){}
+(function(){var t=['warm','apple','minimax','nvidia','spotify','tesla','airbnb','airtable','binance','bmw-m','claude','cursor','dell-1996','figma','hp','ibm','nike','notion','x.ai','zapier'];try{var s=localStorage.getItem('theme');if(s&&t.indexOf(s)>-1){document.documentElement.dataset.theme=s;}}catch(e){}
 var i=t.indexOf(document.documentElement.dataset.theme);if(i<0)i=0;var d=document.documentElement;
 try{document.querySelectorAll('.tp-item').forEach(function(b){b.addEventListener('click',function(){
 var th=this.dataset.theme;d.dataset.theme=th;i=t.indexOf(th);
