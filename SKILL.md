@@ -3,7 +3,7 @@ name: context2html
 description: >
   将调研内容/研究报告自动转化为可视化 HTML 报告。
   从对话上下文提取已有调研结果，或读取外部文件路径。
-  完整复用 teach_more_pic 的 28 个视觉组件（SVG 流程图、ECharts、Three.js、D3.js 等）。
+  完整复用 teach_more_pic 的 29 个视觉组件（SVG 流程图、ECharts、Three.js、D3.js 等）。
   Triggers: "报告", "调研", "research", "report", "生成报告", "把内容做成报告",
   "调研报告", "visual report", "可视化报告", "research report", "出报告".
 disable-model-invocation: true
@@ -12,7 +12,7 @@ argument-hint: "调研内容描述或文件路径？"
 
 # context2html — 调研报告可视化工具
 
-将调研内容/研究报告自动转化为可视化 HTML 报告。完整复用 `teach_more_pic` 的 28 个视觉组件（SVG 流程图、ECharts、Three.js 3D、D3.js 力导向图等）和离线库。
+将调研内容/研究报告自动转化为可视化 HTML 报告。完整复用 `teach_more_pic` 的 29 个视觉组件（SVG 流程图、ECharts、Three.js 3D、D3.js 力导向图等）和离线库。
 
 ## 前置条件
 

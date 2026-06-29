@@ -331,6 +331,7 @@
   --warning: #d97706;
   --error: #dc2626;
   --font: Times New Roman;
+  --font-h: Times New Roman;
   --lh: 1.4;
   --body-size: 1rem;
   --small-size: 0.85rem;
@@ -540,6 +541,7 @@
   --warning: #d97706;
   --error: #dc2626;
   --font: Helvetica Now Text;
+  --font-h: Helvetica Now Text;
   --lh: 1.5;
   --body-size: 1rem;
   --small-size: 0.85rem;

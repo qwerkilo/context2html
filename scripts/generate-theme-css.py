@@ -336,9 +336,9 @@ def generate_theme_css(theme_name, design_md_path):
     ]
 
     for var, val in pairs:
+        if var == '--font-h' and not val:
+            val = body_font  # fallback to body font when heading font undefined
         if val:
-            if var in ('--font-h', '--font') and not val:
-                continue
             css_lines.append(f'  {var}: {val};')
 
     css_lines.append('}\n')
