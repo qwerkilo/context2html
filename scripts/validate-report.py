@@ -27,7 +27,6 @@ def check_svg_links(html, base_dir):
     return issues
 
 
-_check_h1_count = None  # remove reference
 
 
 def check_h1_count(html):
