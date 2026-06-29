@@ -34,7 +34,8 @@ powershell -ExecutionPolicy Bypass -File templates/start-server.ps1
 
 - `test-prompts.json` — 3 typical scenarios (long, file-based, compact). When generating a report manually for testing, pick the scenario that matches.
 - `results.tsv` — darwin-skill optimization history (baseline 80.5 → final 88.1, 3 rounds). Read this before re-optimizing.
-- `examples/` — demo reports: `0001-demo-report.html` (full skeleton, 585 lines) and `report-themes.html` (theme preview, NOT a valid report — don't validate it).
+- `examples/` — demo reports: `0001-demo-report.html` (full skeleton, pass `validate-report.py`) and `report-themes.html` (theme preview, NOT a valid report — don't validate it).
+- `references/humanize_matrix.md` — 20-row D1-D5 change matrix. SKILL.md Step 2.5 says "完成后对照此文件微调". Agent should read this file after writing report body and before final validation.
 
 ## Gotchas
 
