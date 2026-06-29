@@ -160,9 +160,9 @@ argument-hint: "调研内容描述或文件路径？"
 | 路径 | 用途 | 工作流中引用处 |
 |------|------|--------------|
 | `templates/report-starter.html` | 报告骨架模板（所有报告的起点） | Step 3 |
-| `components/NN-name.md` | 组件代码（28 个） | Step 2/3 |
+| `components/NN-name.md` | 组件代码（29 个） | Step 2/3 |
 | `references/decision-guide.md` | 组件选择矩阵 | Step 2 |
-| `references/page-types.md` | 8 种页面类型代码参考 | Step 3 |
+| `references/page-types.md` | 9 种页面类型代码参考 | Step 3 |
 | `libs/` | 离线包（echarts/three/d3） | Step 5 |
 | `templates/start-server.ps1` | 本地 HTTP 服务器启动脚本 | Step 5 |
 | `templates/flowchart-vertical.svg` | 垂直流程图模板 | Step 2/3 |

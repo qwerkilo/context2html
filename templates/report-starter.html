@@ -243,8 +243,8 @@ button:active { transform: scale(0.98); }
 .tp-item:hover { background: rgba(255,255,255,0.08); color: #ffffff; }
 .tp-item.active { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 20%, #222); color: #ffffff; font-weight: 600; }
 .tp-item::before { content: ''; width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; background: var(--tp-color); border: 1px solid rgba(255,255,255,0.15); }
-.lang-btn { background: none; border: 1px solid rgba(255,255,255,0.25); border-radius: 4px; font-size: 0.72rem; cursor: pointer; padding: 1px 5px; line-height: 1.4; opacity: 0.7; transition: opacity 0.2s ease; color: #e0e0e0; font-family: inherit; font-weight: 600; letter-spacing: 0.03em; }
-.lang-btn:hover { opacity: 1; color: #ffffff; border-color: rgba(255,255,255,0.5); }
+.lang-btn { background: none; border: 1px solid var(--cover-accent, rgba(255,255,255,0.25)); border-radius: 4px; font-size: 0.72rem; cursor: pointer; padding: 1px 5px; line-height: 1.4; opacity: 0.7; transition: opacity 0.2s ease; color: var(--cover-text, #e0e0e0); font-family: inherit; font-weight: 600; letter-spacing: 0.03em; }
+.lang-btn:hover { opacity: 1; color: var(--cover-text-hover, #ffffff); border-color: var(--cover-accent-hover, rgba(255,255,255,0.5)); }
 [data-lang] { display: none; }
 [data-lang].active { display: inline; }
 h1[data-lang].active, h2[data-lang].active, p[data-lang].active, div[data-lang].active, section[data-lang].active, article[data-lang].active, aside[data-lang].active { display: block; }
