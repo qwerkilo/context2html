@@ -4,7 +4,11 @@
 
 **This is a sub-skill augmenting teach_more_pic.** Both must be loaded via `Skills:` in AGENTS.md. The 29 visual components (SVG/ECharts/Three.js/D3) are copied from teach_more_pic into `components/` — they live locally and can be edited here.
 
-SKILL.md is the sole workflow document — follow its 6 steps (input → plan → select → humanize → generate → validate → output) in order. The humanize step (Step 2.5) is mandatory and placed before HTML generation. References to validate your choices: `references/decision-guide.md` (component selector matrix + theme picker + CSS variable ref) and `references/page-types.md` (9 page-type templates with component pairing).
+SKILL.md is the sole workflow document — follow its 7 steps (input → plan → select → humanize → generate → validate → output) in order. The humanize step (Step 2.5) is mandatory and placed before HTML generation. References to validate your choices: `references/decision-guide.md` (component selector matrix + theme picker + CSS variable ref) and `references/page-types.md` (9 page-type templates with component pairing).
+
+## CodeGraph
+
+This project has CodeGraph initialized (12 Python/JS files, 900+ nodes). Use `codegraph_explore` to understand check functions in `scripts/validate-report.py` or `scripts/generate-theme-css.py` — faster than reading raw files. `codegraph_search` for symbol lookup (`.check_exec_summary`, `.check_bilingual`, etc.) and `codegraph_callers` to trace validation flow.
 
 ## Generation rules
 
