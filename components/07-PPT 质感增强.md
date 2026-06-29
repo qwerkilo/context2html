@@ -107,24 +107,24 @@ HTML（放在 `<body>` 末尾，JS 之前）——使用组合工具栏（<svg v
 
 CSS（放在报告 `<style>` 中）——工具栏 + 主题面板 + TOC 共用样式：
 ```css
-.ui-toolbar { position: fixed; bottom: 20px; right: 20px; z-index: 999; display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: rgba(255,255,255,0.85); backdrop-filter: blur(6px); border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.ui-toolbar { position: fixed; bottom: 20px; right: 20px; z-index: 999; display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: var(--surface); backdrop-filter: blur(6px); border-radius: 20px; box-shadow: var(--shadow-sm); }
 .tp-btn-toggle, .toc-btn { background: none; border: none; font-size: 1.1rem; cursor: pointer; padding: 0 2px; line-height: 1; opacity: 0.6; transition: opacity 0.2s ease; color: var(--text); }
 .tp-btn-toggle:hover, .toc-btn:hover { opacity: 1; }
-.tp-panel { position: fixed; bottom: 70px; right: 20px; z-index: 998; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius, 8px); padding: 0.6em; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: none; max-height: 50vh; overflow-y: auto; }
+.tp-panel { position: fixed; bottom: 70px; right: 20px; z-index: 998; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.6em; box-shadow: var(--shadow-md); display: none; max-height: 50vh; overflow-y: auto; }
 .tp-panel.open { display: block; }
 .tp-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; min-width: 180px; }
 .tp-item { display: flex; align-items: center; gap: 6px; padding: 0.4em 0.6em; border: 1px solid transparent; border-radius: 6px; background: none; cursor: pointer; font-size: 0.82rem; color: var(--text); text-align: left; transition: background 0.15s ease; }
-.tp-item:hover { background: rgba(0,0,0,0.04); }
+.tp-item:hover { background: color-mix(in srgb, var(--text) 6%, transparent); }
 .tp-item.active { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); font-weight: 600; }
-.tp-item::before { content: ''; width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; background: var(--tp-color); border: 1px solid rgba(0,0,0,0.1); }
+.tp-item::before { content: ''; width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; background: var(--tp-color); border: 1px solid var(--border); }
 .toc-btn { background: none; border: none; font-size: 1.1rem; cursor: pointer; padding: 0 2px; line-height: 1; opacity: 0.6; transition: opacity 0.2s ease; color: var(--text); }
 .toc-btn:hover { opacity: 1; }
-.toc-panel { position: fixed; bottom: 70px; right: 20px; z-index: 998; background: var(--bg); border: 1px solid #e2e8f0; border-radius: var(--radius, 8px); padding: 0.6em 0; box-shadow: 0 4px 12px rgba(0,0,0,0.08); max-height: 50vh; overflow-y: auto; display: none; min-width: 160px; }
+.toc-panel { position: fixed; bottom: 70px; right: 20px; z-index: 998; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.6em 0; box-shadow: var(--shadow-md); max-height: 50vh; overflow-y: auto; display: none; min-width: 160px; }
 .toc-panel.open { display: block; }
 .toc-list { list-style: none; margin: 0; padding: 0; }
-.toc-item { padding: 0.4em 1em; font-size: 0.82rem; cursor: pointer; color: #64748b; transition: color 0.15s ease, background 0.15s ease; }
-.toc-item:hover { background: rgba(0,0,0,0.03); color: var(--text); }
-.toc-item.active { color: var(--accent); font-weight: 600; background: rgba(0,0,0,0.02); }
+.toc-item { padding: 0.4em 1em; font-size: 0.82rem; cursor: pointer; color: var(--muted); transition: color 0.15s ease, background 0.15s ease; }
+.toc-item:hover { background: color-mix(in srgb, var(--text) 4%, transparent); color: var(--text); }
+.toc-item.active { color: var(--accent); font-weight: 600; background: color-mix(in srgb, var(--accent) 4%, transparent); }
 ```
 
 JS（在 PPT 运行时模板中整合）——主题选择器 + TOC 处理：

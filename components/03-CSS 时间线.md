@@ -6,15 +6,15 @@
 .timeline { position: relative; padding: 1em 0; margin: 1.5rem 0; }
 .timeline::before {
   content: ''; position: absolute; left: 18px; top: 0; bottom: 0;
-  width: 2px; background: #d0d0d0;
+  width: 2px; background: var(--border);
 }
 .tl-item { position: relative; padding: 0.6em 0 0.6em 3em; }
 .tl-dot {
   position: absolute; left: 10px; width: 18px; height: 18px; border-radius: 50%;
-  background: #c0392b; border: 3px solid #faf9f7; z-index: 1;
+  background: var(--accent); border: 3px solid var(--bg); z-index: 1;
 }
 .tl-dot.major { width: 22px; height: 22px; left: 8px; } /* 关键事件的强调圆点 */
-.tl-date { font-size: 0.8rem; font-weight: 700; color: #c0392b; }
+.tl-date { font-size: 0.8rem; font-weight: 700; color: var(--accent); }
 .tl-desc { font-size: 0.9rem; margin-top: 0.1em; }
 ```
 

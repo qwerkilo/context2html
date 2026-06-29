@@ -47,7 +47,7 @@ CSS：
 }
 .tab-btn:hover { background: rgba(0,0,0,0.03); }
 .tab-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.tab-btn[aria-selected="true"] { background: var(--accent); color: #fff; border-color: var(--accent); }
+.tab-btn[aria-selected="true"] { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
 .tab-content { flex: 1; padding: 1em 1.2em; background: var(--bg); }
 .tab-pane { display: none; }
 .tab-pane.active { display: block; animation: tabFadeIn var(--anim-dur, 0.3s) ease; }
