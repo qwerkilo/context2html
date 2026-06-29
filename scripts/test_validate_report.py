@@ -1,0 +1,251 @@
+import sys, os, importlib.util
+sys.path.insert(0, os.path.dirname(__file__))
+spec = importlib.util.spec_from_file_location("vr", os.path.join(os.path.dirname(__file__), "validate-report.py"))
+vr = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(vr)
+
+class TestReportSections:
+    def test_exec_summary_present(self):
+        assert not vr.check_exec_summary(
+            '<style>.exec-summary{}</style><div class="exec-summary"><p>Key findings</p></div>')
+    def test_exec_summary_missing(self):
+        assert len(vr.check_exec_summary('<div class="summary">no exec here</div>')) > 0
+    def test_exec_summary_empty(self):
+        assert len(vr.check_exec_summary('')) > 0
+
+    def test_report_chapters_one(self):
+        assert not vr.check_report_chapters(
+            '<div class="report-chapter"><h2>Chapter 1</h2></div>')
+    def test_report_chapters_multiple(self):
+        assert not vr.check_report_chapters(
+            '<div class="report-chapter">A</div><div class="report-chapter">B</div>')
+    def test_report_chapters_none(self):
+        assert len(vr.check_report_chapters(
+            '<div class="chapter">no report-chapter</div>')) > 0
+    def test_report_chapters_empty(self):
+        assert len(vr.check_report_chapters('')) > 0
+
+    def test_conclusion_page_present(self):
+        assert not vr.check_conclusion_page(
+            '<style>.conclusion-page{}</style><section class="conclusion-page"><p>Conclusion</p></section>')
+    def test_conclusion_page_missing(self):
+        assert len(vr.check_conclusion_page(
+            '<section class="results">no conclusion</section>')) > 0
+    def test_conclusion_page_empty(self):
+        assert len(vr.check_conclusion_page('')) > 0
+
+    def test_report_footer_present(self):
+        assert not vr.check_report_footer(
+            '<style>.report-footer{}</style><footer class="report-footer"><p>Footer</p></footer>')
+    def test_report_footer_missing(self):
+        assert len(vr.check_report_footer(
+            '<footer>no report-footer here</footer>')) > 0
+    def test_report_footer_empty(self):
+        assert len(vr.check_report_footer('')) > 0
+
+
+class TestBilingual:
+    def test_no_data_lang_skips(self):
+        assert not vr.check_bilingual('<html><p>no lang attributes</p></html>')
+    def test_zh_en_btn_key_passes(self):
+        assert not vr.check_bilingual(
+            '<html><span data-lang="zh">中</span><span data-lang="en">EN</span>'
+            '<button data-lang-btn></button>key==="l"</html>')
+    def test_missing_zh_fails(self):
+        assert len(vr.check_bilingual(
+            '<html><span data-lang="en">EN</span><button data-lang-btn></button>key==="l"</html>')) > 0
+    def test_missing_en_fails(self):
+        assert len(vr.check_bilingual(
+            '<html><span data-lang="zh">中</span><button data-lang-btn></button>key==="l"</html>')) > 0
+    def test_missing_toggle_fails(self):
+        assert len(vr.check_bilingual(
+            '<html><span data-lang="zh">中</span><span data-lang="en">EN</span>key==="l"</html>')) > 0
+    def test_missing_L_key_fails(self):
+        assert len(vr.check_bilingual(
+            '<html><span data-lang="zh">中</span><span data-lang="en">EN</span>'
+            '<button data-lang-btn></button></html>')) > 0
+    def test_no_data_lang_skips_even_with_toggle(self):
+        assert not vr.check_bilingual('<html><p>no bilingual at all</p></html>')
+    def test_single_lang_with_toggle_fails(self):
+        assert len(vr.check_bilingual(
+            '<html><span data-lang="zh">中</span><button data-lang-btn></button>key==="l"</html>')) > 0
+
+
+class TestThemeCSS:
+    def test_link_present_passes(self):
+        assert not vr.check_theme_css('<link href="theme/report-themes.css" rel="stylesheet">')
+    def test_missing_link_fails(self):
+        assert len(vr.check_theme_css('<link href="theme/other.css" rel="stylesheet">')) > 0
+    def test_CDN_link_flagged(self):
+        assert len(vr.check_theme_css(
+            '<link href="https://cdn.example.com/report-themes.css" rel="stylesheet">')) > 0
+    def test_multiple_refs_ok(self):
+        assert not vr.check_theme_css(
+            '<link href="theme/report-themes.css"><link href="theme/report-themes.css">')
+    def test_empty_html_fails(self):
+        assert len(vr.check_theme_css('')) > 0
+    def test_data_uri_not_link_fails(self):
+        assert len(vr.check_theme_css('<style>@import "data:text/css,..."</style>')) > 0
+    def test_relative_path_okay(self):
+        assert not vr.check_theme_css('<link href="../theme/report-themes.css" rel="stylesheet">')
+
+
+class TestSVG:
+    def test_no_svgs_passes(self, tmp_path):
+        assert not vr.check_svg_links('<html><p>no svg</p></html>', tmp_path)
+    def test_valid_svg_passes(self, tmp_path):
+        (tmp_path / "chart-ok.svg").write_text(
+            '<svg xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100"/></svg>')
+        assert not vr.check_svg_links(f'<html><img src="chart-ok.svg"/></html>', tmp_path)
+    def test_missing_svg_fails(self, tmp_path):
+        assert len(vr.check_svg_links('<html><img src="missing.svg"/></html>', tmp_path)) > 0
+    def test_invalid_xml_fails(self, tmp_path):
+        (tmp_path / "chart-bad.svg").write_text("not valid xml {{{")
+        assert len(vr.check_svg_links(f'<html><img src="chart-bad.svg"/></html>', tmp_path)) > 0
+    def test_mixed_valid_invalid_fails(self, tmp_path):
+        (tmp_path / "chart-ok.svg").write_text(
+            '<svg xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100"/></svg>')
+        assert len(vr.check_svg_links(
+            f'<html><img src="chart-ok.svg"/><img src="missing.svg"/></html>', tmp_path)) > 0
+    def test_multiple_valid_passes(self, tmp_path):
+        (tmp_path / "chart-ok.svg").write_text(
+            '<svg xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100"/></svg>')
+        assert not vr.check_svg_links(
+            f'<html><img src="chart-ok.svg"/><img src="chart-ok.svg"/></html>', tmp_path)
+
+
+class TestFocusVisible:
+    def test_present_in_style_passes(self):
+        assert not vr.check_focus_visible('<style>:focus-visible { outline: 2px solid red; }</style>')
+    def test_missing_fails(self):
+        assert len(vr.check_focus_visible('<style>body { color: red; }</style>')) > 0
+    def test_inline_style_passes(self):
+        assert not vr.check_focus_visible(
+            '<html style="--focus-visible: 1px solid"><style>:focus-visible{}</style></html>')
+    def test_empty_fails(self):
+        assert len(vr.check_focus_visible('')) > 0
+    def test_comment_still_passes(self):
+        assert not vr.check_focus_visible('<!-- :focus-visible is important -->')
+    def test_with_focus_visible_class_passes(self):
+        assert not vr.check_focus_visible(
+            '<style>.custom:focus-visible { outline: 3px solid blue; }</style>')
+
+
+class TestTabularNums:
+    def test_present_passes(self):
+        assert not vr.check_tabular_nums(
+            '<style>body { font-variant-numeric: tabular-nums; }</style>')
+    def test_missing_fails(self):
+        assert len(vr.check_tabular_nums('<style>body { color: red; }</style>')) > 0
+    def test_in_shorthand_passes(self):
+        assert not vr.check_tabular_nums(
+            '<style>body { font: 16px/1.5 sans-serif; font-variant-numeric: tabular-nums; }</style>')
+    def test_empty_fails(self):
+        assert len(vr.check_tabular_nums('')) > 0
+    def test_multiple_declarations_passes(self):
+        assert not vr.check_tabular_nums(
+            '<style>.a{font-variant-numeric:tabular-nums}.b{font-variant-numeric:normal}</style>')
+    def test_in_class_attr_passes(self):
+        assert not vr.check_tabular_nums('<div class="tabular-nums-values">123</div>')
+
+
+class TestSemanticHTML:
+    def test_article_passes(self):
+        assert not vr.check_semantic_html('<html><article></article></html>')
+    def test_section_passes(self):
+        assert not vr.check_semantic_html('<html><section></section></html>')
+    def test_nav_passes(self):
+        assert not vr.check_semantic_html('<html><nav></nav></html>')
+    def test_aside_passes(self):
+        assert not vr.check_semantic_html('<html><aside></aside></html>')
+    def test_main_passes(self):
+        assert not vr.check_semantic_html('<html><main></main></html>')
+    def test_none_fails(self):
+        assert len(vr.check_semantic_html('<html><div></div></html>')) > 0
+    def test_empty_fails(self):
+        assert len(vr.check_semantic_html('')) > 0
+    def test_multiple_nested_passes(self):
+        assert not vr.check_semantic_html(
+            '<html><nav><article><section></section></article></nav></html>')
+
+
+class TestH1Count:
+    def test_exactly_one_passes(self):
+        assert not vr.check_h1_count("<html><h1>Title</h1></html>")
+    def test_zero_fails(self):
+        assert len(vr.check_h1_count("<html></html>")) > 0
+    def test_two_fails(self):
+        assert len(vr.check_h1_count("<html><h1>A</h1><h1>B</h1></html>")) > 0
+    def test_bilingual_passes(self):
+        assert not vr.check_h1_count(
+            '<html><h1 data-lang="zh">标题</h1><h1 data-lang="en">Title</h1></html>')
+    def test_bilingual_mismatch_fails(self):
+        assert len(vr.check_h1_count(
+            '<html><h1 data-lang="zh">标题</h1><h1 data-lang="zh">第二标题</h1></html>')) > 0
+
+
+class TestRelativeLinks:
+    def test_relative_passes(self):
+        assert not vr.check_relative_links('<a href="0021-slug.html">link</a>')
+    def test_absolute_slash_fails(self):
+        assert len(vr.check_relative_links('<a href="/reports/x.html">link</a>')) > 0
+    def test_absolute_http_fails(self):
+        assert len(vr.check_relative_links(
+            '<a href="https://example.com/report.html">link</a>')) > 0
+    def test_no_html_links_passes(self):
+        assert not vr.check_relative_links('<a href="https://example.com">link</a>')
+    def test_same_dir_relative_passes(self):
+        assert not vr.check_relative_links('<a href="./sub/report.html">link</a>')
+
+
+class TestSVGContrast:
+    def test_no_svgs_passes(self, tmp_path):
+        assert not vr.check_svg_contrast('<html><p>hello</p></html>', tmp_path)
+    def test_safe_colors_passes(self, tmp_path):
+        (tmp_path / "safe.svg").write_text(
+            '<svg><rect fill="#333" width="100"/><text fill="#fff">white on dark</text></svg>')
+        assert not vr.check_svg_contrast(f'<html><img src="safe.svg"/></html>', tmp_path)
+    def test_light_fill_white_text_fails(self, tmp_path):
+        (tmp_path / "risky.svg").write_text(
+            '<svg><rect fill="#fef2f2" width="100"/><text fill="#fff">white on light</text></svg>')
+        assert len(vr.check_svg_contrast(f'<html><img src="risky.svg"/></html>', tmp_path)) > 0
+    def test_missing_file_no_crash(self, tmp_path):
+        assert not vr.check_svg_contrast('<html><img src="noexist.svg"/></html>', tmp_path)
+    def test_mixed_safe_risky_fails(self, tmp_path):
+        (tmp_path / "safe.svg").write_text(
+            '<svg><rect fill="#333" width="100"/><text fill="#fff">white on dark</text></svg>')
+        (tmp_path / "risky.svg").write_text(
+            '<svg><rect fill="#fef2f2" width="100"/><text fill="#fff">white on light</text></svg>')
+        assert len(vr.check_svg_contrast(
+            f'<html><img src="safe.svg"/><img src="risky.svg"/></html>', tmp_path)) > 0
+
+
+class TestLibDeps:
+    def test_no_echarts_three_js_passes(self):
+        assert not vr.check_lib_deps('<html><p>hello</p></html>', '.')
+    def test_echarts_CDN_passes(self):
+        assert not vr.check_lib_deps(
+            '<html><script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js">'
+            '</script>echarts.init()</html>', '.')
+    def test_echarts_local_passes(self):
+        assert not vr.check_lib_deps('<html>echarts.init()</html>', '.')
+    def test_three_js_CDN_passes(self):
+        assert not vr.check_lib_deps(
+            '<html><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">'
+            '</script>new THREE.Scene()</html>', '.')
+    def test_three_js_local_passes(self):
+        assert not vr.check_lib_deps('<html>new THREE.Scene()</html>', '.')
+    def test_echarts_no_lib_fails(self):
+        assert len(vr.check_lib_deps('<html>echarts.init()</html>', 'C:\\nonexistent')) > 0
+    def test_three_js_no_lib_fails(self):
+        assert len(vr.check_lib_deps('<html>new THREE.Scene()</html>', 'C:\\nonexistent')) > 0
+    def test_d3_CDN_passes(self):
+        assert not vr.check_lib_deps(
+            '<html><script src="https://d3js.org/d3.v7.min.js">'
+            '</script>d3.forceSimulation()</html>', '.')
+    def test_d3_no_lib_fails(self):
+        assert len(vr.check_lib_deps(
+            '<html>d3.select("body")</html>', 'C:\\nonexistent')) > 0
+    def test_echarts_GL_no_lib_fails(self):
+        assert len(vr.check_lib_deps(
+            '<html>type: "bar3D"</html>', 'C:\\nonexistent')) > 0

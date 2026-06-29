@@ -5,21 +5,11 @@ Write-Host ""
 $pass = 0
 $fail = 0
 
-# --- Unit tests ---
-Write-Host "--- Unit test: validate-lesson.py ---" -ForegroundColor Yellow
-$unitOut = & python scripts/test_validate.py 2>&1
+# --- Pytest unit tests ---
+Write-Host "--- Unit tests (pytest): validate-report + validate-lesson ---" -ForegroundColor Yellow
+$unitOut = & python -m pytest scripts/test_validate_report.py scripts/test_validate_lesson.py -v --tb=short 2>&1
 $unitLines = $unitOut -join "`n"
 Write-Host $unitLines
-if ($LASTEXITCODE -eq 0) {
-    $pass++
-} else {
-    $fail++
-}
-
-Write-Host "--- Unit test: validate-report.py ---" -ForegroundColor Yellow
-$rptUnitOut = & python scripts/test_validate-report.py 2>&1
-$rptUnitLines = $rptUnitOut -join "`n"
-Write-Host $rptUnitLines
 if ($LASTEXITCODE -eq 0) {
     $pass++
 } else {

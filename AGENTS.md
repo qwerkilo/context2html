@@ -17,8 +17,11 @@ SKILL.md is the sole workflow document — follow its 6 steps (input → plan �
 ## Commands
 
 ```bash
-# Full test suite (unit tests + HTML validation)
+# Full test suite (pytest unit tests + HTML validation)
 powershell -ExecutionPolicy Bypass -File scripts/run-tests.ps1
+
+# Run unit tests directly with pytest
+python -m pytest scripts/test_validate_report.py scripts/test_validate_lesson.py -v --tb=short
 
 # Validate a single report (required before delivery)
 python scripts/validate-report.py path/to/report.html
