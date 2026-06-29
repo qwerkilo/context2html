@@ -4,13 +4,13 @@
 
 **This is a sub-skill augmenting teach_more_pic.** Both must be loaded via `Skills:` in AGENTS.md. The 29 visual components (SVG/ECharts/Three.js/D3) are copied from teach_more_pic into `components/` — they live locally and can be edited here.
 
-SKILL.md is the sole workflow document — follow its 5 steps (input → plan → select → generate → validate → output) in order. References to validate your choices: `references/decision-guide.md` (component selector matrix + theme picker + CSS variable ref) and `references/page-types.md` (9 page-type templates with component pairing).
+SKILL.md is the sole workflow document — follow its 6 steps (input → plan → select → humanize → generate → validate → output) in order. The humanize step (Step 2.5) is mandatory and placed before HTML generation. References to validate your choices: `references/decision-guide.md` (component selector matrix + theme picker + CSS variable ref) and `references/page-types.md` (9 page-type templates with component pairing).
 
 ## Generation rules
 
 - **One visual component per 500 words minimum** — use `references/decision-guide.md` to pick.
 - **Bilingual always** — every content block must have `data-lang="zh"` + `data-lang="en"`. L key toggles.
-- **Humanize Chinese prose** — follow D1-D5 rules in SKILL.md (vary sentence length, rotate paragraph structure, reduce connectors, substitute terms).
+- **Humanize Chinese prose** — follow D1-D5 rules in SKILL.md (vary sentence length, rotate paragraph structure, reduce connectors, substitute terms). Execution is Step 2.5 with its own STOP checkpoint — not optional.
 - **Tags per chapter end** — tag group #17 at the end of every chapter.
 - **Theme** — choose from the 10-row table in `references/decision-guide.md` theme section. Set `<html data-theme="xxx">`.
 
