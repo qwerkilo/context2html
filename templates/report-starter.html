@@ -4,35 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>报告标题 - 调研报告</title>
-<!-- 完整 20 主题 CSS 由 theme/report-themes.css 提供（从 teach_more_pic DESIGN.md 自动生成）-->
-<!-- 替换为本项目根路径：../theme/report-themes.css；独立发报告时将内联 CSS 直接嵌入 -->
-<link rel="stylesheet" href="../theme/report-themes.css">
 <style>
-/* ===== CSS 变量与主题（最小回退，完整主题在上方 <link>） ===== */
+/* ===== CSS 变量基线（非主题变量） ===== */
 :root {
-  --bg: #faf9f7; --text: #1a1a1a; --accent: #c0392b;
-  --accent-text: #ffffff;
-  --accent-soft: rgba(192,57,43,0.12); --accent-muted: rgba(192,57,43,0.4);
-  --surface: #f5f0eb; --border: #ddd8d0;
-  --surface-raised: #ece6dd; --muted: #888;
-  --link: #c0392b; --success: #16a34a; --warning: #d97706; --error: #dc2626;
   --font: "Noto Serif CJK SC",Georgia,"Times New Roman",serif;
   --font-h: "Noto Serif CJK SC",Georgia,"Times New Roman",serif;
   --lh: 1.8; --h1-size: 2rem; --h2-size: 1.3rem;
   --body-size: 1rem; --small-size: 0.85rem;
   --radius: 8px; --anim-dur: 0.3s; --anim-y: 18px;
-  --h2-border: 2px solid #ddd;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
-  --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
-  --chart-1: #c0392b; --chart-2: #e67e22; --chart-3: #2980b9; --chart-4: #27ae60;
-  --tag-bg: rgba(192,57,43,0.1); --tag-text: #c0392b;
-  --table-stripe: rgba(0,0,0,0.04); --table-header-bg: rgba(192,57,43,0.08);
-  --blockquote-border: 4px solid #c0392b; --blockquote-bg: rgba(192,57,43,0.06);
-  --code-bg: #f5f0eb; --code-text: #c0392b;
-  --section-gap: 4rem; --toc-accent: #c0392b;
 }
-/* 品牌主题由 theme/report-themes.css 覆盖 — 运行 scripts/generate-theme-css.py 从 DESIGN.md 重新生成 */
+/* 主题变量（--bg, --accent, 等）由 theme/report-themes.css 的 [data-theme="xxx"] 提供 */
+/* · 运行 scripts/generate-theme-css.py 从 teach_more_pic 的 DESIGN.md 重新生成 */
+/* · 独立发报告时可将 report-themes.css 内联到此位置 */
 
 /* ===== 正文排版 ===== */
 body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: var(--lh); max-width: 720px; margin: 0 auto; padding: 0 1.5rem; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }
@@ -287,6 +270,8 @@ body, body * { transition: background-color 0.35s ease-out, color 0.35s ease-out
   h1 { font-size: 1.5rem; }
 }
 </style>
+<!-- 完整 20 主题 CSS（在 <style> 之后加载以确保优先级） -->
+<link rel="stylesheet" href="../theme/report-themes.css">
 </head>
 <body>
 
