@@ -1,0 +1,336 @@
+[
+  {
+    "name": "warm",
+    "accent": "#c0392b",
+    "bg": "#faf9f7",
+    "text": "#1a1a1a",
+    "font": "Noto Serif CJK SC, Georgia, serif",
+    "chart_colors": [
+      "#c0392b",
+      "#e67e22",
+      "#2980b9",
+      "#27ae60"
+    ],
+    "radius": "8px",
+    "has_dark_bg": false
+  },
+  {
+    "name": "airbnb",
+    "accent": "#ff385c",
+    "accent_text": "#ffffff",
+    "bg": "#ffffff",
+    "text": "#222222",
+    "font": "'Airbnb Cereal VF', Circular, sans-serif",
+    "font_h": "'Airbnb Cereal VF', Circular, -apple-system, system-ui, Roboto, 'Helvetica Neue', sans-serif",
+    "chart_colors": [
+      "rgb(255,26,62)",
+      "rgb(215,96,132)",
+      "rgb(255,26,62)",
+      "rgb(215,96,132)"
+    ],
+    "radius": "14px",
+    "has_dark_bg": false
+  },
+  {
+    "name": "airtable",
+    "accent": "#181d26",
+    "accent_text": "#ffffff",
+    "bg": "#ffffff",
+    "text": "#181d26",
+    "font": "Haas, sans-serif",
+    "font_h": "Haas Groot Disp, Haas, sans-serif",
+    "chart_colors": [
+      "rgb(74,0,8)",
+      "rgb(0,69,78)",
+      "rgb(74,0,8)",
+      "rgb(0,69,78)"
+    ],
+    "radius": "10px",
+    "has_dark_bg": false
+  },
+  {
+    "name": "apple",
+    "accent": "#0066cc",
+    "accent_text": "#ffffff",
+    "bg": "#ffffff",
+    "text": "#1d1d1f",
+    "font": "SF Pro Text, system-ui, -apple-system, sans-serif",
+    "font_h": "SF Pro Display, system-ui, -apple-system, sans-serif",
+    "chart_colors": [
+      "rgb(50,72,174)",
+      "rgb(0,142,244)",
+      "rgb(50,72,174)",
+      "rgb(0,142,244)"
+    ],
+    "radius": "11px",
+    "has_dark_bg": false
+  },
+  {
+    "name": "binance",
+    "accent": "#fcd535",
+    "accent_text": "#181a20",
+    "bg": "#ffffff",
+    "text": "#181a20",
+    "font": "BinanceNova, sans-serif",
+    "font_h": "BinanceNova, sans-serif",
+    "chart_colors": [
+      "rgb(255,183,23)",
+      "rgb(212,253,93)",
+      "rgb(255,183,23)",
+      "rgb(212,253,93)"
+    ],
+    "radius": "6px",
+    "has_dark_bg": false
+  },
+  {
+    "name": "bmw-m",
+    "accent": "#ffffff",
+    "accent_text": "#000000",
+    "bg": "#000000",
+    "text": "#ffffff",
+    "font": "BMWTypeNextLatin Light, BMWTypeNextLatin, sans-serif",
+    "font_h": "BMWTypeNextLatin, sans-serif",
+    "chart_colors": [
+      "rgb(255,225,225)",
+      "rgb(215,255,255)",
+      "rgb(255,225,225)",
+      "rgb(215,255,255)"
+    ],
+    "radius": "6px",
+    "has_dark_bg": true
+  },
+  {
+    "name": "claude",
+    "accent": "#cc785c",
+    "accent_text": "#ffffff",
+    "bg": "#faf9f5",
+    "text": "#141413",
+    "font": "StyreneB, Inter, sans-serif",
+    "font_h": "Copernicus, Tiempos Headline, serif",
+    "chart_colors": [
+      "rgb(254,90,62)",
+      "rgb(164,160,132)",
+      "rgb(254,90,62)",
+      "rgb(164,160,132)"
+    ],
+    "radius": "8px",
+    "has_dark_bg": false
+  },
+  {
+    "name": "cursor",
+    "accent": "#f54e00",
+    "accent_text": "#ffffff",
+    "bg": "#f7f7f4",
+    "text": "#26251e",
+    "font": "'CursorGothic', sans-serif",
+    "font_h": "'CursorGothic', sans-serif",
+    "chart_colors": [
+      "rgb(255,48,0)",
+      "rgb(205,118,40)",
+      "rgb(255,48,0)",
+      "rgb(205,118,40)"
+    ],
+    "radius": "8px",
+    "has_dark_bg": false
+  },
+  {
+    "name": "dell-1996",
+    "accent": "#e91d2a",
+    "accent_text": "#ffffff",
+    "bg": "#ffffff",
+    "text": "#000000",
+    "font": "Times New Roman",
+    "font_h": "",
+    "chart_colors": [
+      "rgb(255,0,12)",
+      "rgb(193,69,82)",
+      "rgb(255,0,12)",
+      "rgb(193,69,82)"
+    ],
+    "radius": "8px",
+    "has_dark_bg": false
+  },
+  {
+    "name": "figma",
+    "accent": "#000000",
+    "accent_text": "#ffffff",
+    "bg": "#ffffff",
+    "text": "#000000",
+    "font": "figmaSans",
+    "font_h": "figmaSans",
+    "chart_colors": [
+      "#ff3d8b",
+      "#dceeb1",
+      "#c5b0f4",
+      "#f4ecd6"
+    ],
+    "radius": "8px",
+    "has_dark_bg": false
+  },
+  {
+    "name": "hp",
+    "accent": "#024ad8",
+    "accent_text": "#ffffff",
+    "bg": "#ffffff",
+    "text": "#1a1a1a",
+    "font": "Forma DJR Micro",
+    "font_h": "Forma DJR Micro",
+    "chart_colors": [
+      "rgb(52,44,186)",
+      "rgb(0,114,255)",
+      "rgb(52,44,186)",
+      "rgb(0,114,255)"
+    ],
+    "radius": "4px",
+    "has_dark_bg": false
+  },
+  {
+    "name": "ibm",
+    "accent": "#0f62fe",
+    "accent_text": "#ffffff",
+    "bg": "#ffffff",
+    "text": "#161616",
+    "font": "IBM Plex Sans",
+    "font_h": "IBM Plex Sans",
+    "chart_colors": [
+      "rgb(65,68,224)",
+      "rgb(0,138,255)",
+      "rgb(65,68,224)",
+      "rgb(0,138,255)"
+    ],
+    "radius": "6px",
+    "has_dark_bg": false
+  },
+  {
+    "name": "minimax",
+    "accent": "#0a0a0a",
+    "accent_text": "#ffffff",
+    "bg": "#ffffff",
+    "text": "#0a0a0a",
+    "font": "DM Sans",
+    "font_h": "DM Sans",
+    "chart_colors": [
+      "rgb(60,0,0)",
+      "rgb(0,50,50)",
+      "rgb(60,0,0)",
+      "rgb(0,50,50)"
+    ],
+    "radius": "8px",
+    "has_dark_bg": false
+  },
+  {
+    "name": "nike",
+    "accent": "#111111",
+    "accent_text": "#ffffff",
+    "bg": "#ffffff",
+    "text": "#111111",
+    "font": "Helvetica Now Text",
+    "font_h": "",
+    "chart_colors": [
+      "#d6d1ff",
+      "rgb(67,0,0)",
+      "rgb(0,57,57)",
+      "#d6d1ff"
+    ],
+    "radius": "24px",
+    "has_dark_bg": false
+  },
+  {
+    "name": "notion",
+    "accent": "#5645d4",
+    "accent_text": "#ffffff",
+    "bg": "#ffffff",
+    "text": "#1a1a1a",
+    "font": "Notion Sans",
+    "font_h": "Notion Sans",
+    "chart_colors": [
+      "rgb(136,39,182)",
+      "rgb(46,109,252)",
+      "rgb(136,39,182)",
+      "rgb(46,109,252)"
+    ],
+    "radius": "8px",
+    "has_dark_bg": false
+  },
+  {
+    "name": "nvidia",
+    "accent": "#76b900",
+    "accent_text": "#000000",
+    "bg": "#ffffff",
+    "text": "#000000",
+    "font": "NVIDIA-EMEA",
+    "font_h": "NVIDIA-EMEA",
+    "chart_colors": [
+      "#952fc6",
+      "#feeeb2",
+      "#bff230",
+      "#f9d4ff"
+    ],
+    "radius": "2px",
+    "has_dark_bg": false
+  },
+  {
+    "name": "spotify",
+    "accent": "#1ed760",
+    "bg": "#121212",
+    "text": "#ffffff",
+    "font": "\"SpotifyMixUI\",sans-serif",
+    "chart_colors": [
+      "#1ed760",
+      "#ffa42b",
+      "#f3727f",
+      "#b3b3b3"
+    ],
+    "radius": "8px",
+    "has_dark_bg": true
+  },
+  {
+    "name": "tesla",
+    "accent": "#3e6ae1",
+    "bg": "#ffffff",
+    "text": "#171a20",
+    "font": "\"Universal Sans Text\",sans-serif",
+    "chart_colors": [
+      "#3e6ae1",
+      "#16a34a",
+      "#e82127",
+      "#f4f4f4"
+    ],
+    "radius": "4px",
+    "has_dark_bg": false
+  },
+  {
+    "name": "x.ai",
+    "accent": "#ffffff",
+    "accent_text": "#0a0a0a",
+    "bg": "#0a0a0a",
+    "text": "#ffffff",
+    "font": "universalSans, Inter, system-ui, sans-serif",
+    "font_h": "universalSans, Inter, system-ui, -apple-system, sans-serif",
+    "chart_colors": [
+      "#ff7a17",
+      "#7c3aed",
+      "#a0c3ec",
+      "#c4b5fd"
+    ],
+    "radius": "8px",
+    "has_dark_bg": true
+  },
+  {
+    "name": "zapier",
+    "accent": "#ff4f00",
+    "accent_text": "#fffefb",
+    "bg": "#fffefb",
+    "text": "#201515",
+    "font": "Inter, system-ui, sans-serif",
+    "font_h": "Degular Display, Inter, system-ui, -apple-system, sans-serif",
+    "chart_colors": [
+      "rgb(255,49,0)",
+      "rgb(215,119,40)",
+      "rgb(255,49,0)",
+      "rgb(215,119,40)"
+    ],
+    "radius": "12px",
+    "has_dark_bg": false
+  }
+]

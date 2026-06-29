@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>交互式时间线 - 组件示例</title>
+<link rel="stylesheet" href="../libs/magicui-effects.css">
+<style>
+:root { --bg: #faf9f7; --text: #1a1a1a; --accent: #c0392b; --radius: 8px; --anim-dur: 0.35s; }
+body { font-family: "Noto Serif CJK SC", Georgia, serif; background: var(--bg); color: var(--text); line-height: 1.8; max-width: 720px; margin: 3rem auto; padding: 0 1.5rem; }
+h1 { font-size: 1.6rem; border-bottom: 1px solid #ddd; padding-bottom: 0.5em; }
+
+.tl-interactive { position: relative; margin: 1.5rem 0; }
+.tl-interactive::before { content: ''; position: absolute; left: 18px; top: 8px; bottom: 8px; width: 2px; background: #d0d0d0; }
+.tli-item { position: relative; }
+.tli-dot { display: flex; align-items: center; gap: 0.6em; width: 100%; padding: 0.6em 0 0.6em 3em; border: none; background: none; text-align: left; cursor: pointer; color: var(--text); font-family: inherit; font-size: inherit; }
+.tli-dot::before { content: ''; position: absolute; left: 10px; top: 0.6em; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); border: 3px solid var(--bg); z-index: 1; transition: box-shadow var(--anim-dur) ease; }
+.tli-dot:hover::before { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+.tli-dot:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.tli-date { font-size: 0.8rem; font-weight: 700; color: var(--accent); white-space: nowrap; min-width: 3.5em; }
+.tli-title { flex: 1; font-size: 0.92rem; font-weight: 500; }
+.tli-icon { font-size: 1.1rem; color: var(--accent); font-weight: 300; margin-right: 0.3em; transition: transform var(--anim-dur) ease; }
+.tli-item[data-expanded="true"] .tli-icon { transform: rotate(45deg); }
+.tli-content { overflow: hidden; transition: height var(--anim-dur) ease-out; }
+.tli-item[data-expanded="false"] .tli-content { height: 0; }
+.tli-item[data-expanded="true"] .tli-content { height: auto; }
+.tli-inner { padding: 0.2em 0 1em 3em; font-size: 0.92rem; }
+</style>
+</head>
+<body class="grid-bg">
+
+<h1 class="shiny-text">交互式时间线 — 组件示例</h1>
+
+<p>点击时间线上的圆点或标题展开事件详情。默认全部折叠。</p>
+
+<div class="tl-interactive">
+  <div class="tli-item" data-expanded="false">
+    <button class="tli-dot" aria-expanded="false">
+      <span class="tli-date">2007</span>
+      <span class="tli-title">次贷危机萌芽</span>
+      <span class="tli-icon">+</span>
+    </button>
+    <div class="tli-content">
+      <div class="tli-inner">
+        <p>美国住房价格见顶后开始回落。此前几年（2001-2006）的房地产泡沫中，银行大量发放次级抵押贷款给信用记录较差的借款人。2007 年初，多家次贷机构开始报告违约率上升。</p>
+      </div>
+    </div>
+  </div>
+  <div class="tli-item" data-expanded="false">
+    <button class="tli-dot" aria-expanded="false">
+      <span class="tli-date">2008.03</span>
+      <span class="tli-title">贝尔斯登被收购</span>
+      <span class="tli-icon">+</span>
+    </button>
+    <div class="tli-content">
+      <div class="tli-inner">
+        <p>美国第五大投资银行贝尔斯登因流动性危机被摩根大通以每股 2 美元的价格收购（后提高至 10 美元）。美联储提供了 290 亿美元融资担保。这是危机中第一家倒下的主要投行。</p>
+      </div>
+    </div>
+  </div>
+  <div class="tli-item" data-expanded="false">
+    <button class="tli-dot" aria-expanded="false">
+      <span class="tli-date">2008.09</span>
+      <span class="tli-title">雷曼兄弟破产</span>
+      <span class="tli-icon">+</span>
+    </button>
+    <div class="tli-content">
+      <div class="tli-inner">
+        <p>美国第四大投行雷曼兄弟申请破产保护，这是美国历史上最大的破产案（资产 6390 亿美元）。与贝尔斯登不同，政府未出手救助雷曼，市场信心彻底崩溃，全球信贷市场冻结。</p>
+      </div>
+    </div>
+  </div>
+  <div class="tli-item" data-expanded="false">
+    <button class="tli-dot" aria-expanded="false">
+      <span class="tli-date">2008.10</span>
+      <span class="tli-title">TARP 救助计划</span>
+      <span class="tli-icon">+</span>
+    </button>
+    <div class="tli-content">
+      <div class="tli-inner">
+        <p>美国国会批准 7000 亿美元的问题资产救助计划（TARP），授权财政部购买和担保金融机构的问题资产。同时美联储开始降息至接近零利率，并启动量化宽松（QE）。</p>
+      </div>
+    </div>
+  </div>
+  <div class="tli-item" data-expanded="false">
+    <button class="tli-dot" aria-expanded="false">
+      <span class="tli-date">2009</span>
+      <span class="tli-title">全球经济衰退触底</span>
+      <span class="tli-icon">+</span>
+    </button>
+    <div class="tli-content">
+      <div class="tli-inner">
+        <p>全球 GDP 在 2009 年萎缩 0.1%，为二战以来首次负增长。但大规模的财政刺激和货币宽松开始见效。中国 4 万亿刺激计划对全球经济复苏起到了关键作用。危机最严重的时刻已过。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  document.querySelectorAll('.tli-dot').forEach(function(b) {
+    b.addEventListener('click', function() {
+      var i = this.closest('.tli-item');
+      var c = i.querySelector('.tli-content');
+      var o = i.dataset.expanded === 'true';
+      if (o) {
+        c.style.height = c.scrollHeight + 'px';
+        requestAnimationFrame(function() { c.style.height = '0px'; });
+        i.dataset.expanded = 'false';
+        this.setAttribute('aria-expanded', 'false');
+      } else {
+        c.style.height = '0px';
+        requestAnimationFrame(function() { c.style.height = c.scrollHeight + 'px'; });
+        i.dataset.expanded = 'true';
+        this.setAttribute('aria-expanded', 'true');
+        c.addEventListener('transitionend', function handler() {
+          c.removeEventListener('transitionend', handler);
+          c.style.height = 'auto';
+        });
+      }
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Three.js 3D — WebGPU + TSL 示例</title>
+<link rel="stylesheet" href="../libs/magicui-effects.css">
+<link rel="preload" href="https://cdn.jsdelivr.net/npm/three@0.185.0/build/three.module.js" as="script" crossorigin>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.185.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.0/examples/jsm/"
+  }
+}
+</script>
+<style>
+:root { --bg: #faf9f7; --text: #1a1a1a; --accent: #c0392b; --surface: #f5f0eb; --radius: 8px; }
+body { font-family: "Noto Serif CJK SC",Georgia,serif; background: var(--bg); color: var(--text); max-width: 800px; margin: 0 auto; padding: 2rem; }
+h1 { text-wrap: pretty; border-bottom: 2px solid var(--accent); padding-bottom: 0.5em; }
+.chart-box { background: var(--surface); border-radius: var(--radius); margin: 1rem 0; padding: 8px; position: relative; }
+.chart-box canvas { display: block; }
+.error-msg { display: none; padding: 2rem; text-align: center; color: #dc2626; background: #fef2f2; border-radius: var(--radius); }
+</style>
+</head>
+<body>
+<div class="noise-overlay"><svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><filter id="t-noise2"><feTurbulence type="fractalNoise" baseFrequency="0.4" numOctaves="6" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncR type="linear" slope="0.15"/><feFuncG type="linear" slope="0.15"/><feFuncB type="linear" slope="0.15"/></feComponentTransfer></filter><rect width="100%" height="100%" filter="url(#t-noise2)" opacity="1"/></svg></div>
+
+<h1 class="shiny-text">Three.js 3D — WebGPU + TSL</h1>
+<p>GDP 对比 · 优先 WebGPU，回退 WebGL</p>
+<div class="chart-box" id="chart-box"><div id="three-container" style="width:100%;height:400px;"></div></div>
+<div class="error-msg" id="error-msg"><p>⚠ WebGPU 不可用。使用 WebGL 渲染。</p></div>
+
+<script type="module">
+var container = document.getElementById('three-container');
+if(!container) throw new Error('no container');
+
+var hasWebGPU = typeof navigator !== 'undefined' && navigator.gpu;
+
+import * as THREE from 'three';
+
+var loadWebGPU = hasWebGPU
+  ? import('three/addons/renderers/webgpu/WebGPURenderer.js').then(function(m){ return m.WebGPURenderer; }).catch(function(){ return null; })
+  : Promise.resolve(null);
+
+loadWebGPU.then(function(WebGPURenderer){
+  var w = container.clientWidth, h = container.clientHeight;
+  var scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xf5f0eb);
+
+  var camera = new THREE.PerspectiveCamera(45, w / h, 0.1, 100);
+  camera.position.set(5, 4, 8);
+  camera.lookAt(0, 0, 0);
+
+  var renderer;
+  if(WebGPURenderer && hasWebGPU){
+    renderer = new WebGPURenderer({ antialias: true });
+  } else {
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    if(!hasWebGPU) document.getElementById('error-msg').style.display = 'block';
+  }
+  renderer.setSize(w, h);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  container.appendChild(renderer.domElement);
+
+  var labels = ['美国','中国','日本','德国','英国'];
+  var data = [3.2, 5.1, 2.8, 4.5, 3.9];
+  var colors = [0xc0392b, 0xe67e22, 0x2ecc71, 0x3498db, 0x9b59b6];
+  var barGroup = new THREE.Group();
+
+  for(var i = 0; i < data.length; i++){
+    var bar = new THREE.Mesh(
+      new THREE.BoxGeometry(0.6, data[i], 0.6),
+      new THREE.MeshLambertMaterial({ color: colors[i] })
+    );
+    bar.position.set((i - 2) * 1.2, data[i] / 2, 0);
+    bar.userData = { label: labels[i], value: data[i] };
+    barGroup.add(bar);
+
+    var canvas = document.createElement('canvas');
+    canvas.width = 256; canvas.height = 64;
+    var ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#1a1a1a';
+    ctx.font = 'bold 28px "Noto Serif CJK SC",Georgia,serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(labels[i], 128, 28);
+    ctx.fillStyle = '#555';
+    ctx.font = '20px "Noto Serif CJK SC",Georgia,serif';
+    ctx.fillText(data[i].toFixed(1), 128, 52);
+    var tex = new THREE.CanvasTexture(canvas);
+    tex.needsUpdate = true;
+    var sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false }));
+    sprite.position.set((i - 2) * 1.2, data[i] + 0.5, 0);
+    sprite.scale.set(1.8, 0.45, 1);
+    barGroup.add(sprite);
+  }
+
+  var floor = new THREE.Mesh(
+    new THREE.PlaneGeometry(8, 3),
+    new THREE.MeshLambertMaterial({ color: 0xddd8d0, side: THREE.DoubleSide })
+  );
+  floor.rotation.x = -Math.PI / 2;
+  floor.position.y = -0.05;
+  barGroup.add(floor);
+  scene.add(barGroup);
+
+  var light = new THREE.DirectionalLight(0xffffff, 1);
+  light.position.set(5, 10, 7);
+  scene.add(light);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+
+  // TSL 适用场景：自定义着色器效果（辉光、粒子、后处理等）
+  // 使用方式：import { Fn, uniform, time, color } from 'three/tsl';
+  // TSL 节点可取代材质中的固定着色器代码，实现可编程视觉效果
+
+  var tooltip = document.createElement('div');
+  tooltip.style.cssText = 'position:fixed;background:rgba(0,0,0,0.85);color:#fff;padding:4px 10px;border-radius:6px;font-size:0.85rem;pointer-events:none;z-index:999;opacity:0;transition:opacity 0.15s ease;font-family:inherit;';
+  document.body.appendChild(tooltip);
+
+  var raycaster = new THREE.Raycaster();
+  var mouse = new THREE.Vector2();
+  var hoverBar = null;
+
+  renderer.domElement.addEventListener('mousemove', function(e){
+    var rect = renderer.domElement.getBoundingClientRect();
+    mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+    raycaster.setFromCamera(mouse, camera);
+    var intersects = raycaster.intersectObjects(barGroup.children);
+    if(intersects.length > 0){
+      var obj = intersects[0].object;
+      if(obj.userData && obj.userData.label){
+        tooltip.textContent = obj.userData.label + ': ' + obj.userData.value.toFixed(1);
+        tooltip.style.left = (e.clientX + 12) + 'px';
+        tooltip.style.top = (e.clientY - 8) + 'px';
+        tooltip.style.opacity = '1';
+        hoverBar = obj;
+        obj.material.emissive = obj.material.color;
+        obj.material.emissiveIntensity = 0.3;
+        renderer.domElement.style.cursor = 'pointer';
+      }
+    } else {
+      tooltip.style.opacity = '0';
+      if(hoverBar){ hoverBar.material.emissiveIntensity = 0; hoverBar = null; }
+      renderer.domElement.style.cursor = 'default';
+    }
+  });
+
+  function animate(){ requestAnimationFrame(animate); barGroup.rotation.y += 0.003; renderer.render(scene, camera); }
+  animate();
+
+  window.addEventListener('resize', function(){
+    camera.aspect = container.clientWidth / container.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(container.clientWidth, container.clientHeight);
+  });
+});
+</script>
+</body>
+</html>

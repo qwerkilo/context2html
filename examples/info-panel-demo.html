@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>信息面板/侧边栏 - 组件示例</title>
+<link rel="stylesheet" href="../libs/magicui-effects.css">
+<style>
+:root { --bg: #faf9f7; --text: #1a1a1a; --accent: #c0392b; --radius: 8px; --anim-dur: 0.3s; }
+body { font-family: "Noto Serif CJK SC", Georgia, serif; background: var(--bg); color: var(--text); line-height: 1.8; max-width: 720px; margin: 3rem auto; padding: 0 1.5rem; }
+h1 { font-size: 1.6rem; border-bottom: 1px solid #ddd; padding-bottom: 0.5em; }
+
+.ip-btn { display: inline; padding: 0.1em 0.4em; border: 1px dashed var(--accent); border-radius: 4px; background: transparent; color: var(--accent); cursor: pointer; font-size: inherit; font-family: inherit; transition: background var(--anim-dur) ease; }
+.ip-btn:hover { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+
+.info-panel { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1000; visibility: hidden; }
+.info-panel.open { visibility: visible; }
+.ip-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); opacity: 0; transition: opacity 0.3s ease; }
+.info-panel.open .ip-overlay { opacity: 1; }
+.ip-drawer { position: absolute; top: 0; right: 0; width: 380px; max-width: 90vw; height: 100%; background: var(--bg); box-shadow: -4px 0 20px rgba(0,0,0,0.1); transform: translateX(100%); transition: transform 0.3s ease; overflow-y: auto; }
+.info-panel.open .ip-drawer { transform: translateX(0); }
+.ip-header { display: flex; align-items: center; justify-content: space-between; padding: 1em 1.2em; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; background: var(--bg); z-index: 1; }
+.ip-header h4 { margin: 0; font-size: 1rem; }
+.ip-close { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: #94a3b8; padding: 0.2em; line-height: 1; }
+.ip-close:hover { color: var(--text); }
+.ip-body { padding: 1.2em; }
+</style>
+</head>
+<body>
+
+<h1 class="shiny-text">信息面板/侧边栏 — 组件示例</h1>
+
+<p>点击下方的按钮打开信息面板，查看补充内容。按 ESC 或点击遮罩层关闭。</p>
+
+<p>2008 年金融危机中，雷曼兄弟的破产是最具标志性的事件。<button class="ip-btn glare-hover" data-panel="lehman">📖 雷曼兄弟</button>这家拥有 158 年历史的投行倒闭后，全球信贷市场瞬间冻结。</p>
+
+<p>美国政府的应对措施包括 TARP 救助计划和量化宽松政策。<button class="ip-btn glare-hover" data-panel="qe">📖 量化宽松</button>这些非常规货币政策为后来的危机应对提供了重要参考。</p>
+
+<!-- 面板 1 -->
+<div class="info-panel" id="panel-lehman">
+  <div class="ip-overlay"></div>
+  <div class="ip-drawer">
+    <div class="ip-header">
+      <h4>雷曼兄弟（Lehman Brothers）</h4>
+      <button class="ip-close"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 5l10 10M15 5l-10 10"/></svg></button>
+    </div>
+    <div class="ip-body">
+      <p>雷曼兄弟成立于 1850 年，是美国第四大投资银行。2008 年 9 月 15 日申请破产保护，资产规模 6390 亿美元，为美国历史上最大破产案。</p>
+      <p>与之前被救助的贝尔斯登和之后被救助的 AIG 不同，美国政府决定不出手救助雷曼。这一决定至今仍备受争议——支持者认为这是防止道德风险的必要之举，反对者认为它加剧了危机的蔓延。</p>
+      <p>雷曼的破产直接导致了货币市场基金的"跌破面值"事件，引发全球信贷市场冻结，标志着金融危机从华尔街蔓延至全球实体经济。</p>
+    </div>
+  </div>
+</div>
+
+<!-- 面板 2 -->
+<div class="info-panel" id="panel-qe">
+  <div class="ip-overlay"></div>
+  <div class="ip-drawer">
+    <div class="ip-header">
+      <h4>量化宽松（Quantitative Easing）</h4>
+      <button class="ip-close"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 5l10 10M15 5l-10 10"/></svg></button>
+    </div>
+    <div class="ip-body">
+      <p>量化宽松（QE）是中央银行在政策利率已降至接近零后，通过购买政府债券和其他金融资产来向经济注入流动性的非常规货币政策工具。</p>
+      <p>美联储在 2008 年金融危机后启动了三轮 QE：</p>
+      <ul>
+        <li><strong>QE1</strong>（2008.11）：购买 1.25 万亿美元 MBS 和 1750 亿美元机构债</li>
+        <li><strong>QE2</strong>（2010.11）：购买 6000 亿美元国债</li>
+        <li><strong>QE3</strong>（2012.09）：每月购买 400 亿美元 MBS，后扩大至 850 亿美元</li>
+      </ul>
+      <p>到 2014 年 QE 结束时，美联储资产负债表从 9000 亿美元膨胀至 4.5 万亿美元。</p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  document.querySelectorAll('.ip-btn').forEach(function(b) {
+    b.addEventListener('click', function() {
+      var p = document.getElementById('panel-' + this.dataset.panel);
+      if (p) { p.classList.add('open'); document.body.style.overflow = 'hidden'; }
+    });
+  });
+  document.querySelectorAll('.ip-close, .ip-overlay').forEach(function(e) {
+    e.addEventListener('click', function() {
+      var p = this.closest('.info-panel');
+      p.classList.remove('open'); document.body.style.overflow = '';
+    });
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.info-panel.open').forEach(function(p) {
+        p.classList.remove('open'); document.body.style.overflow = '';
+      });
+    }
+  });
+})();
+</script>
+</body>
+</html>

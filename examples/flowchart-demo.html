@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SVG 流程图 - 组件示例</title>
+<link rel="stylesheet" href="../libs/magicui-effects.css">
+<style>
+:root { --bg: #faf9f7; --text: #1a1a1a; --accent: #c0392b; --radius: 8px; }
+body { font-family: "Noto Serif CJK SC", Georgia, serif; background: var(--bg); color: var(--text); line-height: 1.8; max-width: 720px; margin: 3rem auto; padding: 0 1.5rem; }
+h1 { font-size: 1.6rem; border-bottom: 1px solid #ddd; padding-bottom: 0.5em; }
+p { color: #555; }
+</style>
+</head>
+<body>
+
+<h1 class="shiny-text">SVG 流程图 — 组件示例</h1>
+
+<p>四色语义流程图展示金融危机传导路径：蓝色=正常状态，橙色=触发事件，红色=崩溃节点，绿色=救助措施。</p>
+
+<figure class="svg-fig">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 420" width="720" height="420">
+  <defs>
+    <filter id="s"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.1"/></filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0L10,5L0,10Z" fill="#94a3b8"/></marker>
+    <marker id="arrow-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0L10,5L0,10Z" fill="#dc2626"/></marker>
+  </defs>
+  <style>text{font-family:"Noto Sans CJK SC","PingFang SC","Microsoft YaHei",sans-serif;}</style>
+  <rect width="720" height="420" fill="#faf9f7" rx="12"/>
+
+  <g filter="url(#s)">
+    <rect x="60" y="30" width="180" height="60" rx="8" fill="#2563eb"/>
+    <text x="150" y="55" text-anchor="middle" fill="#fff" font-size="14" font-weight="600">房贷正常发放</text>
+    <text x="150" y="72" text-anchor="middle" fill="#dbeafe" font-size="11">低利率+宽松信贷</text>
+  </g>
+
+  <line x1="240" y1="60" x2="330" y2="60" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="5,3"/>
+
+  <g filter="url(#s)">
+    <rect x="340" y="30" width="200" height="60" rx="8" fill="#d97706"/>
+    <text x="440" y="55" text-anchor="middle" fill="#fff" font-size="14" font-weight="600">次级债大规模发放</text>
+    <text x="440" y="72" text-anchor="middle" fill="#fef3c7" font-size="11">零首付+浮动利率</text>
+  </g>
+
+  <line x1="540" y1="60" x2="620" y2="120" stroke="#dc2626" stroke-width="2" marker-end="url(#arrow-red)"/>
+
+  <g filter="url(#s)">
+    <rect x="460" y="120" width="220" height="60" rx="8" fill="#dc2626"/>
+    <text x="570" y="145" text-anchor="middle" fill="#fff" font-size="14" font-weight="600">利率上升·违约潮</text>
+    <text x="570" y="162" text-anchor="middle" fill="#fecaca" font-size="11">ARM重置→大规模断供</text>
+  </g>
+
+  <line x1="460" y1="150" x2="360" y2="150" stroke="#dc2626" stroke-width="2" marker-end="url(#arrow-red)" stroke-dasharray="5,3"/>
+
+  <line x1="150" y1="90" x2="150" y2="150" stroke="#dc2626" stroke-width="2" marker-end="url(#arrow-red)"/>
+
+  <g filter="url(#s)">
+    <rect x="60" y="150" width="180" height="60" rx="8" fill="#dc2626"/>
+    <text x="150" y="175" text-anchor="middle" fill="#fff" font-size="14" font-weight="600">银行巨额亏损</text>
+    <text x="150" y="192" text-anchor="middle" fill="#fecaca" font-size="11">MBS/CDO 暴跌</text>
+  </g>
+
+  <line x1="150" y1="210" x2="150" y2="270" stroke="#dc2626" stroke-width="2" marker-end="url(#arrow-red)"/>
+
+  <g filter="url(#s)">
+    <rect x="40" y="270" width="220" height="60" rx="8" fill="#dc2626"/>
+    <text x="150" y="295" text-anchor="middle" fill="#fff" font-size="14" font-weight="600">连锁倒闭</text>
+    <text x="150" y="312" text-anchor="middle" fill="#fecaca" font-size="11">雷曼破产+AIG国有化</text>
+  </g>
+
+  <line x1="260" y1="300" x2="350" y2="300" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <g filter="url(#s)">
+    <rect x="360" y="270" width="200" height="60" rx="8" fill="#16a34a"/>
+    <text x="460" y="295" text-anchor="middle" fill="#fff" font-size="14" font-weight="600">政府救助</text>
+    <text x="460" y="312" text-anchor="middle" fill="#bbf7d0" font-size="11">TARP+降息+QE</text>
+  </g>
+
+  <line x1="460" y1="330" x2="460" y2="370" stroke="#16a34a" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <g filter="url(#s)">
+    <rect x="340" y="360" width="240" height="40" rx="8" fill="#2563eb"/>
+    <text x="460" y="385" text-anchor="middle" fill="#fff" font-size="13" font-weight="600">金融监管改革（Dodd-Frank）</text>
+  </g>
+</svg>
+</figure>
+
+<p>流程图使用四种颜色语义区分角色：蓝色表示正常或制度性节点，橙色表示高风险的触发因素，红色表示危机事件或崩溃，绿色表示救助或解决方案。</p>
+
+</body>
+</html>

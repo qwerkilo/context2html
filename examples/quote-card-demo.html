@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>引文卡片 - 组件示例</title>
+<link rel="stylesheet" href="../libs/magicui-effects.css">
+<style>
+:root { --bg: #faf9f7; --text: #1a1a1a; --accent: #c0392b; --radius: 8px; --anim-dur: 0.6s; --anim-y: 24px; }
+body { font-family: "Noto Serif CJK SC", Georgia, serif; background: var(--bg); color: var(--text); line-height: 1.8; max-width: 720px; margin: 3rem auto; padding: 0 1.5rem; }
+h1 { font-size: 1.6rem; border-bottom: 1px solid #ddd; padding-bottom: 0.5em; }
+
+.quote-card { display: flex; gap: 1em; margin: 1.5rem 0; background: var(--bg); border-radius: var(--radius, 8px); padding: 1.2em; }
+.qc-bar { width: 4px; flex-shrink: 0; background: var(--accent); border-radius: 2px; }
+.qc-body { flex: 1; }
+.qc-text { font-size: 1rem; font-style: italic; line-height: 1.7; color: var(--text); margin: 0; }
+.qc-text::before { content: '\201C'; font-size: 1.5em; line-height: 0; vertical-align: -0.3em; color: var(--accent); font-style: normal; padding-right: 0.1em; }
+.qc-text::after { content: '\201D'; font-size: 1.5em; line-height: 0; vertical-align: -0.15em; color: var(--accent); font-style: normal; padding-left: 0.1em; }
+.qc-source { margin-top: 0.8em; display: flex; flex-direction: column; }
+.qc-name { font-weight: 600; font-size: 0.9rem; color: var(--text); font-style: normal; }
+.qc-title { font-size: 0.8rem; color: #64748b; font-style: normal; }
+
+[data-anim] { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+[data-anim].in-view { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<h1 class="shiny-text">引文卡片 — 组件示例</h1>
+
+<p>以下展示两张引文卡片，滚动页面可见淡入动画。</p>
+
+<div class="quote-card border-glow" data-anim="fade-up">
+  <div class="qc-bar"></div>
+  <div class="qc-body">
+    <p class="qc-text">这不仅仅是一场金融危机，更是一次全球经济的结构性转型。旧有的增长模式已经走到了尽头，未来的繁荣需要建立在全新的基础之上。</p>
+    <div class="qc-source">
+      <span class="qc-name">约瑟夫·斯蒂格利茨</span>
+      <span class="qc-title">《全球化及其不满》，2002</span>
+    </div>
+  </div>
+</div>
+
+<div class="quote-card border-glow" data-anim="fade-up">
+  <div class="qc-bar"></div>
+  <div class="qc-body">
+    <p class="qc-text">历史从不重复，但它常常押韵。每一场金融危机的细节各不相同，但底层的剧本：信贷泡沫、过度杠杆、监管滞后总是一再上演。</p>
+    <div class="qc-source">
+      <span class="qc-name">马克·吐温</span>
+      <span class="qc-title">（常被引用于金融史著作）</span>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var obs = new IntersectionObserver(function(es) {
+    es.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('in-view'); });
+  });
+  document.querySelectorAll('[data-anim]').forEach(function(el) { obs.observe(el); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>标签/徽章组 - 组件示例</title>
+<link rel="stylesheet" href="../libs/magicui-effects.css">
+<style>
+:root { --bg: #faf9f7; --text: #1a1a1a; --accent: #c0392b; --radius: 8px; --anim-dur: 0.6s; --anim-y: 24px; }
+body { font-family: "Noto Serif CJK SC", Georgia, serif; background: var(--bg); color: var(--text); line-height: 1.8; max-width: 720px; margin: 3rem auto; padding: 0 1.5rem; }
+h1 { font-size: 1.6rem; border-bottom: 1px solid #ddd; padding-bottom: 0.5em; }
+
+.tag-group { display: flex; flex-wrap: wrap; gap: 0.5em; margin: 1.5rem 0; }
+.tag { display: inline-block; padding: 0.25em 0.7em; border-radius: 999px; font-size: 0.8rem; font-weight: 500; white-space: nowrap; }
+.tag-blue { background: #dbeafe; color: #1e40af; }
+.tag-red { background: #fee2e2; color: #b91c1c; }
+.tag-green { background: #dcfce7; color: #166534; }
+.tag-orange { background: #ffedd5; color: #9a3412; }
+.tag-purple { background: #f3e8ff; color: #6d28d9; }
+
+[data-anim] { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+[data-anim].in-view { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<h1 class="shiny-text">标签/徽章组 — 组件示例</h1>
+
+<p>以下展示 5 种颜色的标签组，对应不同分类语义。</p>
+
+<div class="tag-group border-glow" data-anim="fade-up">
+  <span class="tag tag-blue"># 宏观经济</span>
+  <span class="tag tag-red"># 金融危机</span>
+  <span class="tag tag-green"># 政策应对</span>
+  <span class="tag tag-orange"># 监管改革</span>
+  <span class="tag tag-purple"># 全球化</span>
+</div>
+
+<p>也可以用于展示技术栈或课程关键词：</p>
+
+<div class="tag-group" data-anim="fade-up">
+  <span class="tag tag-blue">MMT</span>
+  <span class="tag tag-red">次贷危机</span>
+  <span class="tag tag-green">量化宽松</span>
+  <span class="tag tag-orange">巴塞尔协议</span>
+  <span class="tag tag-purple">汇率机制</span>
+  <span class="tag tag-blue">通货膨胀</span>
+  <span class="tag tag-red">债务危机</span>
+  <span class="tag tag-green">财政刺激</span>
+</div>
+
+<script>
+(function(){
+  var obs = new IntersectionObserver(function(es) {
+    es.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('in-view'); });
+  });
+  document.querySelectorAll('[data-anim]').forEach(function(el) { obs.observe(el); });
+})();
+</script>
+</body>
+</html>

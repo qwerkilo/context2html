@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ECharts 交互式图表集 — 示例</title>
+<link rel="stylesheet" href="../libs/magicui-effects.css">
+<!-- 优先本地文件，CDN 作为 fallback -->
+<script src="../libs/echarts.min.js"></script>
+<script>if(typeof echarts==='undefined'){document.write('<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"><\/script>')}</script>
+<style>
+:root { --bg: #faf9f7; --text: #1a1a1a; --accent: #c0392b; --surface: #f5f0eb; --border: #ddd8d0; --muted: #888; --radius: 8px; }
+body { font-family: "Noto Serif CJK SC",Georgia,serif; background: var(--bg); color: var(--text); max-width: 800px; margin: 0 auto; padding: 2rem; }
+h1 { text-wrap: pretty; border-bottom: 2px solid var(--accent); padding-bottom: 0.5em; }
+h2 { margin-top: 2em; text-wrap: pretty; }
+.chart-box { background: var(--surface); border-radius: var(--radius); margin: 1rem 0; padding: 8px; }
+.no-js-fallback { display: none; text-align: center; padding: 2rem; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<h1 class="shiny-text">ECharts 交互式图表集</h1>
+<p>柱状图、饼图、折线图、堆叠图演示（需要 JavaScript）</p>
+
+<h2>26a — 纵向柱状图</h2>
+<div class="chart-box border-glow"><div id="chart-bar" style="width:100%;height:350px;"></div></div>
+
+<h2>26b — 饼图（环形）</h2>
+<div class="chart-box border-glow"><div id="chart-pie" style="width:100%;height:320px;"></div></div>
+
+<h2>26c — 折线图</h2>
+<div class="chart-box border-glow"><div id="chart-line" style="width:100%;height:350px;"></div></div>
+
+<h2>26d — 堆叠条形图</h2>
+<div class="chart-box border-glow"><div id="chart-stacked" style="width:100%;height:350px;"></div></div>
+
+<div class="no-js-fallback"><p>图表加载需要 JavaScript</p></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  if(typeof echarts === 'undefined') return;
+
+  // 26a: 柱状图
+  var bar = echarts.init(document.getElementById('chart-bar'));
+  bar.setOption({
+    tooltip: { trigger: 'axis' },
+    xAxis: { type: 'category', data: ['中国','美国','日本','德国','英国','印度'], axisLabel: { color: '#888' } },
+    yAxis: { type: 'value', axisLabel: { color: '#888' } },
+    series: [{ type: 'bar', data: [17.7, 25.5, 4.2, 4.0, 3.3, 3.7], itemStyle: { color: '#c0392b' } }],
+    grid: { left: 50, right: 20, top: 20, bottom: 40 }
+  });
+
+  // 26b: 饼图
+  var pie = echarts.init(document.getElementById('chart-pie'));
+  pie.setOption({
+    tooltip: { trigger: 'item' },
+    series: [{
+      type: 'pie', radius: ['30%','60%'],
+      data: [
+        { value: 45, name: '消费', itemStyle: { color: '#c0392b' } },
+        { value: 25, name: '投资', itemStyle: { color: '#e67e22' } },
+        { value: 20, name: '政府支出', itemStyle: { color: '#2ecc71' } },
+        { value: 10, name: '净出口', itemStyle: { color: '#3498db' } }
+      ],
+      label: { color: '#1a1a1a' }
+    }]
+  });
+
+  // 26c: 折线图
+  var line = echarts.init(document.getElementById('chart-line'));
+  line.setOption({
+    tooltip: { trigger: 'axis' },
+    xAxis: { type: 'category', data: ['2020','2021','2022','2023','2024'], axisLabel: { color: '#888' } },
+    yAxis: { type: 'value', axisLabel: { color: '#888' } },
+    series: [{ type: 'line', data: [2.3, 5.1, 8.0, 3.5, 2.8], smooth: true, lineStyle: { color: '#c0392b', width: 3 }, itemStyle: { color: '#c0392b' } }],
+    grid: { left: 50, right: 20, top: 20, bottom: 40 }
+  });
+
+  // 26d: 堆叠条形图
+  var stacked = echarts.init(document.getElementById('chart-stacked'));
+  stacked.setOption({
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+    legend: { textStyle: { color: '#1a1a1a' } },
+    xAxis: { type: 'value', axisLabel: { color: '#888' } },
+    yAxis: { type: 'category', data: ['2020','2021','2022','2023'], axisLabel: { color: '#888' } },
+    series: [
+      { name: '农业', type: 'bar', stack: 'total', data: [15, 14, 13, 12], itemStyle: { color: '#27ae60' } },
+      { name: '工业', type: 'bar', stack: 'total', data: [38, 40, 39, 37], itemStyle: { color: '#2980b9' } },
+      { name: '服务业', type: 'bar', stack: 'total', data: [47, 46, 48, 51], itemStyle: { color: '#c0392b' } }
+    ],
+    grid: { left: 60, right: 30, top: 40, bottom: 30 }
+  });
+});
+</script>
+</body>
+</html>

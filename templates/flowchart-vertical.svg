@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 460" width="700" height="460">
+  <defs>
+    <filter id="s"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.08"/></filter>
+    <marker id="ab" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#2563eb"/></marker>
+    <marker id="ao" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#d97706"/></marker>
+    <marker id="ar" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#dc2626"/></marker>
+    <marker id="ag" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#16a34a"/></marker>
+  </defs>
+  <style>
+    text{font-family:"Noto Sans CJK SC","PingFang SC","Microsoft YaHei",sans-serif;}
+    .t{font-size:18px;font-weight:700;fill:#1e293b;}
+    .n{font-size:13px;font-weight:500;}
+    .d{font-size:11px;font-weight:400;fill:#475569;}
+  </style>
+  <rect width="700" height="460" fill="#ffffff" rx="12"/>
+  <text x="350" y="35" text-anchor="middle" class="t">金融危机传导路径</text>
+
+  <g filter="url(#s)">
+    <rect x="150" y="65" width="400" height="44" rx="8" fill="#eff6ff" stroke="#bfdbfe"/>
+    <rect x="150" y="65" width="36" height="44" rx="8" fill="#2563eb"/>
+    <rect x="178" y="65" width="5" height="44" fill="#2563eb"/>
+    <text x="168" y="90" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">1</text>
+    <text x="195" y="82" class="n" fill="#1e40af">房贷正常发放</text>
+    <text x="195" y="98" class="d">低利率 · 宽松信贷环境</text>
+  </g>
+  <path d="M 350,109 L 350,120" stroke="#2563eb"/><polygon points="346,120 350,127 354,120" fill="#2563eb"/>
+
+  <g filter="url(#s)">
+    <rect x="150" y="130" width="400" height="44" rx="8" fill="#fff7ed" stroke="#fed7aa"/>
+    <rect x="150" y="130" width="36" height="44" rx="8" fill="#d97706"/>
+    <rect x="178" y="130" width="5" height="44" fill="#d97706"/>
+    <text x="168" y="155" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">2</text>
+    <text x="195" y="147" class="n" fill="#9a3412">次级债大规模发放</text>
+    <text x="195" y="163" class="d">零首付 · 浮动利率抵押贷款</text>
+  </g>
+  <path d="M 350,174 L 350,185" stroke="#dc2626"/><polygon points="346,185 350,192 354,185" fill="#dc2626"/>
+
+  <g filter="url(#s)">
+    <rect x="150" y="195" width="400" height="44" rx="8" fill="#fef2f2" stroke="#fecaca"/>
+    <rect x="150" y="195" width="36" height="44" rx="8" fill="#dc2626"/>
+    <rect x="178" y="195" width="5" height="44" fill="#dc2626"/>
+    <text x="168" y="220" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">3</text>
+    <text x="195" y="212" class="n" fill="#991b1b">利率上升 · 违约潮</text>
+    <text x="195" y="228" class="d">ARM重置触发大规模断供</text>
+  </g>
+  <path d="M 350,239 L 350,250" stroke="#dc2626"/><polygon points="346,250 350,257 354,250" fill="#dc2626"/>
+
+  <g filter="url(#s)">
+    <rect x="150" y="260" width="400" height="44" rx="8" fill="#fef2f2" stroke="#fecaca"/>
+    <rect x="150" y="260" width="36" height="44" rx="8" fill="#dc2626"/>
+    <rect x="178" y="260" width="5" height="44" fill="#dc2626"/>
+    <text x="168" y="285" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">4</text>
+    <text x="195" y="277" class="n" fill="#991b1b">银行巨额亏损</text>
+    <text x="195" y="293" class="d">MBS/CDO 暴跌 · 连锁反映</text>
+  </g>
+  <path d="M 350,304 L 350,315" stroke="#dc2626"/><polygon points="346,315 350,322 354,315" fill="#dc2626"/>
+
+  <g filter="url(#s)">
+    <rect x="150" y="325" width="400" height="44" rx="8" fill="#f0fdf4" stroke="#bbf7d0"/>
+    <rect x="150" y="325" width="36" height="44" rx="8" fill="#16a34a"/>
+    <rect x="178" y="325" width="5" height="44" fill="#16a34a"/>
+    <text x="168" y="350" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">5</text>
+    <text x="195" y="342" class="n" fill="#166534">政府救助</text>
+    <text x="195" y="358" class="d">TARP · 降息 · 量化宽松</text>
+  </g>
+
+  <g transform="translate(60, 410)">
+    <rect x="0" y="0" width="12" height="12" rx="2" fill="#eff6ff" stroke="#bfdbfe"/>
+    <text x="16" y="10" fill="#64748b" font-size="11">正常</text>
+    <rect x="60" y="0" width="12" height="12" rx="2" fill="#fff7ed" stroke="#fed7aa"/>
+    <text x="76" y="10" fill="#64748b" font-size="11">触发</text>
+    <rect x="120" y="0" width="12" height="12" rx="2" fill="#fef2f2" stroke="#fecaca"/>
+    <text x="136" y="10" fill="#64748b" font-size="11">危机</text>
+    <rect x="180" y="0" width="12" height="12" rx="2" fill="#f0fdf4" stroke="#bbf7d0"/>
+    <text x="196" y="10" fill="#64748b" font-size="11">救助</text>
+  </g>
+</svg>

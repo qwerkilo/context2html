@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>对比表增强版 - 组件示例</title>
+<link rel="stylesheet" href="../libs/magicui-effects.css">
+<style>
+:root { --bg: #faf9f7; --text: #1a1a1a; --accent: #c0392b; --radius: 8px; --anim-dur: 0.35s; }
+body { font-family: "Noto Serif CJK SC", Georgia, serif; background: var(--bg); color: var(--text); line-height: 1.8; max-width: 720px; margin: 3rem auto; padding: 0 1.5rem; }
+h1 { font-size: 1.6rem; border-bottom: 1px solid #ddd; padding-bottom: 0.5em; }
+
+.cmp-wrap { overflow-x: auto; margin: 1.5rem 0; border: 1px solid #e2e8f0; border-radius: var(--radius, 8px); }
+.cmp-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.cmp-table th { position: sticky; top: 0; z-index: 2; background: #f8fafc; padding: 0.6em 0.8em; text-align: left; font-weight: 600; border-bottom: 2px solid var(--accent); white-space: nowrap; cursor: pointer; user-select: none; }
+.cmp-table th:hover { background: #f1f5f9; }
+.cmp-arrow { font-size: 0.75rem; opacity: 0.3; margin-left: 0.3em; }
+.cmp-table th.sorted-asc .cmp-arrow, .cmp-table th.sorted-desc .cmp-arrow { opacity: 1; }
+.cmp-table td { padding: 0.5em 0.8em; border-bottom: 1px solid #e2e8f0; }
+.cmp-table tbody tr:nth-child(even) td { background: #f8fafc; }
+.cmp-table tbody tr:hover td { background: #f1f5f9; }
+.cmp-table tbody td:first-child { font-weight: 600; }
+
+[data-anim] { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+[data-anim].in-view { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body class="grid-bg">
+
+<h1 class="shiny-text">对比表增强版 — 组件示例</h1>
+
+<p>点击列头排序（↕），支持数值和文本混合排序。表头在滚动时固定。</p>
+
+<div class="cmp-wrap" data-anim="fade-up">
+  <table class="cmp-table" data-sortable>
+    <thead>
+      <tr>
+        <th data-sort>维度 <span class="cmp-arrow">↕</span></th>
+        <th data-sort>方案 A <span class="cmp-arrow">↕</span></th>
+        <th data-sort>方案 B <span class="cmp-arrow">↕</span></th>
+        <th data-sort>方案 C <span class="cmp-arrow">↕</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>实施成本</td><td>高</td><td>中</td><td>低</td></tr>
+      <tr><td>覆盖范围</td><td>全国</td><td>区域</td><td>城市</td></tr>
+      <tr><td>见效速度</td><td>快</td><td>中</td><td>慢</td></tr>
+      <tr><td>持续性</td><td>强</td><td>中</td><td>弱</td></tr>
+      <tr><td>政治阻力</td><td>大</td><td>中</td><td>小</td></tr>
+      <tr><td>国际经验</td><td>丰富</td><td>有限</td><td>较少</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+(function(){
+  var obs = new IntersectionObserver(function(es) {
+    es.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('in-view'); });
+  });
+  document.querySelectorAll('[data-anim]').forEach(function(el) { obs.observe(el); });
+})();
+
+(function(){
+  document.querySelectorAll('[data-sortable] th[data-sort]').forEach(function(t) {
+    t.addEventListener('click', function() {
+      var T = this.closest('table');
+      var b = T.querySelector('tbody');
+      var R = Array.from(b.querySelectorAll('tr'));
+      var i = Array.from(this.parentNode.children).indexOf(this);
+      var a = !this.classList.contains('sorted-asc');
+      T.querySelectorAll('th').forEach(function(h) { h.classList.remove('sorted-asc', 'sorted-desc'); });
+      this.classList.add(a ? 'sorted-asc' : 'sorted-desc');
+      R.sort(function(x, y) {
+        var u = x.children[i].textContent.trim();
+        var v = y.children[i].textContent.trim();
+        var p = parseFloat(u), q = parseFloat(v);
+        if (!isNaN(p) && !isNaN(q)) return a ? p - q : q - p;
+        return a ? u.localeCompare(v, 'zh-CN') : v.localeCompare(u, 'zh-CN');
+      });
+      R.forEach(function(r) { b.appendChild(r); });
+    });
+  });
+})();
+</script>
+</body>
+</html>

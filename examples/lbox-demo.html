@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>全屏模态/灯箱 - 组件示例</title>
+<link rel="stylesheet" href="../libs/magicui-effects.css">
+<style>
+:root { --bg: #faf9f7; --text: #1a1a1a; --accent: #c0392b; --radius: 8px; --anim-dur: 0.3s; }
+body { font-family: "Noto Serif CJK SC", Georgia, serif; background: var(--bg); color: var(--text); line-height: 1.8; max-width: 720px; margin: 3rem auto; padding: 0 1.5rem; }
+h1 { font-size: 1.6rem; border-bottom: 1px solid #ddd; padding-bottom: 0.5em; }
+
+.lbox { position: fixed; inset: 0; z-index: 1001; display: flex; align-items: center; justify-content: center; visibility: hidden; }
+.lbox.open { visibility: visible; }
+.lbox-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.8); opacity: 0; transition: opacity 0.3s ease; }
+.lbox.open .lbox-overlay { opacity: 1; }
+.lbox-content { position: relative; max-width: 90vw; max-height: 90vh; transform: scale(0.92); transition: transform 0.3s ease; }
+.lbox.open .lbox-content { transform: scale(1); }
+.lbox-close { position: absolute; top: -2.2em; right: 0; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; padding: 0.2em; line-height: 1; opacity: 0.8; }
+.lbox-close:hover { opacity: 1; }
+.lbox-content img { display: block; max-width: 100%; max-height: 85vh; border-radius: 4px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+
+.demo-thumb { width: 300px; height: 180px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.9rem; }
+</style>
+</head>
+<body class="dot-bg">
+
+<h1 class="shiny-text">全屏模态/灯箱 — 组件示例</h1>
+
+<p>点击下方缩略图或按钮打开灯箱查看大图。ESC / 点击遮罩 / <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 5l10 10M15 5l-10 10"/></svg> 关闭。</p>
+
+<img src="#" class="lbox-trigger" data-lbox="chart-1" alt="图表缩略图" style="cursor:pointer;" onerror="this.style.display='none'" onload="this.style.display=''">
+<div class="demo-thumb lbox-trigger" data-lbox="chart-1" style="cursor:pointer;">点击查看大图</div>
+
+<div class="lbox" id="lbox-chart-1">
+  <div class="lbox-overlay"></div>
+  <div class="lbox-content">
+    <button class="lbox-close"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 5l10 10M15 5l-10 10"/></svg></button>
+    <div style="background:linear-gradient(135deg, #667eea, #764ba2); width:640px; height:360px; border-radius:4px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:1.5rem;">全屏大图内容</div>
+  </div>
+</div>
+
+<p>也支持纯按钮触发：</p>
+
+<button class="lbox-trigger" data-lbox="detail-1"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="8.5" cy="8.5" r="4.5"/><path d="M12 12l4 4"/></svg> 查看详细数据</button>
+
+<div class="lbox" id="lbox-detail-1">
+  <div class="lbox-overlay"></div>
+  <div class="lbox-content" style="background:var(--bg); border-radius:8px; padding:1.5em; max-width:600px;">
+    <button class="lbox-close" style="color:var(--text);"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 5l10 10M15 5l-10 10"/></svg></button>
+    <h3 style="margin-top:0;">详细数据</h3>
+    <p>这里可以放任何 HTML 内容——表格、图表、详细说明等。</p>
+  </div>
+</div>
+
+<script>
+(function(){
+  document.querySelectorAll('[data-lbox]').forEach(function(t) {
+    t.addEventListener('click', function() {
+      var id = this.dataset.lbox;
+      var lb = document.getElementById('lbox-' + id);
+      if (lb) { lb.classList.add('open'); document.body.style.overflow = 'hidden'; }
+    });
+  });
+  document.querySelectorAll('.lbox-close, .lbox-overlay').forEach(function(e) {
+    e.addEventListener('click', function() {
+      var lb = this.closest('.lbox');
+      lb.classList.remove('open'); document.body.style.overflow = '';
+    });
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.lbox.open').forEach(function(lb) {
+        lb.classList.remove('open'); document.body.style.overflow = '';
+      });
+    }
+  });
+})();
+</script>
+</body>
+</html>

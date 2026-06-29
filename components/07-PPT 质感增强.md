@@ -1,0 +1,407 @@
+### 7. PPT 质感增强（纵向滚读 + 动画 + 主题切换）
+
+在保持纵向滚读结构的基础上，添加 PPT 级的视觉品质。以下三个能力需要添加到每个课程的 `<head>` 中（CSS + JS）。
+
+#### 7.1 主题切换（T 键 + localStorage 持久化）
+
+键盘按 `T` 键循环切换主题。用户选择的主题自动保存到 `localStorage`，刷新页面或切换课程后保留。
+
+默认包含以下主题（来自 `theme/*/DESIGN.md`），每个主题控制 12 个 CSS 变量：
+
+```css
+:root {
+  --bg: #faf9f7; --text: #1a1a1a; --accent: #c0392b;
+  --accent-text: #ffffff; --surface: #f5f0eb; --border: #ddd8d0;
+  --surface-raised: #ece6dd; --muted: #888;
+  --link: #c0392b; --success: #16a34a; --warning: #d97706; --error: #dc2626;
+  --font: "Noto Serif CJK SC",Georgia,"Times New Roman",serif;
+  --font-h: "Noto Serif CJK SC",Georgia,"Times New Roman",serif;
+  --lh: 1.8; --h1-size: 2rem; --h2-size: 1.3rem;
+  --body-size: 1rem; --small-size: 0.85rem;
+  --radius: 8px; --anim-dur: 0.3s; --anim-y: 18px;
+  --h2-border: 1px solid #ddd; --h1-size: 2rem;
+}
+[data-theme="airbnb"] {
+  --bg: #ffffff; --text: #222222; --accent: #ff385c;
+  --accent-text: #ffffff; --surface: #ffffff; --border: #dddddd;
+  --surface-raised: #f2f2f2; --muted: #6a6a6a;
+  --link: #ff385c; --success: #16a34a; --warning: #d97706; --error: #dc2626;
+  --font: "Airbnb Cereal VF",sans-serif; --font-h: "Airbnb Cereal VF",sans-serif;
+  --lh: 1.25;
+}
+
+[data-theme="airtable"] {
+  --bg: #ffffff; --text: #181d26; --accent: #181d26;
+  --accent-text: #ffffff; --surface: #f8fafc; --border: #dddddd;
+  --surface-raised: #e0e2e6; --muted: #41454d;
+  --link: #1b61c9; --success: #006400; --warning: #d97706; --error: #dc2626;
+  --font: "Inter Display",sans-serif; --font-h: "Inter Display",sans-serif;
+  --lh: 1.3;
+}
+
+[data-theme="apple"] {
+  --bg: #ffffff; --text: #1d1d1f; --accent: #0066cc;
+  --accent-text: #ffffff; --surface: #f5f5f7; --border: #e0e0e0;
+  --surface-raised: #f5f5f7; --muted: #666666;
+  --link: #0066cc; --success: #16a34a; --warning: #d97706; --error: #dc2626;
+  --font: "SF Pro Text",sans-serif; --font-h: "SF Pro Text",sans-serif;
+  --lh: 1.5; --radius: 12px; --anim-dur: 0.8s; --anim-y: 20px;
+}
+
+[data-theme="binance"] {
+  --bg: #ffffff; --text: #181a20; --accent: #fcd535;
+  --accent-text: #181a20; --surface: #f5f5f5; --border: #e0e0e0;
+  --surface-raised: #f5f5f5; --muted: #707a8a;
+  --link: #fcd535; --success: #16a34a; --warning: #d97706; --error: #dc2626;
+  --font: "BinanceNova",sans-serif; --font-h: "BinancePlex",sans-serif;
+  --lh: 1.4;
+}
+
+[data-theme="bmw-m"] {
+  --bg: #000000; --text: #ffffff; --accent: #ffffff;
+  --accent-text: #000000; --surface: #1a1a1a; --border: #3c3c3c;
+  --surface-raised: #262626; --muted: #7e7e7e;
+  --link: #ffffff; --success: #0fa336; --warning: #f4b400; --error: #dc2626;
+  --font: "BMWTypeNextLatin",sans-serif; --font-h: "BMWTypeNextLatin",sans-serif;
+  --lh: 1.4;
+}
+
+[data-theme="claude"] {
+  --bg: #faf9f5; --text: #141413; --accent: #cc785c;
+  --accent-text: #ffffff; --surface: #efe9de; --border: #e6dfd8;
+  --surface-raised: #efe9de; --muted: #6c6a64;
+  --link: #cc785c; --success: #5db872; --warning: #d4a017; --error: #c64545;
+  --font: "StyreneB",sans-serif; --font-h: "Copernicus",sans-serif;
+  --lh: 1.4;
+}
+
+[data-theme="cursor"] {
+  --bg: #f7f7f4; --text: #26251e; --accent: #f54e00;
+  --accent-text: #ffffff; --surface: #ffffff; --border: #e6e5e0;
+  --surface-raised: #e6e5e0; --muted: #807d72;
+  --link: #f54e00; --success: #16a34a; --warning: #d97706; --error: #dc2626;
+  --font: "CursorGothic",sans-serif; --font-h: "CursorGothic",sans-serif;
+  --lh: 1.4;
+}
+
+[data-theme="dell-1996"] {
+  --bg: #ffffff; --text: #000000; --accent: #e91d2a;
+  --accent-text: #ffffff; --surface: #ffffff; --border: #e0e0e0;
+  --surface-raised: #ffffff; --muted: #666666;
+  --link: #0000ee; --success: #16a34a; --warning: #d97706; --error: #dc2626;
+  --font: "Times New Roman",sans-serif; --font-h: "Helvetica",sans-serif;
+  --lh: 1.35;
+}
+
+[data-theme="figma"] {
+  --bg: #ffffff; --text: #000000; --accent: #000000;
+  --accent-text: #ffffff; --surface: #f7f7f5; --border: #e6e6e6;
+  --surface-raised: #f7f7f5; --muted: #666666;
+  --link: #000000; --success: #16a34a; --warning: #d97706; --error: #dc2626;
+  --font: "figmaMono",sans-serif; --font-h: "figmaSans",sans-serif;
+  --lh: 1.5;
+}
+
+[data-theme="hp"] {
+  --bg: #ffffff; --text: #1a1a1a; --accent: #024ad8;
+  --accent-text: #ffffff; --surface: #f5f5f5; --border: #e8e8e8;
+  --surface-raised: #f5f5f5; --muted: #666666;
+  --link: #024ad8; --success: #16a34a; --warning: #d97706; --error: #b3262b;
+  --font: "Forma DJR Micro",sans-serif; --font-h: "Forma DJR Micro",sans-serif;
+  --lh: 1.17;
+}
+
+[data-theme="ibm"] {
+  --bg: #ffffff; --text: #161616; --accent: #0f62fe;
+  --accent-text: #ffffff; --surface: #f5f5f5; --border: #e0e0e0;
+  --surface-raised: #f5f5f5; --muted: #525252;
+  --link: #0f62fe; --success: #16a34a; --warning: #d97706; --error: #dc2626;
+  --font: "IBM Plex Sans",sans-serif; --font-h: "IBM Plex Sans",sans-serif;
+  --lh: 1.33;
+}
+
+[data-theme="minimax"] {
+  --bg: #ffffff; --text: #0a0a0a; --accent: #0a0a0a;
+  --accent-text: #ffffff; --surface: #f2f3f5; --border: #e5e7eb;
+  --surface-raised: #f2f3f5; --muted: #a8aab2;
+  --link: #0a0a0a; --success: #16a34a; --warning: #d97706; --error: #dc2626;
+  --font: "DM Sans",sans-serif; --font-h: "DM Sans",sans-serif;
+  --lh: 1.6; --radius: 8px; --anim-dur: 0.35s; --anim-y: 30px; --h2-border: none; --h1-size: 2.4rem;
+}
+
+[data-theme="nike"] {
+  --bg: #ffffff; --text: #111111; --accent: #111111;
+  --accent-text: #ffffff; --surface: #f5f5f5; --border: #cacacb;
+  --surface-raised: #f5f5f5; --muted: #666666;
+  --link: #111111; --success: #007d48; --warning: #d97706; --error: #dc2626;
+  --font: "Helvetica Now Text Medium",sans-serif; --font-h: "Helvetica Now Display Medium",sans-serif;
+  --lh: 1.5;
+}
+
+[data-theme="notion"] {
+  --bg: #ffffff; --text: #1a1a1a; --accent: #5645d4;
+  --accent-text: #ffffff; --surface: #fafaf9; --border: #e5e3df;
+  --surface-raised: #fafaf9; --muted: #bbb8b1;
+  --link: #0075de; --success: #16a34a; --warning: #d97706; --error: #dc2626;
+  --font: "Notion Sans",sans-serif; --font-h: "Notion Sans",sans-serif;
+  --lh: 1.4;
+}
+
+[data-theme="nvidia"] {
+  --bg: #ffffff; --text: #000000; --accent: #76b900;
+  --accent-text: #000000; --surface: #f7f7f7; --border: #cccccc;
+  --surface-raised: #1a1a1a; --muted: #666666;
+  --link: #0046a4; --success: #16a34a; --warning: #df6500; --error: #e52020;
+  --font: "NVIDIA-EMEA",sans-serif; --font-h: "NVIDIA-EMEA",sans-serif;
+  --lh: 1.55; --radius: 2px; --anim-dur: 0s; --anim-y: 0px; --h2-border: 2px solid var(--accent); --h1-size: 1.9rem;
+}
+
+[data-theme="x.ai"] {
+  --bg: #0a0a0a; --text: #ffffff; --accent: #ffffff;
+  --accent-text: #0a0a0a; --surface: #f5f5f5; --border: #212327;
+  --surface-raised: #f5f5f5; --muted: #666666;
+  --link: #ffffff; --success: #16a34a; --warning: #d97706; --error: #dc2626;
+  --font: "GeistMono",sans-serif; --font-h: "universalSans",sans-serif;
+  --lh: 1.6;
+}
+
+[data-theme="zapier"] {
+  --bg: #fffefb; --text: #201515; --accent: #ff4f00;
+  --accent-text: #fffefb; --surface: #f5f5f5; --border: #e0e0e0;
+  --surface-raised: #f5f5f5; --muted: #666666;
+  --link: #ff4f00; --success: #16a34a; --warning: #d97706; --error: #dc2626;
+  --font: "Degular Display",sans-serif; --font-h: "Inter",sans-serif;
+  --lh: 1.6;
+}
+
+`
+ 正文字体 | Noto Serif | SF Pro Text | DM Sans | Inter |
+| `--font-h` | 标题字体 | Noto Serif | SF Pro Display | DM Sans | Inter |
+| `--lh` | 行高 | 1.8 | 1.9 | 1.7 | 1.6 |
+| `--h1-size` | 大标题 | 2rem | 2.1rem | 2.4rem | 1.9rem |
+| `--h2-border` | h2 下划线 | 1px 灰 | 1px 浅灰 | 无边框 | 2px 强调色粗线 |
+| `--radius` | 组件圆角 | 8px | 12px | 8px | 2px |
+| `--anim-dur` | 动画时长 | 0.6s | 0.8s | 0.35s | 0s（无动画） |
+| `--anim-y` | 动画位移 | 24px | 20px | 30px | 0px |
+
+主题详情参考 `theme/{apple|minimax|nvidia}/DESIGN.md`。
+
+页面加载时从 `localStorage` 读取主题，无记录则用默认 `warm`：
+
+```js
+(function(){
+  var t=['warm','apple','minimax','nvidia','airbnb','airtable','binance','bmw-m','claude','cursor','dell-1996','figma','hp','ibm','nike','notion','x.ai','zapier'];
+  var saved=localStorage.getItem('theme');
+  if(saved&&t.indexOf(saved)>-1){document.documentElement.dataset.theme=saved;}
+})();
+```
+
+T 键切换并保存：
+
+```js
+const themes = ['warm', 'apple', 'minimax', 'nvidia'];
+let ti = themes.indexOf(document.documentElement.dataset.theme) || 0;
+document.addEventListener('keydown', e => {
+  if (e.key === 't' && !e.ctrlKey && !e.metaKey) {
+    ti = (ti + 1) % themes.length;
+    document.documentElement.dataset.theme = themes[ti];
+    localStorage.setItem('theme', themes[ti]);
+  }
+});
+```
+
+#### 7.2 入场动画（滚动触发）
+
+使用 IntersectionObserver 实现元素进入视口时播放动画。
+
+```css
+[data-anim] { opacity: 0; transform: translateY(var(--anim-y, 24px)); transition: opacity var(--anim-dur, 0.3s) ease-out, transform var(--anim-dur, 0.3s) ease-out; }
+[data-anim].in-view { opacity: 1; transform: translateY(0); }
+[data-anim="fade"] { transform: none; }
+[data-anim="slide-left"] { transform: translateX(calc(var(--anim-y, 24px) * -1)); }
+[data-anim="slide-left"].in-view { transform: translateX(0); }
+@media (prefers-reduced-motion: reduce) { [data-anim] { opacity: 1; transform: none; transition: none; } }
+```
+
+需要动画的元素加 `data-anim="fade-up"`。JS：
+
+```js
+const obs = new IntersectionObserver(es => es.forEach(e => {
+  if (e.isIntersecting) e.target.classList.add('in-view');
+}));
+document.querySelectorAll('[data-anim]').forEach(el => obs.observe(el));
+```
+
+使用规则：
+- **h2 标题**：总是加 `data-anim="fade-up"`（进入视口时从下方滑入）
+- **SVG 图 / 时间线 / 条形图**：总是加 `data-anim="fade-up"`
+- **对比表**：加 `data-anim="fade"`
+- **段落文本**：不加（太多段落同时动画反而眼花）
+- 前 2 个视觉元素不用动画（首屏元素已在视口内）
+
+#### 7.3 键盘章节导航（← → 键）
+
+按 ← → 键跳转到上一个/下一个 h2 标题。
+
+```js
+document.addEventListener('keydown', e => {
+  if ((e.key === 'ArrowRight' || e.key === 'ArrowLeft') && !e.ctrlKey && !e.metaKey) {
+    e.preventDefault();
+    const sections = document.querySelectorAll('h2');
+    const current = [...sections].findIndex(h2 => {
+      const rect = h2.getBoundingClientRect();
+      return rect.top >= 0 && rect.top < window.innerHeight / 2;
+    });
+    const next = e.key === 'ArrowRight' ? Math.min(current + 1, sections.length - 1) : Math.max(current - 1, 0);
+    if (next >= 0 && sections[next]) sections[next].scrollIntoView({ behavior: 'smooth' });
+  }
+});
+```
+
+#### 7.4 内容密度规范（区别于纯 PPT）
+
+纵向滚读的课程每屏要有"视觉呼吸"：
+- 每两个 h2 之间至少插入 1 个视觉组件（SVG / 时间线 / 条形图 / 对比表）
+- 连续文本不超过 4 段
+- 段落中不使用过多的引用或信息框——每个 `.info-box` / `.warning-box` 之间至少隔 1 段
+- 一个标准的 h2 章节体量："1-2 段引出 → 视觉组件 → 1-2 段深化"
+
+#### 7.5 主题选择器按钮（UI 方式切换，替代纯键盘）
+
+在页面右下角添加一个浮动的主题选择器。点击 <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="10" r="8"/><circle cx="10" cy="7" r="2" fill="currentColor"/><path d="M4 15l4-4"/></svg> 按钮打开主题面板，显示所有主题的名称和色点，当前主题高亮。比 19 个小圆点更易用。
+
+HTML（放在 `<body>` 末尾，JS 之前）——使用组合工具栏（<svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="10" r="8"/><circle cx="10" cy="7" r="2" fill="currentColor"/><path d="M4 15l4-4"/></svg> 主题按钮 + <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 5h14M3 10h14M3 15h10"/></svg> 目录按钮）：
+```html
+<div class="ui-toolbar">
+  <button class="tp-btn-toggle" aria-label="切换主题" title="切换主题"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="10" r="8"/><circle cx="10" cy="7" r="2" fill="currentColor"/><path d="M4 15l4-4"/></svg></button>
+  <button class="toc-btn" aria-label="目录" title="目录"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 5h14M3 10h14M3 15h10"/></svg></button>
+</div>
+<nav class="tp-panel">
+  <div class="tp-grid" role="listbox" aria-label="选择主题">
+    <button class="tp-item active" data-theme="warm" style="--tp-color:#c0392b;">暖色</button>
+    <button class="tp-item" data-theme="apple" style="--tp-color:#0066cc;">Apple</button>
+    <button class="tp-item" data-theme="minimax" style="--tp-color:#ff5530;">Minimax</button>
+    <button class="tp-item" data-theme="nvidia" style="--tp-color:#76b900;">NVIDIA</button>
+    <button class="tp-item" data-theme="airbnb" style="--tp-color:#ff385c;">Airbnb</button>
+    <button class="tp-item" data-theme="airtable" style="--tp-color:#181d26;">Airtable</button>
+    <button class="tp-item" data-theme="binance" style="--tp-color:#fcd535;">Binance</button>
+    <button class="tp-item" data-theme="bmw-m" style="--tp-color:#3c3c3c;">BMW M</button>
+    <button class="tp-item" data-theme="claude" style="--tp-color:#cc785c;">Claude</button>
+    <button class="tp-item" data-theme="cursor" style="--tp-color:#f54e00;">Cursor</button>
+    <button class="tp-item" data-theme="dell-1996" style="--tp-color:#e91d2a;">Dell 1996</button>
+    <button class="tp-item" data-theme="figma" style="--tp-color:#000000;">Figma</button>
+    <button class="tp-item" data-theme="hp" style="--tp-color:#024ad8;">HP</button>
+    <button class="tp-item" data-theme="ibm" style="--tp-color:#0f62fe;">IBM</button>
+    <button class="tp-item" data-theme="nike" style="--tp-color:#111111;">Nike</button>
+    <button class="tp-item" data-theme="notion" style="--tp-color:#5645d4;">Notion</button>
+    <button class="tp-item" data-theme="x.ai" style="--tp-color:#636363;">x.ai</button>
+    <button class="tp-item" data-theme="zapier" style="--tp-color:#ff4f00;">Zapier</button>
+  </div>
+</nav>
+<nav class="toc-panel"><ul class="toc-list"></ul></nav>
+```
+
+CSS（放在课程 `<style>` 中）——工具栏 + 主题面板 + TOC 共用样式：
+```css
+.ui-toolbar { position: fixed; bottom: 20px; right: 20px; z-index: 999; display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: rgba(255,255,255,0.85); backdrop-filter: blur(6px); border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.tp-btn-toggle, .toc-btn { background: none; border: none; font-size: 1.1rem; cursor: pointer; padding: 0 2px; line-height: 1; opacity: 0.6; transition: opacity 0.2s ease; color: var(--text); }
+.tp-btn-toggle:hover, .toc-btn:hover { opacity: 1; }
+.tp-panel { position: fixed; bottom: 70px; right: 20px; z-index: 998; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius, 8px); padding: 0.6em; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: none; max-height: 50vh; overflow-y: auto; }
+.tp-panel.open { display: block; }
+.tp-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; min-width: 180px; }
+.tp-item { display: flex; align-items: center; gap: 6px; padding: 0.4em 0.6em; border: 1px solid transparent; border-radius: 6px; background: none; cursor: pointer; font-size: 0.82rem; color: var(--text); text-align: left; transition: background 0.15s ease; }
+.tp-item:hover { background: rgba(0,0,0,0.04); }
+.tp-item.active { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); font-weight: 600; }
+.tp-item::before { content: ''; width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; background: var(--tp-color); border: 1px solid rgba(0,0,0,0.1); }
+.toc-btn { background: none; border: none; font-size: 1.1rem; cursor: pointer; padding: 0 2px; line-height: 1; opacity: 0.6; transition: opacity 0.2s ease; color: var(--text); }
+.toc-btn:hover { opacity: 1; }
+.toc-panel { position: fixed; bottom: 70px; right: 20px; z-index: 998; background: var(--bg); border: 1px solid #e2e8f0; border-radius: var(--radius, 8px); padding: 0.6em 0; box-shadow: 0 4px 12px rgba(0,0,0,0.08); max-height: 50vh; overflow-y: auto; display: none; min-width: 160px; }
+.toc-panel.open { display: block; }
+.toc-list { list-style: none; margin: 0; padding: 0; }
+.toc-item { padding: 0.4em 1em; font-size: 0.82rem; cursor: pointer; color: #64748b; transition: color 0.15s ease, background 0.15s ease; }
+.toc-item:hover { background: rgba(0,0,0,0.03); color: var(--text); }
+.toc-item.active { color: var(--accent); font-weight: 600; background: rgba(0,0,0,0.02); }
+```
+
+JS（在 PPT 运行时模板中整合）——主题选择器 + TOC 处理：
+```js
+try{document.querySelectorAll('.tp-btn').forEach(function(b){b.addEventListener('click',function(){
+var th=this.dataset.theme;d.dataset.theme=th;i=t.indexOf(th);
+document.querySelectorAll('.tp-btn').forEach(function(x){x.classList.toggle('active',x.dataset.theme===th);});});});
+}catch(e){}
+try{var tl=document.querySelector('.toc-list');if(tl){var h2s=document.querySelectorAll('h2');
+h2s.forEach(function(h,i){var li=document.createElement('li');li.className='toc-item';li.textContent=h.textContent;
+li.addEventListener('click',function(){h.scrollIntoView({behavior:'smooth'});
+document.querySelector('.toc-panel').classList.remove('open');});tl.appendChild(li);});
+document.querySelector('.toc-btn').addEventListener('click',function(){
+document.querySelector('.toc-panel').classList.toggle('open');});
+var to=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){
+var idx=Array.from(h2s).indexOf(e.target);
+document.querySelectorAll('.toc-item').forEach(function(x,i){x.classList.toggle('active',i===idx);});}});},
+{rootMargin:'-80px 0px -60% 0px'});h2s.forEach(function(h){to.observe(h);});
+document.addEventListener('click',function(e){if(!e.target.closest('.ui-toolbar')&&!e.target.closest('.toc-panel')){
+document.querySelector('.toc-panel').classList.remove('open');}});}
+}catch(e){}
+
+#### 7.6 JS 运行时模板
+
+课程末尾的 `<script>` 块（在 quiz JS 之后）追加：
+
+```html
+<script>
+// PPT 质感增强 — 含降级处理
+(function(){var t=['warm','apple','minimax','nvidia'];try{var s=localStorage.getItem('theme');if(s&&t.indexOf(s)>-1){document.documentElement.dataset.theme=s;}}catch(e){}
+var i=t.indexOf(document.documentElement.dataset.theme);if(i<0)i=0;var d=document.documentElement;
+try{document.querySelectorAll('.tp-item').forEach(function(b){b.addEventListener('click',function(){
+var th=this.dataset.theme;d.dataset.theme=th;i=t.indexOf(th);
+try{localStorage.setItem('theme',th);}catch(e){}
+document.querySelectorAll('.tp-item').forEach(function(x){x.classList.toggle('active',x.dataset.theme===th);});
+document.querySelector('.tp-panel').classList.remove('open');});});
+}catch(e){}
+try{document.querySelector('.tp-btn-toggle').addEventListener('click',function(){
+document.querySelector('.tp-panel').classList.toggle('open');});
+}catch(e){}
+try{document.addEventListener('keydown',function(e){if(e.key==='t'&&!e.ctrlKey&&!e.metaKey){i=(i+1)%t.length;d.dataset.theme=t[i];
+try{localStorage.setItem('theme',t[i]);}catch(e){}
+document.querySelectorAll('.tp-item').forEach(function(x){x.classList.toggle('active',x.dataset.theme===t[i]);});}});
+}catch(e){} // 主题切换降级：静默失败
+// 点击外部关闭主题面板
+try{document.addEventListener('click',function(e){if(!e.target.closest('.ui-toolbar')&&!e.target.closest('.tp-panel')){
+document.querySelector('.tp-panel').classList.remove('open');}});
+}catch(e){}
+try{var tl=document.querySelector('.toc-list');if(tl){var h2s=document.querySelectorAll('h2');
+h2s.forEach(function(h,i){var li=document.createElement('li');li.className='toc-item';li.textContent=h.textContent;
+li.addEventListener('click',function(){h.scrollIntoView({behavior:'smooth'});
+document.querySelector('.toc-panel').classList.remove('open');});tl.appendChild(li);});
+document.querySelector('.toc-btn').addEventListener('click',function(){
+document.querySelector('.toc-panel').classList.toggle('open');});
+var to=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){
+var idx=Array.from(h2s).indexOf(e.target);
+document.querySelectorAll('.toc-item').forEach(function(x,i){x.classList.toggle('active',i===idx);});}});},
+{rootMargin:'-80px 0px -60% 0px'});h2s.forEach(function(h){to.observe(h);});
+document.addEventListener('click',function(e){if(!e.target.closest('.ui-toolbar')&&!e.target.closest('.toc-panel')){
+document.querySelector('.toc-panel').classList.remove('open');}});}
+}catch(e){} // 浮动目录降级：静默失败
+try{var o=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)e.target.classList.add('in-view');});});
+document.querySelectorAll('[data-anim]').forEach(function(el){o.observe(el);});
+}catch(e){document.querySelectorAll('[data-anim]').forEach(function(el){el.style.opacity='1';el.style.transform='none';});
+} // IntersectionObserver 降级：直接显示所有元素
+try{var s=document.querySelectorAll('h2');
+document.addEventListener('keydown',function(e){if((e.key==='ArrowRight'||e.key==='ArrowLeft')&&!e.ctrlKey&&!e.metaKey){e.preventDefault();
+var c=Array.from(s).findIndex(function(h){var r=h.getBoundingClientRect();return r.top>=0&&r.top<window.innerHeight/2;});
+var n=e.key==='ArrowRight'?Math.min(c+1,s.length-1):Math.max(c-1,0);if(n>=0&&s[n])s[n].scrollIntoView({behavior:'smooth'});
+}});}catch(e){} // 键盘导航降级：静默失败
+})();
+</script>
+```
+
+降级说明：
+- **IntersectionObserver 不支持的浏览器**（IE11、旧 Safari）：catch 块将所有 `[data-anim]` 元素的 opacity 设为 1、transform 取消，用户看到的是静态完整页面
+- **smooth scroll 不支持**：浏览器自动降级为 instant scroll
+- **T 键切主题不支持**：静默失败，用户停留在默认主题
+- 降级设计的核心原则：**JS 增强不影响基本可用性**——所有降级情况下，课程内容仍然是完整可读的
+
+/* ===== 主题切换过渡动画 ===== */
+body { transition: background-color 0.35s ease-out, color 0.35s ease-out; }
+body, body * { transition: background-color 0.35s ease-out, color 0.35s ease-out, border-color 0.35s ease-out, box-shadow 0.35s ease-out; }
+@media (prefers-reduced-motion: reduce) { body, body * { transition: none !important; } }

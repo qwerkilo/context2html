@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="theme-newspaper">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #2c2c2c; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: Georgia, "Noto Serif CJK SC", serif; }
+
+  .card { width: 680px; background: #f8f5f0; color: #1a1a1a; padding: 0; box-shadow: 0 8px 40px rgba(0,0,0,0.3); }
+
+  .card-header { background: #1a1a1a; color: #f8f5f0; padding: 28px 36px 22px; }
+  .card-header h1 { font-size: 20px; font-weight: 700; letter-spacing: 1px; font-family: "Inter","SF Pro Text",sans-serif; }
+  .card-header .sub { font-size: 12px; opacity: 0.6; margin-top: 6px; font-family: "SF Pro Text",sans-serif; }
+
+  .card-body { padding: 28px 36px 32px; }
+
+  .score-row { display: flex; gap: 32px; margin-bottom: 28px; padding-bottom: 24px; border-bottom: 2px solid #ddd8d0; }
+  .score-item { flex: 1; text-align: center; }
+  .score-item .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #888; font-family: "SF Pro Text",sans-serif; }
+  .score-item .value { font-size: 40px; font-weight: 700; line-height: 1.2; font-family: Georgia, serif; }
+  .score-item .value.up { color: #1a7a3a; }
+  .score-item .value.down { color: #c0392b; }
+
+  .dim-section { margin-bottom: 24px; }
+  .dim-section h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: 12px; font-family: "SF Pro Text",sans-serif; }
+
+  .dim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; }
+  .dim-row { display: flex; align-items: center; gap: 6px; font-size: 13px; font-family: "SF Pro Text",sans-serif; }
+  .dim-row .dim-name { width: 75px; color: #666; text-align: right; }
+  .dim-row .dim-bar-wrap { flex: 1; height: 10px; background: #e0dbd4; border-radius: 5px; overflow: hidden; }
+  .dim-row .dim-bar { height: 100%; background: #1a1a1a; border-radius: 5px; transition: width 0.5s; }
+  .dim-row .dim-bar.improved { background: #1a7a3a; }
+  .dim-row .dim-score { width: 42px; font-size: 12px; color: #888; text-align: right; font-family: "SF Pro Text",sans-serif; }
+
+  .dims-total { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; }
+  .dim-row-full { display: flex; align-items: center; gap: 6px; font-size: 13px; font-family: "SF Pro Text",sans-serif; }
+  .dim-row-full .dim-name { width: 75px; color: #c0392b; text-align: right; font-weight: 700; }
+  .dim-row-full .dim-bar-wrap { flex: 1; height: 10px; background: #e0dbd4; border-radius: 5px; overflow: hidden; }
+  .dim-row-full .dim-bar { height: 100%; background: #1a7a3a; border-radius: 5px; }
+  .dim-row-full .dim-score { width: 42px; font-size: 12px; color: #1a7a3a; text-align: right; font-weight: 700; font-family: "SF Pro Text",sans-serif; }
+
+  .improvements { margin-top: 20px; padding-top: 20px; border-top: 2px solid #ddd8d0; }
+  .improvements h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #666; margin-bottom: 10px; font-family: "SF Pro Text",sans-serif; }
+  .improvements ul { list-style: none; font-size: 13px; line-height: 1.6; font-family: "SF Pro Text",sans-serif; }
+  .improvements ul li::before { content: "— "; color: #c0392b; }
+  .improvements ul li { color: #333; }
+
+  .card-footer { padding: 16px 36px; background: #ede8e1; font-size: 11px; color: #999; text-align: center; font-family: "SF Pro Text",sans-serif; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="card-header">
+    <h1>⟨Darwin⟩ Skill Report</h1>
+    <div class="sub">context2html · 2026-06-29 · 3 rounds · keep 3/3</div>
+  </div>
+  <div class="card-body">
+    <div class="score-row">
+      <div class="score-item"><div class="label">Before</div><div class="value" style="color:#888">80.5</div></div>
+      <div class="score-item"><div class="label">After</div><div class="value up">88.1</div></div>
+      <div class="score-item"><div class="label">Δ</div><div class="value up">+7.6</div></div>
+    </div>
+
+    <div class="dim-section">
+      <h3>Dimension Scores (after) — 1–9</h3>
+      <div class="dim-grid">
+        <div class="dim-row"><span class="dim-name">D1 Frontmatter</span><div class="dim-bar-wrap"><div class="dim-bar" style="width:90%"></div></div><span class="dim-score">9</span></div>
+        <div class="dim-row"><span class="dim-name">D2 Workflow</span><div class="dim-bar-wrap"><div class="dim-bar improved" style="width:97%"></div></div><span class="dim-score">9.7</span></div>
+        <div class="dim-row"><span class="dim-name">D3 Failures</span><div class="dim-bar-wrap"><div class="dim-bar improved" style="width:95%"></div></div><span class="dim-score">9.5</span></div>
+        <div class="dim-row"><span class="dim-name">D4 Checkpoint</span><div class="dim-bar-wrap"><div class="dim-bar improved" style="width:95%"></div></div><span class="dim-score">9.5</span></div>
+        <div class="dim-row"><span class="dim-name">D5 Specificity</span><div class="dim-bar-wrap"><div class="dim-bar improved" style="width:88%"></div></div><span class="dim-score">8.8</span></div>
+        <div class="dim-row"><span class="dim-name">D6 Resources</span><div class="dim-bar-wrap"><div class="dim-bar" style="width:100%"></div></div><span class="dim-score">10</span></div>
+        <div class="dim-row"><span class="dim-name">D7 Architecture</span><div class="dim-bar-wrap"><div class="dim-bar improved" style="width:95%"></div></div><span class="dim-score">9.5</span></div>
+        <div class="dim-row"><span class="dim-name">D8 Test Perf</span><div class="dim-bar-wrap"><div class="dim-bar improved" style="width:75%"></div></div><span class="dim-score">7.5</span></div>
+        <div class="dim-row-full" style="grid-column:1/-1"><span class="dim-name">D9 Anti-pat</span><div class="dim-bar-wrap"><div class="dim-bar" style="width:90%"></div></div><span class="dim-score">9</span></div>
+      </div>
+    </div>
+
+    <div class="improvements">
+      <h3>Improvements</h3>
+      <ul>
+        <li>失败分支嵌入 0/1/3/4 四步 + 异常表 8→10 行</li>
+        <li>Step 3 新增正文确认 STOP 检查点</li>
+        <li>删除冗余错误检查清单，合并交叉引用入 Step 4</li>
+      </ul>
+    </div>
+  </div>
+  <div class="card-footer">Train your Skills like you train your models · github.com/alchaincyf/darwin-skill</div>
+</div>
+</body>
+</html>

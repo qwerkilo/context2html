@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>步骤指示器 - 组件示例</title>
+<link rel="stylesheet" href="../libs/magicui-effects.css">
+<style>
+:root { --bg: #faf9f7; --text: #1a1a1a; --accent: #c0392b; --radius: 8px; --anim-dur: 0.35s; }
+body { font-family: "Noto Serif CJK SC", Georgia, serif; background: var(--bg); color: var(--text); line-height: 1.8; max-width: 720px; margin: 3rem auto; padding: 0 1.5rem; }
+h1 { font-size: 1.6rem; border-bottom: 1px solid #ddd; padding-bottom: 0.5em; }
+
+.step-indicator { display: flex; align-items: center; justify-content: space-between; margin: 1.5rem 0; position: relative; }
+.step-indicator::before { content: ''; position: absolute; left: 10%; right: 10%; top: 16px; height: 2px; background: #d0d0d0; z-index: 0; }
+.si-step { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; }
+.si-num { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; margin-bottom: 0.3em; border: 2px solid #e2e8f0; background: #fff; color: #94a3b8; }
+.si-step.done .si-num { background: var(--accent); color: #fff; border-color: var(--accent); }
+.si-step.current .si-num { background: #fff; color: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 4px rgba(192,57,43,0.12); }
+.si-label { font-size: 0.78rem; color: #94a3b8; font-weight: 500; }
+.si-step.done .si-label, .si-step.current .si-label { color: var(--text); }
+@media (max-width: 500px) { .step-indicator { gap: 0.3em; overflow-x: auto; justify-content: flex-start; } .step-indicator::before { display: none; } .si-step { flex: 0 0 auto; min-width: 60px; } }
+
+[data-anim] { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+[data-anim].in-view { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<h1 class="shiny-text">步骤指示器 — 组件示例</h1>
+
+<p>以下展示 5 步流程，已完成 2 步、当前在第 3 步。</p>
+
+<div class="step-indicator" data-anim="fade-up">
+  <div class="si-step done">
+    <div class="si-num">1</div>
+    <div class="si-label">需求</div>
+  </div>
+  <div class="si-step done">
+    <div class="si-num">2</div>
+    <div class="si-label">设计</div>
+  </div>
+  <div class="si-step current glare-hover">
+    <div class="si-num">3</div>
+    <div class="si-label">开发</div>
+  </div>
+  <div class="si-step">
+    <div class="si-num">4</div>
+    <div class="si-label">测试</div>
+  </div>
+  <div class="si-step">
+    <div class="si-num">5</div>
+    <div class="si-label">部署</div>
+  </div>
+</div>
+
+<p>说明：强调色实心 = 已完成，描边+光晕 = 当前步骤，灰色 = 待办。</p>
+
+<script>
+(function(){
+  var obs = new IntersectionObserver(function(es) {
+    es.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('in-view'); });
+  });
+  document.querySelectorAll('[data-anim]').forEach(function(el) { obs.observe(el); });
+})();
+</script>
+</body>
+</html>

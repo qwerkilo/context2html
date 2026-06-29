@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="warm">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>全球 AI 芯片市场调研报告 2024-2026</title>
+<link rel="stylesheet" href="../theme/report-themes.css">
+<style>
+/* ===== CSS 变量与主题 ===== */
+:root {
+  --bg: #faf9f7; --text: #1a1a1a; --accent: #c0392b;
+  --accent-text: #ffffff; --surface: #f5f0eb; --border: #ddd8d0;
+  --surface-raised: #ece6dd; --muted: #888;
+  --link: #c0392b; --success: #16a34a; --warning: #d97706; --error: #dc2626;
+  --font: "Noto Serif CJK SC",Georgia,"Times New Roman",serif;
+  --font-h: "Noto Serif CJK SC",Georgia,"Times New Roman",serif;
+  --lh: 1.8; --h1-size: 2rem; --h2-size: 1.3rem;
+  --body-size: 1rem; --small-size: 0.85rem;
+  --radius: 8px; --anim-dur: 0.3s; --anim-y: 18px;
+  --h2-border: 1px solid #ddd; --h1-size: 2rem;
+}
+[data-theme="airbnb"] {
+  --bg: #ffffff; --text: #222222; --accent: #ff385c;
+  --accent-text: #ffffff; --surface: #ffffff; --border: #dddddd;
+  --surface-raised: #f2f2f2; --muted: #6a6a6a;
+  --link: #ff385c; --success: #16a34a; --warning: #d97706; --error: #dc2626;
+  --font: "Airbnb Cereal VF",sans-serif; --font-h: "Airbnb Cereal VF",sans-serif;
+  --lh: 1.25;
+}
+
+[data-theme="airtable"] {
+  --bg: #ffffff; --text: #181d26; --accent: #181d26;
+  --accent-text: #ffffff; --surface: #f8fafc; --border: #dddddd;
+  --surface-raised: #e0e2e6; --muted: #41454d;
+  --link: #1b61c9; --success: #006400; --warning: #d97706; --error: #dc2626;
+  --font: "Inter Display",sans-serif; --font-h: "Inter Display",sans-serif;
+  --lh: 1.3;
+}
+
+[data-theme="apple"] {
+  --bg: #ffffff; --text: #1d1d1f; --accent: #0066cc;
+  --accent-text: #ffffff; --surface: #f5f5f7; --border: #e0e0e0;
+  --surface-raised: #f5f5f7; --muted: #666666;
+  --link: #0066cc; --success: #16a34a; --warning: #d97706; --error: #dc2626;
+  --font: "SF Pro Text",sans-serif; --font-h: "SF Pro Text",sans-serif;
+  --lh: 1.5; --radius: 12px; --anim-dur: 0.8s; --anim-y: 20px;
+}
+
+[data-theme="binance"] {
+  --bg: #ffffff; --text: #181a20; --accent: #fcd535;
+  --accent-text: #181a20; --surface: #f5f5f5; --border: #e0e0e0;
+  --surface-raised: #f5f5f5; --muted: #707a8a;
+  --link: #fcd535; --success: #16a34a; --warning: #d97706; --error: #dc2626;
+  --font: "BinanceNova",sans-serif; --font-h: "BinancePlex",sans-serif;
+  --lh: 1.4;
+}
+
+[data-theme="bmw-m"] {
+  --bg: #000000; --text: #ffffff; --accent: #ffffff;
+  --accent-text: #000000; --surface: #1a1a1a; --border: #3c3c3c;
+  --surface-raised: #262626; --muted: #7e7e7e;
+  --link: #ffffff; --success: #0fa336; --warning: #f4b400; --error: #dc2626;
+  --font: "BMWTypeNextLatin",sans-serif; --font-h: "BMWTypeNextLatin",sans-serif;
+  --lh: 1.4;
+}
+
+[data-theme="claude"] {
+  --bg: #faf9f5; --text: #141413; --accent: #cc785c;
+  --accent-text: #ffffff; --surface: #efe9de; --border: #e6dfd8;
+  --surface-raised: #efe9de; --muted: #6c6a64;
+  --link: #cc785c; --success: #5db872; --warning: #d4a017; --error: #c64545;
+  --font: "StyreneB",sans-serif; --font-h: "Copernicus",sans-serif;
+  --lh: 1.4;
+}
+
+[data-theme="cursor"] {
+  --bg: #f7f7f4; --text: #26251e; --accent: #f54e00;
+  --accent-text: #ffffff; --surface: #ffffff; --border: #e6e5e0;
+  --surface-raised: #e6e5e0; --muted: #807d72;
+  --link: #f54e00; --success: #16a34a; --warning: #d97706; --error: #dc2626;
+  --font: "CursorGothic",sans-serif; --font-h: "CursorGothic",sans-serif;
+  --lh: 1.4;
+}
+
+[data-theme="dell-1996"] {
+  --bg: #ffffff; --text: #000000; --accent: #e91d2a;
+  --accent-text: #ffffff; --surface: #ffffff; --border: #e0e0e0;
+  --surface-raised: #ffffff; --muted: #666666;
+  --link: #0000ee; --success: #16a34a; --warning: #d97706; --error: #dc2626;
+  --font: "Times New Roman",sans-serif; --font-h: "Helvetica",sans-serif;
+  --lh: 1.35;
+}
+
+[data-theme="figma"] {
+  --bg: #ffffff; --text: #000000; --accent: #000000;
+  --accent-text: #ffffff; --surface: #f7f7f5; --border: #e6e6e6;
+  --surface-raised: #f7f7f5; --muted: #666666;
+  --link: #000000; --success: #16a34a; --warning: #d97706; --error: #dc2626;
+  --font: "figmaMono",sans-serif; --font-h: "figmaSans",sans-serif;
+  --lh: 1.5;
+}
+
+[data-theme="hp"] {
+  --bg: #ffffff; --text: #1a1a1a; --accent: #024ad8;
+  --accent-text: #ffffff; --surface: #f5f5f5; --border: #e8e8e8;
+  --surface-raised: #f5f5f5; --muted: #666666;
+  --link: #024ad8; --success: #16a34a; --warning: #d97706; --error: #b3262b;
+  --font: "Forma DJR Micro",sans-serif; --font-h: "Forma DJR Micro",sans-serif;
+  --lh: 1.17;
+}
+
+[data-theme="ibm"] {
+  --bg: #ffffff; --text: #161616; --accent: #0f62fe;
+  --accent-text: #ffffff; --surface: #f5f5f5; --border: #e0e0e0;
+  --surface-raised: #f5f5f5; --muted: #525252;
+  --link: #0f62fe; --success: #16a34a; --warning: #d97706; --error: #dc2626;
+  --font: "IBM Plex Sans",sans-serif; --font-h: "IBM Plex Sans",sans-serif;
+  --lh: 1.33;
+}
+
+[data-theme="minimax"] {
+  --bg: #ffffff; --text: #0a0a0a; --accent: #0a0a0a;
+  --accent-text: #ffffff; --surface: #f2f3f5; --border: #e5e7eb;
+  --surface-raised: #f2f3f5; --muted: #a8aab2;
+  --link: #0a0a0a; --success: #16a34a; --warning: #d97706; --error: #dc2626;
+  --font: "DM Sans",sans-serif; --font-h: "DM Sans",sans-serif;
+  --lh: 1.6; --radius: 8px; --anim-dur: 0.35s; --anim-y: 30px; --h2-border: none; --h1-size: 2.4rem;
+}
+
+[data-theme="nike"] {
+  --bg: #ffffff; --text: #111111; --accent: #111111;
+  --accent-text: #ffffff; --surface: #f5f5f5; --border: #cacacb;
+  --surface-raised: #f5f5f5; --muted: #666666;
+  --link: #111111; --success: #007d48; --warning: #d97706; --error: #dc2626;
+  --font: "Helvetica Now Text Medium",sans-serif; --font-h: "Helvetica Now Display Medium",sans-serif;
+  --lh: 1.5;
+}
+
+[data-theme="notion"] {
+  --bg: #ffffff; --text: #1a1a1a; --accent: #5645d4;
+  --accent-text: #ffffff; --surface: #fafaf9; --border: #e5e3df;
+  --surface-raised: #fafaf9; --muted: #bbb8b1;
+  --link: #0075de; --success: #16a34a; --warning: #d97706; --error: #dc2626;
+  --font: "Notion Sans",sans-serif; --font-h: "Notion Sans",sans-serif;
+  --lh: 1.4;
+}
+
+[data-theme="nvidia"] {
+  --bg: #ffffff; --text: #000000; --accent: #76b900;
+  --accent-text: #000000; --surface: #f7f7f7; --border: #cccccc;
+  --surface-raised: #1a1a1a; --muted: #666666;
+  --link: #0046a4; --success: #16a34a; --warning: #df6500; --error: #e52020;
+  --font: "NVIDIA-EMEA",sans-serif; --font-h: "NVIDIA-EMEA",sans-serif;
+  --lh: 1.55; --radius: 2px; --anim-dur: 0s; --anim-y: 0px; --h2-border: 2px solid var(--accent); --h1-size: 1.9rem;
+}
+
+[data-theme="spotify"] {
+  --bg: #121212; --text: #ffffff; --accent: #1ed760;
+  --accent-text: #000000; --surface: #181818; --border: #4d4d4d;
+  --surface-raised: #1f1f1f; --muted: #b3b3b3;
+  --link: #1ed760; --success: #1ed760; --warning: #ffa42b; --error: #f3727f;
+  --font: "SpotifyMixUI",sans-serif; --font-h: "SpotifyMixUITitle",sans-serif;
+  --lh: 1.5; --radius: 8px; --anim-dur: 0.3s; --anim-y: 0px; --h2-border: 1px solid #4d4d4d; --h1-size: 1.5rem;
+}
+
+[data-theme="tesla"] {
+  --bg: #ffffff; --text: #171a20; --accent: #3e6ae1;
+  --accent-text: #ffffff; --surface: #f4f4f4; --border: #d0d1d2;
+  --surface-raised: #f4f4f4; --muted: #5c5e62;
+  --link: #3e6ae1; --success: #16a34a; --warning: #d97706; --error: #dc2626;
+  --font: "Universal Sans Text",sans-serif; --font-h: "Universal Sans Display",sans-serif;
+  --lh: 1.43; --radius: 4px; --anim-dur: 0.33s; --anim-y: 0px; --h2-border: none; --h1-size: 2.5rem;
+}
+
+[data-theme="x.ai"] {
+  --bg: #0a0a0a; --text: #ffffff; --accent: #ffffff;
+  --accent-text: #0a0a0a; --surface: #191919; --border: #212327;
+  --surface-raised: #1a1c20; --muted: #7d8187;
+  --link: #ffffff; --success: #16a34a; --warning: #d97706; --error: #dc2626;
+  --font: "GeistMono",sans-serif; --font-h: "universalSans",sans-serif;
+  --lh: 1.6;
+}
+
+[data-theme="zapier"] {
+  --bg: #fffefb; --text: #201515; --accent: #ff4f00;
+  --accent-text: #fffefb; --surface: #f5f5f5; --border: #e0e0e0;
+  --surface-raised: #f5f5f5; --muted: #666666;
+  --link: #ff4f00; --success: #16a34a; --warning: #d97706; --error: #dc2626;
+  --font: "Degular Display",sans-serif; --font-h: "Inter",sans-serif;
+  --lh: 1.6;
+}
+
+/* ===== 正文排版 ===== */
+body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: var(--lh); max-width: 720px; margin: 0 auto; padding: 0 1.5rem; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }
+h1 { font-size: var(--h1-size); font-family: var(--font-h); margin-top: 2rem; text-wrap: pretty; letter-spacing: -0.01em; }
+h2 { font-size: 1.3rem; font-family: var(--font-h); border-bottom: var(--h2-border); padding-bottom: 0.3em; margin-top: 2em; text-wrap: pretty; letter-spacing: -0.01em; }
+p { margin: 1.2em 0; }
+
+/* ===== Focus visible — WCAG AA ===== */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+button:active { transform: scale(0.98); }
+@media (prefers-reduced-motion: reduce) { button:active { transform: none; } }
+
+/* ===== 动画 ===== */
+[data-anim] { opacity: 0; transform: translateY(var(--anim-y)); transition: opacity var(--anim-dur) ease-out, transform var(--anim-dur) ease-out; }
+[data-anim].in-view { opacity: 1; transform: translateY(0); }
+[data-anim="fade"] { transform: none; }
+[data-anim="slide-left"] { transform: translateX(calc(var(--anim-y) * -1)); }
+[data-anim="slide-left"].in-view { transform: translateX(0); }
+@media (prefers-reduced-motion: reduce) { [data-anim] { opacity: 1; transform: none; transition: none; } }
+
+/* ===== 封面页 ===== */
+.cover-page { text-align: center; padding: 4rem 1.5rem; margin-bottom: 2.5rem; border-bottom: 2px solid var(--accent); position: relative; }
+.cover-page::after { content: ''; position: absolute; bottom: -2px; left: 25%; right: 25%; height: 2px; background: var(--accent); opacity: 0.3; }
+.cover-badge { display: inline-block; padding: 0.25em 1.2em; background: var(--accent); color: var(--accent-text); border-radius: 20px; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.05em; margin-bottom: 1em; }
+.cover-subtitle { font-size: 1.15rem; color: var(--muted); margin-top: 0.5em; font-weight: 500; }
+.cover-hook { font-size: 0.95rem; color: var(--muted); margin-top: 1em; font-style: italic; max-width: 480px; margin-left: auto; margin-right: auto; }
+
+/* ===== 报告专用页面类型 ===== */
+.exec-summary { margin: 2rem 0; padding: 1.5rem 2rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+.exec-summary h2 { border: none; margin-top: 0; }
+.exec-summary-item { display: flex; align-items: flex-start; gap: 0.8rem; margin: 1em 0; font-size: 0.95rem; }
+.exec-summary-item::before { content: '\25C6'; color: var(--accent); font-size: 0.7rem; flex-shrink: 0; margin-top: 0.3em; }
+
+.key-numbers { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin: 2rem 0; }
+.kn-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; text-align: center; }
+.kn-number { font-size: 2rem; font-weight: 800; color: var(--accent); display: block; font-variant-numeric: tabular-nums; }
+.kn-label { font-size: 0.82rem; color: var(--muted); margin-top: 0.3em; display: block; }
+
+.report-toc { margin: 2rem 0; padding: 1.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+.report-toc ol { margin: 0; padding-left: 1.5em; }
+.report-toc li { margin: 0.5em 0; font-size: 0.9rem; }
+.report-toc a { color: var(--link); text-decoration: none; transition: opacity 0.2s; }
+.report-toc a:hover { opacity: 0.7; text-decoration: underline; }
+
+.report-chapter { margin: 2.5rem 0; }
+.report-chapter h2 { font-size: 1.4rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.3em; margin-top: 0; }
+
+.conclusion-page { margin: 2.5rem 0; padding: 1.5rem 2rem; background: var(--surface); border-left: 4px solid var(--accent); border-radius: 0 var(--radius) var(--radius) 0; }
+.conclusion-page h2 { border: none; margin-top: 0; }
+.ccl-item { display: flex; align-items: flex-start; gap: 0.8rem; margin: 1em 0; font-size: 0.95rem; }
+.ccl-item::before { content: '\2192'; color: var(--accent); font-weight: 700; flex-shrink: 0; }
+
+.appendix { margin: 2rem 0; padding: 1rem 0; border-top: 1px solid var(--border); font-size: 0.85rem; color: var(--muted); }
+.appendix h2 { border: none; font-size: 1rem; color: var(--text); }
+
+.report-footer { margin: 2rem 0; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 0.78rem; color: var(--muted); text-align: center; }
+
+/* ============================================================ */
+/* ===== 组件 CSS 从此处插入（按前缀分组）                      ===== */
+/* ===== 🛑 以下为示例组件 CSS，替换课程内容时按需保留/删除  ===== */
+/* ============================================================ */
+
+/* CSS 条形图 (#4) */
+.bar-chart { margin: 1.5rem 0; }
+.bar-item { display: flex; align-items: center; gap: 10px; margin-bottom: 0.6em; }
+.bar-label { width: 120px; font-size: 0.82rem; font-weight: 600; text-align: right; flex-shrink: 0; }
+.bar-track { flex: 1; height: 24px; background: var(--surface); border-radius: 12px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 12px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 0.72rem; font-weight: 600; color: #fff; transition: width 1s ease; }
+
+/* 数据卡片网格 (#12) */
+.dg-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+.dg-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.2rem; text-align: center; }
+.dg-icon { font-size: 1.5rem; display: block; margin-bottom: 0.3em; }
+.dg-value { font-size: 1.5rem; font-weight: 800; color: var(--accent); display: block; font-variant-numeric: tabular-nums; }
+.dg-label { font-size: 0.78rem; color: var(--muted); margin-top: 0.2em; display: block; }
+
+/* ===== Magic UI 装饰效果（同步自 libs/magicui-effects.css，见 libs/ 为最新版） ===== */
+@keyframes bg-spin { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+.shiny-text { background: linear-gradient(110deg, var(--text) 30%, var(--accent) 50%, var(--text) 70%); background-size: 200% 100%; background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shine var(--shine-duration, 4s) cubic-bezier(0.6,0.6,0,1) infinite; }
+@keyframes shine { 0% { background-position: 0% 50%; } 100% { background-position: 200% 50%; } }
+.noise-overlay { position: absolute; inset: 0; z-index: 0; opacity: 0.04; pointer-events: none; overflow: hidden; mix-blend-mode: multiply; }
+.noise-overlay svg { width: 100%; height: 100%; }
+.cover-page .noise-overlay { opacity: 0.03; }
+.dot-bg { background-image: radial-gradient(circle, var(--border, rgba(128,128,128,0.3)) 1px, transparent 1px); background-size: 20px 20px; }
+.grid-bg { background-image: linear-gradient(var(--border, rgba(128,128,128,0.15)) 1px, transparent 1px), linear-gradient(90deg, var(--border, rgba(128,128,128,0.15)) 1px, transparent 1px); background-size: 40px 40px; }
+.meteors-container { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+.meteor { position: absolute; width: 1px; height: 1px; background: var(--accent, #888); border-radius: 50%; box-shadow: 0 0 0 1px rgba(255,255,255,0.05); animation: meteor var(--meteor-duration, 5s) var(--meteor-delay, 0s) linear infinite; opacity: 0; }
+.meteor::after { content: ''; position: absolute; top: 50%; transform: translateY(-50%); width: 60px; height: 1px; background: linear-gradient(to right, var(--accent, #888), transparent); opacity: 0.5; }
+@keyframes meteor { 0% { transform: rotate(var(--angle, -215deg)) translateX(0); opacity: 0; } 5% { opacity: 1; } 30% { opacity: 1; } 100% { transform: rotate(var(--angle, -215deg)) translateX(-500px); opacity: 0; } }
+.border-glow { position: relative; overflow: hidden; }
+.border-glow::before { content: ''; position: absolute; inset: -50%; z-index: 0; background: conic-gradient(from 0deg, transparent, var(--glow-color, var(--accent, #c0392b)), transparent 60%); animation: border-spin var(--glow-duration, 3s) linear infinite; opacity: var(--glow-opacity, 0.35); }
+.border-glow::after { content: ''; position: absolute; inset: 1px; background: var(--surface, #f5f0eb); border-radius: inherit; z-index: 1; pointer-events: none; }
+.border-glow > * { position: relative; z-index: 2; }
+@keyframes border-spin { to { transform: rotate(360deg); } }
+.glare-hover { position: relative; overflow: hidden; }
+.glare-hover::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(var(--glare-angle, -45deg), transparent 60%, color-mix(in srgb, var(--glare-color, var(--accent, #fff)) 40%, transparent) 70%, transparent 100%); background-size: var(--glare-size, 250%) var(--glare-size, 250%), 100% 100%; background-position: -100% -100%, 0 0; transition: background-position var(--glare-duration, 650ms) ease-in-out; }
+.glare-hover:hover::before { background-position: 100% 100%, 0 0; }
+.glare-hover > * { position: relative; z-index: 2; }
+[data-anim="blur"] { opacity: 0; filter: blur(8px); transform: translateY(12px); transition: opacity 0.5s ease-out, filter 0.5s ease-out, transform 0.5s ease-out; }
+[data-anim="blur"].in-view { opacity: 1; filter: blur(0); transform: translateY(0); }
+.gradient-text { background: linear-gradient(90deg, var(--grad-from, var(--accent, #e74c3c)), var(--grad-via, #8e44ad), var(--grad-to, var(--accent, #e74c3c))); background-size: var(--grad-size, 300%) 100%; background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: gradient-flow var(--grad-duration, 4s) ease infinite; }
+@keyframes gradient-flow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+.neon-card { position: relative; z-index: 1; border-radius: var(--neon-radius, 12px); }
+.neon-card::before, .neon-card::after { content: ''; position: absolute; inset: calc(var(--neon-border, 2px) * -1); z-index: -1; border-radius: inherit; background: linear-gradient(0deg, var(--neon-from, #ff00aa), var(--neon-to, #00fff1)); background-size: 100% 200%; animation: bg-spin var(--neon-speed, 3s) ease infinite; }
+.neon-card::after { filter: blur(var(--neon-blur, 30px)); opacity: var(--neon-glow-opacity, 0.6); }
+.neon-card > * { position: relative; z-index: 1; background: var(--surface, #f5f0eb); border-radius: inherit; padding: 1.2rem; }
+.spotlight-card { position: relative; overflow: hidden; }
+.spotlight-card::before { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(var(--spotlight-size, 300px) circle at var(--mx, 50%) var(--my, 50%), var(--spotlight-color, rgba(255,255,255,0.25)), transparent 80%); opacity: 0; transition: opacity 0.2s ease; }
+.spotlight-card:hover::before { opacity: 1; }
+.spotlight-card > * { position: relative; z-index: 2; }
+.interactive-btn { position: relative; display: inline-flex; align-items: center; gap: 8px; padding: 0.5em 1.5em; border: none; border-radius: 999px; cursor: pointer; font-family: inherit; font-weight: 600; font-size: 0.9rem; background: var(--accent, #333); color: var(--accent-text, #fff); overflow: hidden; transition: transform 0.2s ease; }
+.interactive-btn:hover { transform: scale(1.02); }
+.interactive-btn .btn-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-text, #fff); transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.interactive-btn:hover .btn-dot { transform: scale(100); }
+.interactive-btn .btn-text { position: relative; z-index: 1; transition: transform 0.3s ease, opacity 0.3s ease; }
+.interactive-btn:hover .btn-text { transform: translateX(10px); opacity: 0; }
+.interactive-btn .btn-hover { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 6px; transform: translateX(-10px); opacity: 0; transition: transform 0.3s ease, opacity 0.3s ease; z-index: 1; }
+.interactive-btn:hover .btn-hover { transform: translateX(0); opacity: 1; }
+@keyframes blink-cursor { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+.typing-cursor::after { content: '|'; display: inline-block; animation: blink-cursor 1s step-end infinite; color: var(--accent, inherit); font-weight: 300; margin-left: 1px; }
+@media (prefers-reduced-motion: reduce) { .shiny-text { background: none; -webkit-text-fill-color: unset; } .border-glow::before, .border-glow::after { display: none; } .meteor { display: none; } [data-anim="blur"] { opacity: 1; filter: none; transform: none; } .gradient-text { background: none; -webkit-text-fill-color: unset; } .neon-card::before, .neon-card::after { display: none; } .interactive-btn:hover { transform: none; } .interactive-btn:hover .btn-dot { transform: none; } .interactive-btn:hover .btn-text { opacity: 1; transform: none; } .interactive-btn:hover .btn-hover { display: none; } }
+
+/* ===== 底部工具栏（z-index 层级: toolbar=999, panel=998, overlay=1000） ===== */
+.ui-toolbar { position: fixed; bottom: 20px; right: 20px; z-index: 999; display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: rgba(20,20,20,0.88); backdrop-filter: blur(6px); border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+.tp-btn-toggle, .toc-btn { background: none; border: none; font-size: 1.1rem; cursor: pointer; padding: 0 2px; line-height: 1; opacity: 0.7; transition: opacity 0.2s ease; color: #e0e0e0; }
+.tp-btn-toggle:hover, .toc-btn:hover { opacity: 1; color: #ffffff; }
+.tp-panel { position: fixed; bottom: 70px; right: 20px; z-index: 998; background: #1a1a1a; border: 1px solid #333; border-radius: var(--radius, 8px); padding: 0.6em; box-shadow: 0 4px 16px rgba(0,0,0,0.3); display: none; max-height: 50vh; overflow-y: auto; }
+.tp-panel.open { display: block; }
+.tp-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; min-width: 180px; }
+.tp-item { display: flex; align-items: center; gap: 6px; padding: 0.4em 0.6em; border: 1px solid transparent; border-radius: 6px; background: none; cursor: pointer; font-size: 0.82rem; color: #d0d0d0; text-align: left; transition: background 0.15s ease; }
+.tp-item:hover { background: rgba(255,255,255,0.08); color: #ffffff; }
+.tp-item.active { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 20%, #222); color: #ffffff; font-weight: 600; }
+.tp-item::before { content: ''; width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; background: var(--tp-color); border: 1px solid rgba(255,255,255,0.15); }
+.lang-btn { background: none; border: 1px solid rgba(255,255,255,0.25); border-radius: 4px; font-size: 0.72rem; cursor: pointer; padding: 1px 5px; line-height: 1.4; opacity: 0.7; transition: opacity 0.2s ease; color: #e0e0e0; font-family: inherit; font-weight: 600; letter-spacing: 0.03em; }
+.lang-btn:hover { opacity: 1; color: #ffffff; border-color: rgba(255,255,255,0.5); }
+[data-lang] { display: none; }
+[data-lang].active { display: inline; }
+h1[data-lang].active, h2[data-lang].active, p[data-lang].active, div[data-lang].active, section[data-lang].active, article[data-lang].active, aside[data-lang].active { display: block; }
+td[data-lang].active, th[data-lang].active { display: table-cell; }
+.cover-badge[data-lang].active { display: inline-block; }
+.toc-btn { background: none; border: none; font-size: 1.1rem; cursor: pointer; padding: 0 2px; line-height: 1; opacity: 0.7; transition: opacity 0.2s ease; color: #e0e0e0; }
+.toc-btn:hover { opacity: 1; color: #ffffff; }
+.toc-panel { position: fixed; bottom: 70px; right: 20px; z-index: 998; background: #1a1a1a; border: 1px solid #333; border-radius: var(--radius, 8px); padding: 0.6em 0; box-shadow: 0 4px 16px rgba(0,0,0,0.3); overflow-y: auto; display: none; min-width: 160px; max-height: 50vh; }
+.toc-panel.open { display: block; }
+.toc-list { list-style: none; margin: 0; padding: 0; }
+.toc-item { padding: 0.4em 1em; font-size: 0.82rem; cursor: pointer; color: #999; transition: color 0.15s ease, background 0.15s ease; }
+.toc-item:hover { background: rgba(255,255,255,0.06); color: #ffffff; }
+.toc-item.active { color: var(--accent); font-weight: 600; background: rgba(255,255,255,0.04); }
+
+
+/* ===== 主题切换过渡动画 ===== */
+body { transition: background-color 0.35s ease-out, color 0.35s ease-out; }
+body, body * { transition: background-color 0.35s ease-out, color 0.35s ease-out, border-color 0.35s ease-out, box-shadow 0.35s ease-out; }
+@media (prefers-reduced-motion: reduce) { body, body * { transition: none !important; } }
+/* ===== 响应式 ===== */
+@media (max-width: 600px) {
+  body { padding: 0 1rem; }
+  h1 { font-size: 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== 报告封面页 ===== -->
+<article class="cover-page">
+  <div class="noise-overlay">
+    <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+      <filter id="noise-filter"><feTurbulence type="fractalNoise" baseFrequency="0.4" numOctaves="6" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncR type="linear" slope="0.15"/><feFuncG type="linear" slope="0.15"/><feFuncB type="linear" slope="0.15"/></feComponentTransfer></filter>
+      <rect width="100%" height="100%" filter="url(#noise-filter)" opacity="1"/>
+    </svg>
+  </div>
+  <div class="meteors-container"></div>
+  <div class="cover-badge shiny-text" data-lang="zh">示例报告</div>
+  <div class="cover-badge shiny-text" data-lang="en">Demo Report</div>
+  <h1 data-lang="zh">全球 AI 芯片市场调研报告</h1>
+  <h1 data-lang="en">Global AI Chip Market Research Report</h1>
+  <p class="cover-subtitle" data-lang="zh">2024-2026 年市场规模、竞争格局与技术趋势分析</p>
+  <p class="cover-subtitle" data-lang="en">Market Size, Competitive Landscape &amp; Technology Trends 2024-2026</p>
+  <p class="cover-hook" style="font-style:normal;font-size:0.85rem;color:var(--muted);" data-lang="zh">📅 2026-06  |  作者: Research Team  |  数据来源: Gartner, IDC, 公开财报</p>
+  <p class="cover-hook" style="font-style:normal;font-size:0.85rem;color:var(--muted);" data-lang="en">📅 2026-06  |  Author: Research Team  |  Sources: Gartner, IDC, Public Filings</p>
+</article>
+
+<!-- ===== 摘要 / 关键发现 ===== -->
+<section class="exec-summary">
+  <h2 data-lang="zh">📋 关键发现</h2>
+  <h2 data-lang="en">📋 Key Findings</h2>
+  <div class="exec-summary-item" data-lang="zh">全球 AI 芯片市场 2025 年规模达到 980 亿美元——三年年复合增长 38%，没慢下来过</div>
+  <div class="exec-summary-item" data-lang="en">Global AI chip market reached $98B in 2025, CAGR of 38%</div>
+  <div class="exec-summary-item" data-lang="zh">NVIDIA 吃下独立 GPU 八八成的份额，可定制 ASIC 的增速比它还猛</div>
+  <div class="exec-summary-item" data-lang="en">NVIDIA holds 88% of discrete GPU market, but custom ASICs grow faster</div>
+  <div class="exec-summary-item" data-lang="zh">中国 AI 芯片自给率从 2020 年的 6% 爬到 2025 年的 18%，路还长但方向明确</div>
+  <div class="exec-summary-item" data-lang="en">China's AI chip self-sufficiency rose from 6% (2020) to 18% (2025)</div>
+</section>
+
+<!-- ===== 关键数字（可选） ===== -->
+<section class="key-numbers">
+  <div class="kn-card"><span class="kn-number" data-countup="980">0</span><span class="kn-label" data-lang="zh">市场规模 (亿美元)</span><span class="kn-label" data-lang="en">Market Size (USD B)</span></div>
+  <div class="kn-card"><span class="kn-number" data-countup="38">0</span><span class="kn-label" data-lang="zh">年复合增长率 (%)</span><span class="kn-label" data-lang="en">CAGR (%)</span></div>
+  <div class="kn-card"><span class="kn-number" data-countup="88">0</span><span class="kn-label" data-lang="zh">NVIDIA 市占率 (%)</span><span class="kn-label" data-lang="en">NVIDIA Share (%)</span></div>
+  <div class="kn-card"><span class="kn-number" data-countup="18">0</span><span class="kn-label" data-lang="zh">中国自给率 (%)</span><span class="kn-label" data-lang="en">China Self-sufficiency (%)</span></div>
+</section>
+
+<!-- ===== 目录 ===== -->
+<nav class="report-toc">
+  <h2 data-lang="zh">目录</h2>
+  <h2 data-lang="en">Table of Contents</h2>
+  <ol>
+    <li><a href="#ch1" data-lang="zh">第一章：市场概况与规模</a><a href="#ch1" data-lang="en">Chapter 1: Market Overview &amp; Scale</a></li>
+    <li><a href="#ch2" data-lang="zh">第二章：竞争格局分析</a><a href="#ch2" data-lang="en">Chapter 2: Competitive Landscape</a></li>
+    <li><a href="#ch3" data-lang="zh">第三章：技术趋势与展望</a><a href="#ch3" data-lang="en">Chapter 3: Technology Trends &amp; Outlook</a></li>
+  </ol>
+</nav>
+
+<!-- ===== 第一章 ===== -->
+<section class="report-chapter" id="ch1">
+  <h2 data-lang="zh">第一章：市场概况与规模</h2>
+  <h2 data-lang="en">Chapter 1: Market Overview &amp; Scale</h2>
+  <p data-lang="zh">全球 AI 芯片市场在 2024 年已站上 710 亿美元，2025 年进一步冲至 980 亿——年复合增长率 38%。Gartner 和 IDC 的数据都指向同一个判断：大语言模型训练与推理、自动驾驶系统上车、云端与边缘端推理部署的快速扩展，这三驾马车正拉着整个市场加速跑。</p>
+  <p data-lang="en">AI chips are the core computing infrastructure for artificial intelligence. According to Gartner and IDC, the global AI chip market reached approximately $71B in 2024 and grew to $98B in 2025, with a CAGR of 38%. The growth is driven by large language model training and inference, commercial deployment of autonomous driving systems, and rapid expansion of AI inference at both cloud and edge.</p>
+  <p data-lang="zh">这还不是全部。GPU 仍然扛着六成市场份额。故事的另一面是：ASIC 和 FPGA 这些定制化芯片增速更快——推理场景下能效比高出 GPU 一大截。Google 的 TPU、Amazon 的 Trainium 和 Inferentia、微软未命名的自研项目……云巨头们不再满足于买芯片，转而自己下场设计。市场格局正在被改写。</p>
+  <p data-lang="en">By product type, GPUs remain the dominant force with approximately 60% market share. Notably, custom chips like ASICs and FPGAs are growing faster than GPUs, especially in inference scenarios where they deliver superior energy efficiency. Major cloud providers including Google (TPU), Amazon (Trainium/Inferentia), and Microsoft have introduced their own chips, driving market diversification.</p>
+
+  <!-- 条形图组件 -->
+  <h3 data-lang="zh" style="font-size:1rem;margin-top:1.5em;">AI 芯片细分市场规模（2025 年，亿美元）</h3>
+  <h3 data-lang="en" style="font-size:1rem;margin-top:1.5em;">AI Chip Market by Segment (2025, USD B)</h3>
+  <div class="bar-chart">
+    <div class="bar-item"><span class="bar-label">GPU</span><div class="bar-track"><div class="bar-fill" style="width:60%;background:#c0392b;">588</div></div></div>
+    <div class="bar-item"><span class="bar-label">ASIC</span><div class="bar-track"><div class="bar-fill" style="width:22%;background:#e67e22;">215</div></div></div>
+    <div class="bar-item"><span class="bar-label">FPGA</span><div class="bar-track"><div class="bar-fill" style="width:10%;background:#3498db;">98</div></div></div>
+    <div class="bar-item"><span class="bar-label">其他</span><div class="bar-track"><div class="bar-fill" style="width:8%;background:#27ae60;">79</div></div></div>
+  </div>
+</section>
+
+<!-- ===== 第二章 ===== -->
+<section class="report-chapter" id="ch2">
+  <h2 data-lang="zh">第二章：竞争格局分析</h2>
+  <h2 data-lang="en">Chapter 2: Competitive Landscape</h2>
+  <p data-lang="zh">格局用一个词概括：一超多强。NVIDIA 盘踞顶端——它靠 CUDA 生态和 Hopper/Blackwell 架构筑起的壁垒，在独立 GPU 市场拿下了 88% 的份额。AMD 的 MI300X 在数据中心 GPU 领域咬得很紧；Intel 的 Gaudi 加速器则在推理市场不断试探。这三家之外，还有一群虎视眈眈的定制芯片玩家。</p>
+  <p data-lang="en">The AI chip competitive landscape is centered around NVIDIA with multiple players pursuing differentiated strategies. Leveraging its CUDA ecosystem and powerful Hopper/Blackwell architecture, NVIDIA dominates both training and inference markets with 88% discrete GPU share. AMD is catching up in data center GPUs with the MI300X series, while Intel targets AI inference with its Gaudi accelerators.</p>
+  <p data-lang="zh">定制 ASIC 的增长更猛。Google TPU、Amazon Trainium 在云厂商内部大规模部署——每瓦性能比通用 GPU 强太多。2025 年这个市场已经到 215 亿，未来三年 CAGR 超过 45%。</p>
+  <p data-lang="en">Custom ASICs (Google TPU, Amazon Trainium) are growing rapidly in cloud-deployed scenarios, offering superior performance per watt. The ASIC market reached approximately $21.5B in 2025 and is expected to grow at over 45% CAGR over the next three years. Chinese vendors like Huawei (Ascend series) and Cambricon are growing fast amid the domestic substitution wave, though gaps remain versus international leaders.</p>
+  <p data-lang="zh">国内也在追赶。华为昇腾、寒武纪受益于国产替代浪潮，出货量快速攀升。不过要说跟国际一线水平 PK——差距还在。</p>
+  <p data-lang="en">Custom ASICs (Google TPU, Amazon Trainium) are growing rapidly in cloud-deployed scenarios, offering superior performance per watt. The ASIC market reached approximately $21.5B in 2025 and is expected to grow at over 45% CAGR over the next three years. Chinese vendors like Huawei (Ascend series) and Cambricon are growing fast amid the domestic substitution wave, though gaps remain versus international leaders.</p>
+
+  <!-- 数据卡片网格 -->
+  <div class="dg-grid">
+    <div class="dg-card"><span class="dg-icon">🏢</span><span class="dg-value">88%</span><span class="dg-label" data-lang="zh">独立 GPU 市占率</span><span class="dg-label" data-lang="en">GPU Market Share</span></div>
+    <div class="dg-card"><span class="dg-icon">🔧</span><span class="dg-value">8x</span><span class="dg-label" data-lang="zh">每代性能提升</span><span class="dg-label" data-lang="en">Per-Gen Performance Lift</span></div>
+    <div class="dg-card"><span class="dg-icon">🌐</span><span class="dg-value">4M+</span><span class="dg-label" data-lang="zh">CUDA 开发者</span><span class="dg-label" data-lang="en">CUDA Developers</span></div>
+    <div class="dg-card"><span class="dg-icon">📈</span><span class="dg-value">45%</span><span class="dg-label" data-lang="zh">ASIC 三年 CAGR</span><span class="dg-label" data-lang="en">ASIC 3Y CAGR</span></div>
+  </div>
+</section>
+
+<!-- ===== 第三章 ===== -->
+<section class="report-chapter" id="ch3">
+  <h2 data-lang="zh">第三章：技术趋势与展望</h2>
+  <h2 data-lang="en">Chapter 3: Technology Trends &amp; Outlook</h2>
+  <p data-lang="zh">传统冯·诺依曼架构有一个死穴：存储墙。数据在处理器和内存之间来回搬运，功耗和延迟就在这里烧掉了。存算一体（CIM）的解法很直接——在存储单元里直接算。对大规模神经网络推理来说，这个思路特别对路。</p>
+  <p data-lang="en">Computing-in-Memory (CIM) architecture is a key technology direction for AI chips. The traditional von Neumann architecture suffers from the memory wall bottleneck, where data movement between processor and memory consumes significant power and latency. CIM overcomes this by performing computation directly within memory cells, dramatically reducing data movement overhead, especially for large-scale neural network inference.</p>
+  <p data-lang="zh">更大的芯片需要更好的封装。NVIDIA、AMD 的高端 AI 加速器已经全线转向多芯片模块（MCM）。这导致台积电的 CoWoS 产能被抢购一空——它反过来成了制约 AI 芯片出货的瓶颈。先进封装，现在谁抢到产能谁就有货卖。</p>
+  <p data-lang="en">Advanced packaging, especially CoWoS (Chip-on-Wafer-on-Substrate) and 3D packaging, is becoming a critical bottleneck for next-generation AI chips. As chip sizes grow, high-end AI accelerators from NVIDIA, AMD and others have adopted multi-chip module (MCM) designs. TSMC's CoWoS capacity is in short supply, becoming a key constraint on AI chip shipments.</p>
+  <p data-lang="zh">再往远处看，光互连和 Chiplet 是绕不开的方向。前者用光信号取代电信号，芯片间带宽更高、功耗更低；后者让厂商混搭不同工艺节点造模块。我们估计，到 2028 年六成以上的高端 AI 芯片会走向 Chiplet。</p>
+  <p data-lang="en">Silicon photonics and chiplet architectures are important medium-to-long-term trends. Silicon photonics enables higher bandwidth and lower power data transmission between chips, while chiplet designs allow mixing different process nodes to reduce cost and design complexity. By 2028, over 60% of high-end AI chips are expected to adopt chiplet architectures.</p>
+</section>
+
+<!-- ===== 结论与建议 ===== -->
+<aside class="conclusion-page">
+  <h2 data-lang="zh">结论与建议</h2>
+  <h2 data-lang="en">Conclusions &amp; Recommendations</h2>
+  <div class="ccl-item" data-lang="zh">值得盯住定制 AI 芯片——ASIC 和存算一体是两条主线</div>
+  <div class="ccl-item" data-lang="en">Focus on custom AI chips, especially ASICs and CIM architectures</div>
+  <div class="ccl-item" data-lang="zh">中国芯片自给率往上走，国产替代供应链正在成型</div>
+  <div class="ccl-item" data-lang="en">Rising domestic self-sufficiency creates localization investment opportunities</div>
+  <div class="ccl-item" data-lang="zh">先进封装（CoWoS/3D）卡着下一代 AI 芯片的量产命门</div>
+  <div class="ccl-item" data-lang="en">Advanced packaging (CoWoS/3D) to be a key bottleneck for next-gen AI chips</div>
+</aside>
+
+<!-- ===== 附录 ===== -->
+<section class="appendix">
+  <h2 data-lang="zh">附录</h2>
+  <h2 data-lang="en">Appendix</h2>
+  <p data-lang="zh"><strong>数据来源：</strong>Gartner（全球 AI 芯片市场预测）、IDC（AI 基础设施追踪报告）、各公司年报（NVIDIA、AMD、Intel、Google、Amazon 等）</p>
+  <p data-lang="en"><strong>Data Sources:</strong> Gartner (AI Chip Market Forecast), IDC (AI Infrastructure Tracker), Annual Reports (NVIDIA, AMD, Intel, Google, Amazon, etc.)</p>
+  <p data-lang="zh"><strong>方法说明：</strong>本报告数据来源于公开渠道的二手数据整理，采用多源交叉验证方法。市场规模数据为按产品类别拆分后的汇总估算，可能与特定机构定义存在差异。市场预测基于历史增长趋势和行业专家共识。</p>
+  <p data-lang="en"><strong>Methodology:</strong> Data compiled from publicly available secondary sources using multi-source cross-validation. Market size estimates are aggregated by product category and may differ from individual institutional definitions. Projections are based on historical growth trends and industry expert consensus.</p>
+</section>
+
+<!-- ===== 报告脚注 ===== -->
+<footer class="report-footer">
+  <p data-lang="zh">本报告由 context2html 自动生成  |  生成日期：2026-06-29</p>
+  <p data-lang="en">Generated by context2html  |  Date: 2026-06-29</p>
+</footer>
+
+
+
+<!-- ===== 底部工具栏（<svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="10" r="8"/><circle cx="10" cy="7" r="2" fill="currentColor"/><path d="M4 15l4-4"/></svg> 主题面板 + <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 5h14M3 10h14M3 15h10"/></svg> 浮动目录） ===== -->
+<div class="ui-toolbar">
+  <button class="tp-btn-toggle" aria-label="切换主题" title="切换主题"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="10" r="8"/><circle cx="10" cy="7" r="2" fill="currentColor"/><path d="M4 15l4-4"/></svg></button>
+  <button class="lang-btn" data-lang-btn aria-label="切换语言" title="切换语言" type="button">中</button>
+  <button class="toc-btn" aria-label="目录" title="目录"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 5h14M3 10h14M3 15h10"/></svg></button>
+</div>
+<nav class="tp-panel">
+  <div class="tp-grid" role="listbox" aria-label="选择主题">
+    <button class="tp-item active" data-theme="warm" style="--tp-color:#c0392b;">暖色</button>
+    <button class="tp-item" data-theme="apple" style="--tp-color:#0066cc;">Apple</button>
+    <button class="tp-item" data-theme="minimax" style="--tp-color:#ff5530;">Minimax</button>
+    <button class="tp-item" data-theme="nvidia" style="--tp-color:#76b900;">NVIDIA</button>
+    <button class="tp-item" data-theme="spotify" style="--tp-color:#1ed760;">Spotify</button>
+    <button class="tp-item" data-theme="tesla" style="--tp-color:#3e6ae1;">Tesla</button>
+    <button class="tp-item" data-theme="airbnb" style="--tp-color:#ff385c;">Airbnb</button>
+    <button class="tp-item" data-theme="airtable" style="--tp-color:#181d26;">Airtable</button>
+    <button class="tp-item" data-theme="binance" style="--tp-color:#fcd535;">Binance</button>
+    <button class="tp-item" data-theme="bmw-m" style="--tp-color:#3c3c3c;">BMW M</button>
+    <button class="tp-item" data-theme="claude" style="--tp-color:#cc785c;">Claude</button>
+    <button class="tp-item" data-theme="cursor" style="--tp-color:#f54e00;">Cursor</button>
+    <button class="tp-item" data-theme="dell-1996" style="--tp-color:#e91d2a;">Dell 1996</button>
+    <button class="tp-item" data-theme="figma" style="--tp-color:#000000;">Figma</button>
+    <button class="tp-item" data-theme="hp" style="--tp-color:#024ad8;">HP</button>
+    <button class="tp-item" data-theme="ibm" style="--tp-color:#0f62fe;">IBM</button>
+    <button class="tp-item" data-theme="nike" style="--tp-color:#111111;">Nike</button>
+    <button class="tp-item" data-theme="notion" style="--tp-color:#5645d4;">Notion</button>
+    <button class="tp-item" data-theme="x.ai" style="--tp-color:#636363;">x.ai</button>
+    <button class="tp-item" data-theme="zapier" style="--tp-color:#ff4f00;">Zapier</button>
+  </div>
+</nav>
+<nav class="toc-panel"><ul class="toc-list"></ul></nav>
+
+<!-- ===== PPT 质感增强 JS ===== -->
+<script>
+(function(){var t=['warm','apple','minimax','nvidia','spotify','tesla','airbnb','airtable','binance','bmw-m','claude','cursor','dell-1996','figma','hp','ibm','nike','notion','x.ai','zapier'];try{var s=localStorage.getItem('theme');if(s&&t.indexOf(s)>-1){document.documentElement.dataset.theme=s;}}catch(e){}
+var i=t.indexOf(document.documentElement.dataset.theme);if(i<0)i=0;var d=document.documentElement;
+try{document.querySelectorAll('.tp-item').forEach(function(b){b.addEventListener('click',function(){
+var th=this.dataset.theme;d.dataset.theme=th;i=t.indexOf(th);try{localStorage.setItem('theme',th);}catch(e){}
+document.querySelectorAll('.tp-item').forEach(function(x){x.classList.toggle('active',x.dataset.theme===th);});
+document.querySelector('.tp-panel').classList.remove('open');});});
+}catch(e){}
+try{document.querySelector('.tp-btn-toggle').addEventListener('click',function(){
+document.querySelector('.tp-panel').classList.toggle('open');});
+}catch(e){}
+try{var mc=document.querySelector('.meteors-container');if(mc){for(var mi=0;mi<15;mi++){var m=document.createElement('div');m.className='meteor';m.style.setProperty('--angle',-215+'deg');m.style.left=Math.random()*innerWidth+'px';m.style.animationDelay=(Math.random()*1+0.2)+'s';m.style.animationDuration=(Math.floor(Math.random()*8+2))+'s';mc.appendChild(m);}}}catch(e){}
+try{document.addEventListener('keydown',function(e){if(e.key==='t'&&!e.ctrlKey&&!e.metaKey){i=(i+1)%t.length;d.dataset.theme=t[i];
+try{localStorage.setItem('theme',t[i]);}catch(e){}
+document.querySelectorAll('.tp-item').forEach(function(x){x.classList.toggle('active',x.dataset.theme===t[i]);});}});
+}catch(e){}
+try{document.addEventListener('click',function(e){if(!e.target.closest('.ui-toolbar')&&!e.target.closest('.tp-panel')){
+document.querySelector('.tp-panel').classList.remove('open');}});
+}catch(e){}
+try{var tl=document.querySelector('.toc-list');var tocBtn=document.querySelector('.toc-btn');var to;function buildTOC(){if(!tl)return;var lang='zh';try{var ls=localStorage.getItem('lang');if(ls)lang=ls;}catch(e){}var allH2s=document.querySelectorAll('h2');var h2s=[];allH2s.forEach(function(h){if(!h.hasAttribute('data-lang')||h.dataset.lang===lang)h2s.push(h);});tl.innerHTML='';h2s.forEach(function(h,i){var li=document.createElement('li');li.className='toc-item';li.textContent=h.textContent;li.addEventListener('click',function(){h.scrollIntoView({behavior:'smooth'});document.querySelector('.toc-panel').classList.remove('open');});tl.appendChild(li);});if(to)to.disconnect();to=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){var idx=Array.from(h2s).indexOf(e.target);document.querySelectorAll('.toc-item').forEach(function(x,i){x.classList.toggle('active',i===idx);});}});},{rootMargin:'-80px 0px -60% 0px'});h2s.forEach(function(h){to.observe(h);});}if(tocBtn)tocBtn.addEventListener('click',function(){document.querySelector('.toc-panel').classList.toggle('open');});document.addEventListener('click',function(e){if(!e.target.closest('.ui-toolbar')&&!e.target.closest('.toc-panel')){document.querySelector('.toc-panel').classList.remove('open');}});buildTOC();}catch(e){}
+try{var la=['zh','en'];var li=la.indexOf(localStorage.getItem('lang'));if(li<0)li=0;var lb=document.querySelector('[data-lang-btn]');function sw(l){document.querySelectorAll('[data-lang]').forEach(function(x){x.classList.toggle('active',x.dataset.lang===l);});try{localStorage.setItem('lang',l);}catch(e){}if(lb){lb.textContent=l==='zh'?'中':'EN';}if(typeof buildTOC==='function')buildTOC();}sw(la[li]);if(lb){lb.addEventListener('click',function(){li=(li+1)%la.length;sw(la[li]);});}document.addEventListener('keydown',function(e){if(e.key==='l'&&!e.ctrlKey&&!e.metaKey){li=(li+1)%la.length;sw(la[li]);}});}catch(e){}
+try{document.querySelectorAll('.spotlight-card').forEach(function(c){c.addEventListener('mousemove',function(e){var r=c.getBoundingClientRect();c.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');c.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%');});});}catch(e){}
+try{var o=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)e.target.classList.add('in-view');});});
+document.querySelectorAll('[data-anim]').forEach(function(el){o.observe(el);});
+}catch(e){document.querySelectorAll('[data-anim]').forEach(function(el){el.style.opacity='1';el.style.transform='none';});}
+try{var s=document.querySelectorAll('h2');
+document.addEventListener('keydown',function(e){if((e.key==='ArrowRight'||e.key==='ArrowLeft')&&!e.ctrlKey&&!e.metaKey){e.preventDefault();
+var lang='zh';try{var ls=localStorage.getItem('lang');if(ls)lang=ls;}catch(e){}
+var h2s=[];s.forEach(function(h){if(!h.hasAttribute('data-lang')||h.dataset.lang===lang)h2s.push(h);});
+var c=h2s.findIndex(function(h){var r=h.getBoundingClientRect();return r.top>=0&&r.top<window.innerHeight/2;});
+var n=e.key==='ArrowRight'?Math.min(c+1,h2s.length-1):Math.max(c-1,0);if(n>=0&&h2s[n])h2s[n].scrollIntoView({behavior:'smooth'});}});}catch(e){}
+})();
+</script>
+
+<!-- ===== 🛑 组件示例 JS — 替换报告内容时按需保留/删除 ===== -->
+
+<!-- 数值滚动动画 (#16) 🛑 替换目标值 -->
+<script>
+(function(){
+  var els = document.querySelectorAll('[data-countup]');
+  if (!els.length) return;
+  var io = new IntersectionObserver(function(es) {
+    es.forEach(function(e) {
+      if (e.isIntersecting) {
+        var target = parseFloat(e.dataset.countup);
+        var start = performance.now();
+        var dur = 1500;
+        function step(now) {
+          var t = Math.min((now - start) / dur, 1);
+          var val = t < 1 ? target * (1 - Math.pow(1 - t, 3)) : target;
+          e.textContent = target % 1 === 0 ? Math.round(val).toLocaleString() : val.toFixed(1);
+          if (t < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+        io.unobserve(e);
+      }
+    });
+  }, { threshold: 0.3 });
+  els.forEach(function(el) { io.observe(el); });
+})();
+</script>
+<!-- ===== 🛑 上方为组件示例 JS ===== -->
+<!-- INSERT: 从 components/NN-name.md 复制 JS 到这里（可追加在下方） -->
+
+</body>
+</html>

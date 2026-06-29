@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据图表集 - 组件示例</title>
+<style>
+:root { --bg: #faf9f7; --text: #1a1a1a; --accent: #c0392b; --surface: #f5f0eb; --border: #ddd8d0; --success: #16a34a; --warning: #d97706; --error: #dc2626; --radius: 8px; --anim-dur: 0.3s; }
+body { font-family: "Noto Serif CJK SC", Georgia, serif; background: var(--bg); color: var(--text); line-height: 1.8; max-width: 720px; margin: 3rem auto; padding: 0 1.5rem; }
+h1 { font-size: 1.6rem; border-bottom: 1px solid #ddd; padding-bottom: 0.5em; }
+h2 { font-size: 1.15rem; margin-top: 2em; }
+
+.vchart { margin: 2rem 0; overflow-x: auto; }
+.vc-group { display: flex; align-items: flex-end; gap: 0.6em; height: 200px; padding: 0 0.5em 2em 0.5em; border-bottom: 1px solid var(--border); }
+.vc-bar { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: calc(var(--h) * 1%); background: var(--accent); border-radius: var(--radius, 4px) var(--radius, 4px) 0 0; min-width: 36px; position: relative; }
+.vc-bar::after { content: attr(data-label); position: absolute; bottom: -1.8em; left: 50%; transform: translateX(-50%); font-size: 0.75rem; color: #64748b; white-space: nowrap; }
+.vc-val { position: absolute; top: -1.5em; font-size: 0.72rem; font-weight: 600; color: var(--text); white-space: nowrap; }
+
+.pie-chart { max-width: 240px; display: block; margin: 0 auto; }
+.pie-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4em 1em; margin-top: 0.5em; font-size: 0.8rem; }
+.pl-item { display: flex; align-items: center; gap: 0.3em; }
+.pl-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+.line-chart { max-width: 100%; height: auto; }
+.line-chart line { stroke: var(--border); }
+
+.stack-chart { margin: 1.5rem 0; }
+.sc-row { display: flex; align-items: center; margin: 0.4em 0; gap: 0.8em; }
+.sc-label { width: 60px; flex-shrink: 0; font-size: 0.82rem; font-weight: 500; color: var(--text); text-align: right; }
+.sc-track { flex: 1; display: flex; height: 1.5em; border-radius: 4px; overflow: hidden; }
+.sc-seg { height: 100%; }
+.sc-seg:first-child { border-radius: 4px 0 0 4px; }
+.sc-seg:last-child { border-radius: 0 4px 4px 0; }
+
+[data-anim] { opacity: 0; transform: translateY(18px); transition: opacity var(--anim-dur) ease-out, transform var(--anim-dur) ease-out; }
+[data-anim].in-view { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<h1>数据图表集 — 组件示例</h1>
+
+<h2>纵向柱状图</h2>
+<p>各国经济刺激规模对比。</p>
+
+<div class="vchart" data-anim="fade-up">
+  <div class="vc-group">
+    <div class="vc-bar" style="--h:85;" data-label="美国"><span class="vc-val">7,000亿</span></div>
+    <div class="vc-bar" style="--h:65;" data-label="中国"><span class="vc-val">5,860亿</span></div>
+    <div class="vc-bar" style="--h:45;" data-label="日本"><span class="vc-val">3,300亿</span></div>
+    <div class="vc-bar" style="--h:30;" data-label="英国"><span class="vc-val">2,200亿</span></div>
+    <div class="vc-bar" style="--h:20;" data-label="韩国"><span class="vc-val">1,200亿</span></div>
+  </div>
+</div>
+
+<h2>饼图</h2>
+<p>GDP 构成比例。</p>
+
+<figure class="svg-fig" data-anim="fade-up">
+  <svg viewBox="0 0 100 100" class="pie-chart">
+    <circle cx="50" cy="50" r="40" fill="none" stroke="var(--border)" stroke-width="20" opacity="0.3"/>
+    <circle cx="50" cy="50" r="40" fill="none" stroke="var(--accent)" stroke-width="20" stroke-dasharray="88 163" stroke-dashoffset="0" transform="rotate(-90 50 50)"/>
+    <circle cx="50" cy="50" r="40" fill="none" stroke="var(--success)" stroke-width="20" stroke-dasharray="63 189" stroke-dashoffset="-88" transform="rotate(-90 50 50)"/>
+    <circle cx="50" cy="50" r="40" fill="none" stroke="var(--warning)" stroke-width="20" stroke-dasharray="50 201" stroke-dashoffset="-151" transform="rotate(-90 50 50)"/>
+    <circle cx="50" cy="50" r="40" fill="none" stroke="var(--error)" stroke-width="20" stroke-dasharray="30 221" stroke-dashoffset="-201" transform="rotate(-90 50 50)"/>
+  </svg>
+  <figcaption class="pie-legend">
+    <span class="pl-item"><span class="pl-dot" style="background:var(--accent);"></span>消费 35%</span>
+    <span class="pl-item"><span class="pl-dot" style="background:var(--success);"></span>投资 25%</span>
+    <span class="pl-item"><span class="pl-dot" style="background:var(--warning);"></span>政府 20%</span>
+    <span class="pl-item"><span class="pl-dot" style="background:var(--error);"></span>出口 12%</span>
+    <span class="pl-item"><span class="pl-dot" style="background:var(--border);"></span>其他 8%</span>
+  </figcaption>
+</figure>
+
+<h2>折线图</h2>
+<p>GDP 季度变化趋势。</p>
+
+<figure class="svg-fig" data-anim="fade-up">
+  <svg viewBox="0 0 300 160" class="line-chart">
+    <line x1="0" y1="120" x2="300" y2="120" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 4"/>
+    <line x1="0" y1="80" x2="300" y2="80" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 4"/>
+    <line x1="0" y1="40" x2="300" y2="40" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 4"/>
+    <polyline points="0,140 50,120 100,130 150,90 200,100 250,50 300,60" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="0" cy="140" r="4" fill="var(--accent)" stroke="#fff" stroke-width="1.5"/>
+    <circle cx="50" cy="120" r="4" fill="var(--accent)" stroke="#fff" stroke-width="1.5"/>
+    <circle cx="100" cy="130" r="4" fill="var(--accent)" stroke="#fff" stroke-width="1.5"/>
+    <circle cx="150" cy="90" r="4" fill="var(--accent)" stroke="#fff" stroke-width="1.5"/>
+    <circle cx="200" cy="100" r="4" fill="var(--accent)" stroke="#fff" stroke-width="1.5"/>
+    <circle cx="250" cy="50" r="4" fill="var(--accent)" stroke="#fff" stroke-width="1.5"/>
+    <circle cx="300" cy="60" r="4" fill="var(--accent)" stroke="#fff" stroke-width="1.5"/>
+  </svg>
+</figure>
+
+<h2>堆叠条形图</h2>
+<p>各国 GDP 构成对比。</p>
+
+<div class="stack-chart" data-anim="fade-up">
+  <div class="sc-row">
+    <div class="sc-label">美国</div>
+    <div class="sc-track">
+      <div class="sc-seg" style="width:45%; background:var(--accent);"></div>
+      <div class="sc-seg" style="width:25%; background:var(--success);"></div>
+      <div class="sc-seg" style="width:15%; background:var(--warning);"></div>
+      <div class="sc-seg" style="width:10%; background:var(--error);"></div>
+      <div class="sc-seg" style="width:5%; background:var(--border);"></div>
+    </div>
+  </div>
+  <div class="sc-row">
+    <div class="sc-label">中国</div>
+    <div class="sc-track">
+      <div class="sc-seg" style="width:38%; background:var(--accent);"></div>
+      <div class="sc-seg" style="width:30%; background:var(--success);"></div>
+      <div class="sc-seg" style="width:18%; background:var(--warning);"></div>
+      <div class="sc-seg" style="width:14%; background:var(--error);"></div>
+    </div>
+  </div>
+  <div class="sc-row">
+    <div class="sc-label">日本</div>
+    <div class="sc-track">
+      <div class="sc-seg" style="width:42%; background:var(--accent);"></div>
+      <div class="sc-seg" style="width:22%; background:var(--success);"></div>
+      <div class="sc-seg" style="width:20%; background:var(--warning);"></div>
+      <div class="sc-seg" style="width:16%; background:var(--error);"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var obs = new IntersectionObserver(function(es) {
+    es.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('in-view'); });
+  });
+  document.querySelectorAll('[data-anim]').forEach(function(el) { obs.observe(el); });
+})();
+</script>
+</body>
+</html>

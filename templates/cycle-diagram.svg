@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 580" width="700" height="580">
+  <defs>
+    <filter id="s"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.08"/></filter>
+    <marker id="a" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#94a3b8"/></marker>
+  </defs>
+  <style>
+    text{font-family:"Noto Sans CJK SC","PingFang SC","Microsoft YaHei",sans-serif;}
+    .t{font-size:18px;font-weight:700;fill:#1e293b;}
+    .n{font-size:13px;font-weight:600;fill:#1e293b;}
+    .d{font-size:11px;fill:#475569;}
+  </style>
+  <rect width="700" height="580" fill="#ffffff" rx="12"/>
+  <text x="350" y="35" text-anchor="middle" class="t">经济周期循环</text>
+
+  <circle cx="350" cy="290" r="100" fill="#eff6ff" stroke="#bfdbfe" stroke-width="2" stroke-dasharray="6,3"/>
+  <circle cx="350" cy="290" r="55" fill="#2563eb" opacity="0.9"/>
+  <text x="350" y="285" text-anchor="middle" fill="#fff" font-size="14" font-weight="700">经济周期</text>
+  <text x="350" y="302" text-anchor="middle" fill="#dbeafe" font-size="11">4阶段</text>
+
+  <g filter="url(#s)">
+    <rect x="245" y="90" width="210" height="60" rx="8" fill="#f0fdf4" stroke="#bbf7d0"/>
+    <text x="350" y="112" text-anchor="middle" fill="#166534" class="n">扩张</text>
+    <text x="350" y="132" text-anchor="middle" class="d">GDP增长 · 就业上升</text>
+  </g>
+
+  <g filter="url(#s)">
+    <rect x="390" y="250" width="210" height="60" rx="8" fill="#fff7ed" stroke="#fed7aa"/>
+    <text x="495" y="272" text-anchor="middle" fill="#9a3412" class="n">顶峰</text>
+    <text x="495" y="292" text-anchor="middle" class="d">产能瓶颈 · 通胀压力</text>
+  </g>
+
+  <g filter="url(#s)">
+    <rect x="245" y="430" width="210" height="60" rx="8" fill="#fef2f2" stroke="#fecaca"/>
+    <text x="350" y="452" text-anchor="middle" fill="#991b1b" class="n">衰退</text>
+    <text x="350" y="472" text-anchor="middle" class="d">GDP下降 · 失业上升</text>
+  </g>
+
+  <g filter="url(#s)">
+    <rect x="100" y="250" width="210" height="60" rx="8" fill="#eff6ff" stroke="#bfdbfe"/>
+    <text x="205" y="272" text-anchor="middle" fill="#1e40af" class="n">谷底</text>
+    <text x="205" y="292" text-anchor="middle" class="d">触底 · 等待复苏</text>
+  </g>
+
+  <path d="M 350,150 Q 350,170 430,250" stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+  <path d="M 495,310 Q 450,410 350,430" stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+  <path d="M 350,490 Q 350,470 270,390" stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+  <path d="M 205,310 Q 250,200 300,160" stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+
+  <g transform="translate(60, 545)">
+    <rect x="0" y="0" width="12" height="12" rx="2" fill="#f0fdf4" stroke="#bbf7d0"/>
+    <text x="16" y="10" fill="#64748b" font-size="11">扩张</text>
+    <rect x="60" y="0" width="12" height="12" rx="2" fill="#fff7ed" stroke="#fed7aa"/>
+    <text x="76" y="10" fill="#64748b" font-size="11">顶峰</text>
+    <rect x="120" y="0" width="12" height="12" rx="2" fill="#fef2f2" stroke="#fecaca"/>
+    <text x="136" y="10" fill="#64748b" font-size="11">衰退</text>
+    <rect x="180" y="0" width="12" height="12" rx="2" fill="#eff6ff" stroke="#bfdbfe"/>
+    <text x="196" y="10" fill="#64748b" font-size="11">谷底</text>
+  </g>
+</svg>

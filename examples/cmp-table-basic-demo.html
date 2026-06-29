@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>对比表 - 组件示例</title>
+<link rel="stylesheet" href="../libs/magicui-effects.css">
+<style>
+:root { --bg: #faf9f7; --text: #1a1a1a; --accent: #c0392b; --radius: 8px; }
+body { font-family: "Noto Serif CJK SC", Georgia, serif; background: var(--bg); color: var(--text); line-height: 1.8; max-width: 720px; margin: 3rem auto; padding: 0 1.5rem; }
+h1 { font-size: 1.6rem; border-bottom: 1px solid #ddd; padding-bottom: 0.5em; }
+p { color: #555; }
+
+.cmp-table { display: flex; flex-direction: column; margin: 1.2rem 0; }
+.cmp-row { display: flex; border-bottom: 1px solid #e2e8f0; }
+.cmp-row:last-child { border-bottom: none; }
+.cmp-cell { flex: 1; padding: 0.7em 0.6em; font-size: 0.85rem; }
+.cmp-cell:first-child { font-weight: 600; color: #475569; flex: 0.7; }
+.cmp-header { background: #2563eb; color: #fff; font-weight: 600; border-bottom: none; }
+.cmp-header .cmp-cell { padding: 0.6em; text-align: center; }
+.cmp-header .cmp-cell:first-child { text-align: left; }
+.cmp-row:nth-child(even):not(.cmp-header) { background: #f8fafc; }
+</style>
+</head>
+<body>
+
+<h1 class="shiny-text">对比表 — 组件示例</h1>
+
+<p>flex 布局多维度对比，表头高亮，斑马纹隔行（基础版，无排序功能）。</p>
+
+<div class="cmp-table border-glow" style="padding:1px;border-radius:var(--radius,8px);background:#fff;">
+  <div class="cmp-row cmp-header">
+    <div class="cmp-cell"></div>
+    <div class="cmp-cell">美</div>
+    <div class="cmp-cell">日</div>
+    <div class="cmp-cell">欧</div>
+    <div class="cmp-cell">中</div>
+  </div>
+  <div class="cmp-row">
+    <div class="cmp-cell">GDP (万亿)</div>
+    <div class="cmp-cell">27.4</div>
+    <div class="cmp-cell">4.2</div>
+    <div class="cmp-cell">18.4</div>
+    <div class="cmp-cell">17.7</div>
+  </div>
+  <div class="cmp-row">
+    <div class="cmp-cell">政府债务/GDP</div>
+    <div class="cmp-cell">123%</div>
+    <div class="cmp-cell">261%</div>
+    <div class="cmp-cell">82%</div>
+    <div class="cmp-cell">55%</div>
+  </div>
+  <div class="cmp-row">
+    <div class="cmp-cell">央行利率</div>
+    <div class="cmp-cell">5.25%</div>
+    <div class="cmp-cell">-0.10%</div>
+    <div class="cmp-cell">4.00%</div>
+    <div class="cmp-cell">3.45%</div>
+  </div>
+  <div class="cmp-row">
+    <div class="cmp-cell">通胀率</div>
+    <div class="cmp-cell">3.2%</div>
+    <div class="cmp-cell">2.8%</div>
+    <div class="cmp-cell">2.9%</div>
+    <div class="cmp-cell">0.3%</div>
+  </div>
+</div>
+
+<p>基础对比表适用于简单的列对比场景。如需粘性表头、排序、斑马纹等高级功能，请使用增强版对比表（#22）。</p>
+
+</body>
+</html>

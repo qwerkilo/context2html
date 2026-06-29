@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ECharts GL — 广东省 3D 地图</title>
+<link rel="stylesheet" href="../libs/magicui-effects.css">
+<script src="../libs/echarts.min.js"></script>
+<script src="../libs/echarts-gl.min.js"></script>
+<script src="../libs/guangdong.js"></script>
+<style>
+:root{--bg:#faf9f7;--text:#1a1a1a;--accent:#3498db;--surface:#f5f0eb;--radius:8px;--font:"Noto Serif CJK SC",Georgia,serif}
+body{font-family:var(--font);background:var(--bg);color:var(--text);max-width:960px;margin:0 auto;padding:2rem;-webkit-font-smoothing:antialiased}
+h1{border-bottom:2px solid var(--accent);padding-bottom:.5em}
+h2{margin-top:2em}
+.box{background:var(--surface);border-radius:var(--radius);margin:1rem 0;padding:8px;overflow:hidden;position:relative}
+p{color:var(--muted);font-size:.9rem;margin:.5em 0}
+.status{position:absolute;top:16px;left:16px;z-index:10;background:rgba(255,255,255,0.9);padding:4px 12px;border-radius:20px;font-size:.78rem;color:#666;pointer-events:none}
+</style>
+</head>
+<body>
+<h1 class="shiny-text">广东省 3D 地图 — ECharts GL</h1>
+<p>各地市 GDP（2024 示意数据）· 悬浮查看数值。</p>
+<div class="box border-glow"><div id="gd-map" style="width:100%;height:600px;"></div><span class="status" id="load-status">加载中...</span></div>
+
+<noscript><p style="text-align:center;padding:2rem;">需要 JavaScript</p></noscript>
+
+<script>
+window.onerror = function(msg, url, line){
+  var s = document.getElementById('load-status');
+  if(s) s.textContent = 'JS错误';
+  var el = document.getElementById('gd-map');
+  if(el) el.innerHTML = '<div style="padding:2rem;text-align:center;color:#c0392b;">JS错误: ' + msg + '<br/>位置: ' + line + '</div>';
+};
+</script>
+
+<script>
+(function(){
+  var el = document.getElementById('gd-map');
+  var status = document.getElementById('load-status');
+  if(!el || !status) return;
+
+  try {
+    if(typeof echarts === 'undefined') throw new Error('ECharts 未加载');
+    if(!window.__gdGeoJSON) throw new Error('未找到广东省地图数据 (libs/guangdong.js)');
+
+    echarts.registerMap('guangdong', window.__gdGeoJSON);
+
+    var cities = {
+      '深圳市': 3.46, '广州市': 3.04, '佛山市': 1.33, '东莞市': 1.12,
+      '惠州市': 0.61, '珠海市': 0.42, '茂名市': 0.40, '江门市': 0.38,
+      '中山市': 0.37, '湛江市': 0.37, '汕头市': 0.33, '肇庆市': 0.28,
+      '揭阳市': 0.24, '清远市': 0.21, '阳江市': 0.16, '韶关市': 0.16,
+      '梅州市': 0.14, '潮州市': 0.13, '河源市': 0.13, '汕尾市': 0.13,
+      '云浮市': 0.12
+    };
+    var mapData = [];
+    for(var k in cities){
+      if(cities.hasOwnProperty(k)) mapData.push({ name: k, value: cities[k] });
+    }
+    status.textContent = '广东省 · ' + mapData.length + ' 地市';
+
+    var chart = echarts.init(el);
+
+    chart.setOption({
+      tooltip: {
+        trigger: 'item',
+        formatter: function(p){
+          if(p.componentType === 'series' && p.value)
+            return p.name + '<br/>GDP: <b>' + Number(p.value).toFixed(2) + '</b> 万亿';
+          return p.name;
+        }
+      },
+      visualMap: {
+        show: true,
+        min: 0.1,
+        max: 3.5,
+        text: ['高', '低'],
+        inRange: { color: ['#3498db','#2ecc71','#f39c12','#e74c3c'] },
+        left: 'left', bottom: 20,
+        seriesIndex: 0
+      },
+      series: [{
+        type: 'map3D',
+        map: 'guangdong',
+        data: mapData,
+        regionHeight: 1.5,
+        shading: 'lambert',
+        itemStyle: {
+          borderColor: 'rgba(255,255,255,0.4)',
+          borderWidth: 0.5
+        },
+        label: { show: true, color: '#1a1a1a', fontSize: 9 },
+        emphasis: {
+          label: { fontSize: 13, color: '#c0392b' },
+          itemStyle: { areaColor: '#c0392b' }
+        },
+        viewControl: {
+          autoRotate: true, autoRotateSpeed: 5,
+          distance: 140, beta: 15
+        },
+        light: {
+          main: { intensity: 1.0 },
+          ambient: { intensity: 0.3 }
+        }
+      }]
+    });
+
+    window.addEventListener('resize', function(){ chart.resize(); });
+  } catch(e) {
+    status.textContent = '出错';
+    if(el) el.innerHTML = '<div style="padding:2rem;text-align:center;color:#c0392b;">' + e.message + '</div>';
+  }
+})();
+</script>
+</body>
+</html>

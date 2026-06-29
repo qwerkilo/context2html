@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 400" width="700" height="400">
+  <defs>
+    <filter id="s"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.08"/></filter>
+  </defs>
+  <style>
+    text{font-family:"Noto Sans CJK SC","PingFang SC","Microsoft YaHei",sans-serif;}
+    .t{font-size:18px;font-weight:700;fill:#1e293b;}
+    .h{font-size:14px;font-weight:700;fill:#fff;}
+    .l{font-size:12px;fill:#475569;}
+    .v{font-size:13px;font-weight:600;fill:#1e293b;}
+  </style>
+  <rect width="700" height="400" fill="#ffffff" rx="12"/>
+  <text x="350" y="35" text-anchor="middle" class="t">对比：2008 vs 2020 金融危机</text>
+
+  <g filter="url(#s)">
+    <rect x="30" y="55" width="300" height="32" rx="6" fill="#2563eb"/>
+    <text x="180" y="76" text-anchor="middle" class="h">2008 全球金融危机</text>
+  </g>
+  <g filter="url(#s)">
+    <rect x="370" y="55" width="300" height="32" rx="6" fill="#d97706"/>
+    <text x="520" y="76" text-anchor="middle" class="h">2020 疫情冲击</text>
+  </g>
+
+  <g filter="url(#s)">
+    <rect x="30" y="105" width="300" height="50" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+    <text x="180" y="125" text-anchor="middle" class="l">起因：次级贷违约</text>
+    <text x="180" y="142" text-anchor="middle" class="l">金融体系内部风险暴露</text>
+  </g>
+  <g filter="url(#s)">
+    <rect x="370" y="105" width="300" height="50" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+    <text x="520" y="125" text-anchor="middle" class="l">起因：新冠疫情封锁</text>
+    <text x="520" y="142" text-anchor="middle" class="l">实体经济外部冲击</text>
+  </g>
+
+  <g filter="url(#s)">
+    <rect x="30" y="173" width="300" height="50" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+    <text x="180" y="193" text-anchor="middle" class="l">传导：信用紧缩螺旋</text>
+    <text x="180" y="210" text-anchor="middle" class="l">银行间借贷冻结</text>
+  </g>
+  <g filter="url(#s)">
+    <rect x="370" y="173" width="300" height="50" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+    <text x="520" y="193" text-anchor="middle" class="l">传导：供应链中断</text>
+    <text x="520" y="210" text-anchor="middle" class="l">需求骤降+失业潮</text>
+  </g>
+
+  <g filter="url(#s)">
+    <rect x="30" y="241" width="300" height="50" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+    <text x="180" y="261" text-anchor="middle" class="l">政策：TARP+QE</text>
+    <text x="180" y="278" text-anchor="middle" class="l">银行救助+资产购买</text>
+  </g>
+  <g filter="url(#s)">
+    <rect x="370" y="241" width="300" height="50" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+    <text x="520" y="261" text-anchor="middle" class="l">政策：直接财政转移</text>
+    <text x="520" y="278" text-anchor="middle" class="l">全民发钱+薪资保护</text>
+  </g>
+
+  <g filter="url(#s)">
+    <rect x="30" y="309" width="300" height="50" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+    <text x="180" y="329" text-anchor="middle" class="l">复苏：缓慢（U型）</text>
+    <text x="180" y="346" text-anchor="middle" class="l">失业率峰值10%</text>
+  </g>
+  <g filter="url(#s)">
+    <rect x="370" y="309" width="300" height="50" rx="6" fill="#f8fafc" stroke="#e2e8f0"/>
+    <text x="520" y="329" text-anchor="middle" class="l">复苏：快速（V型）</text>
+    <text x="520" y="346" text-anchor="middle" class="l">失业率峰值14.8%</text>
+  </g>
+</svg>

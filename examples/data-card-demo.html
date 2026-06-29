@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据卡片网格 - 组件示例</title>
+<link rel="stylesheet" href="../libs/magicui-effects.css">
+<style>
+:root { --bg: #faf9f7; --text: #1a1a1a; --accent: #c0392b; --radius: 8px; --anim-dur: 0.6s; --anim-y: 24px; }
+body { font-family: "Noto Serif CJK SC", Georgia, serif; background: var(--bg); color: var(--text); line-height: 1.8; max-width: 720px; margin: 3rem auto; padding: 0 1.5rem; }
+h1 { font-size: 1.6rem; border-bottom: 1px solid #ddd; padding-bottom: 0.5em; }
+
+.data-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+.dg-card { background: var(--bg); border: 1px solid #e2e8f0; border-radius: var(--radius, 8px); padding: 1.2em 0.8em; text-align: center; transition: box-shadow var(--anim-dur) ease; }
+.dg-card:nth-child(2) { transition-delay: 50ms; }
+.dg-card:nth-child(3) { transition-delay: 100ms; }
+.dg-card:nth-child(4) { transition-delay: 150ms; }
+.dg-card:nth-child(5) { transition-delay: 200ms; }
+.dg-card:nth-child(6) { transition-delay: 250ms; }
+.dg-card { transition: transform 0.2s ease-out, box-shadow 0.2s ease-out; }
+.dg-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.dg-icon { font-size: 2rem; margin-bottom: 0.25em; line-height: 1; }
+.dg-value { font-size: 1.8rem; font-weight: 800; color: var(--accent); line-height: 1.1; }
+.dg-unit { font-size: 0.8rem; color: var(--accent); font-weight: 500; margin-bottom: 0.5em; }
+.dg-label { font-size: 0.85rem; color: #64748b; line-height: 1.3; }
+
+[data-anim] { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+[data-anim].in-view { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<h1 class="shiny-text">数据卡片网格 — 组件示例</h1>
+
+<p>以下展示 6 张数据卡片，滚动页面可见淡入动画。</p>
+
+<div class="data-grid dot-bg">
+  <div class="dg-card border-glow" data-anim="fade-up">
+    <div class="dg-icon">📉</div>
+    <div class="dg-value">8.8</div>
+    <div class="dg-unit">万亿美元</div>
+    <div class="dg-label">全球财富蒸发</div>
+  </div>
+  <div class="dg-card border-glow" data-anim="fade-up">
+    <div class="dg-icon">🏦</div>
+    <div class="dg-value">127</div>
+    <div class="dg-unit">家</div>
+    <div class="dg-label">倒闭银行数</div>
+  </div>
+  <div class="dg-card border-glow" data-anim="fade-up">
+    <div class="dg-icon">🌍</div>
+    <div class="dg-value">0.1</div>
+    <div class="dg-unit">%</div>
+    <div class="dg-label">全球 GDP 萎缩</div>
+  </div>
+  <div class="dg-card border-glow" data-anim="fade-up">
+    <div class="dg-icon">🏠</div>
+    <div class="dg-value">20</div>
+    <div class="dg-unit">%</div>
+    <div class="dg-label">美国房价跌幅</div>
+  </div>
+  <div class="dg-card border-glow" data-anim="fade-up">
+    <div class="dg-icon">💼</div>
+    <div class="dg-value">8.5</div>
+    <div class="dg-unit">百万人</div>
+    <div class="dg-label">失业人数增加</div>
+  </div>
+  <div class="dg-card border-glow" data-anim="fade-up">
+    <div class="dg-icon">💰</div>
+    <div class="dg-value">7000</div>
+    <div class="dg-unit">亿美元</div>
+    <div class="dg-label">TARP 救助规模</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var obs = new IntersectionObserver(function(es) {
+    es.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('in-view'); });
+  });
+  document.querySelectorAll('[data-anim]').forEach(function(el) { obs.observe(el); });
+})();
+</script>
+</body>
+</html>

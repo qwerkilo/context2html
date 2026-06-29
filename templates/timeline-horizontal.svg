@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 220" width="700" height="220">
+  <defs>
+    <filter id="s"><feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity="0.08"/></filter>
+    <marker id="a" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#cbd5e1"/></marker>
+  </defs>
+  <style>
+    text{font-family:"Noto Sans CJK SC","PingFang SC","Microsoft YaHei",sans-serif;}
+    .t{font-size:18px;font-weight:700;fill:#1e293b;}
+    .d{font-size:11px;fill:#475569;}
+  </style>
+  <rect width="700" height="220" fill="#ffffff" rx="12"/>
+  <text x="350" y="30" text-anchor="middle" class="t">2008 金融危机时间线</text>
+
+  <line x1="60" y1="120" x2="640" y2="120" stroke="#e2e8f0" stroke-width="3"/>
+
+  <g filter="url(#s)">
+    <circle cx="95" cy="120" r="10" fill="#2563eb"/>
+    <text x="95" y="145" text-anchor="middle" class="d">3月</text>
+    <text x="95" y="162" text-anchor="middle" class="d">贝尔斯登</text>
+    <text x="95" y="175" text-anchor="middle" class="d">被摩根收购</text>
+  </g>
+
+  <g filter="url(#s)">
+    <circle cx="205" cy="120" r="10" fill="#d97706"/>
+    <text x="205" y="95" text-anchor="middle" class="d">7月</text>
+    <text x="205" y="78" text-anchor="middle" class="d">房利美/房地美</text>
+    <text x="205" y="63" text-anchor="middle" class="d">政府接管</text>
+  </g>
+
+  <g filter="url(#s)">
+    <circle cx="350" cy="120" r="14" fill="#dc2626"/>
+    <text x="350" y="145" text-anchor="middle" fill="#dc2626" font-size="12" font-weight="600">9.15</text>
+    <text x="350" y="162" text-anchor="middle" fill="#dc2626" font-weight="600">雷曼破产</text>
+  </g>
+
+  <g filter="url(#s)">
+    <circle cx="480" cy="120" r="10" fill="#d97706"/>
+    <text x="480" y="95" text-anchor="middle" class="d">9月</text>
+    <text x="480" y="78" text-anchor="middle" class="d">AIG</text>
+    <text x="480" y="63" text-anchor="middle" class="d">国有化</text>
+  </g>
+
+  <g filter="url(#s)">
+    <circle cx="595" cy="120" r="10" fill="#16a34a"/>
+    <text x="595" y="145" text-anchor="middle" class="d">10月</text>
+    <text x="595" y="162" text-anchor="middle" class="d">TARP</text>
+    <text x="595" y="175" text-anchor="middle" class="d">7000亿救助</text>
+  </g>
+
+  <g transform="translate(60, 195)">
+    <rect x="0" y="0" width="12" height="12" rx="2" fill="#2563eb"/>
+    <text x="16" y="10" fill="#64748b" font-size="10">正常</text>
+    <rect x="60" y="0" width="12" height="12" rx="2" fill="#d97706"/>
+    <text x="76" y="10" fill="#64748b" font-size="10">触发</text>
+    <rect x="120" y="0" width="12" height="12" rx="2" fill="#dc2626"/>
+    <text x="136" y="10" fill="#64748b" font-size="10">危机</text>
+    <rect x="180" y="0" width="12" height="12" rx="2" fill="#16a34a"/>
+    <text x="196" y="10" fill="#64748b" font-size="10">救助</text>
+  </g>
+</svg>

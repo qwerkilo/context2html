@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>图片前后对比滑块 - 组件示例</title>
+<link rel="stylesheet" href="../libs/magicui-effects.css">
+<style>
+:root { --bg: #faf9f7; --text: #1a1a1a; --accent: #c0392b; --radius: 8px; --anim-dur: 0.35s; }
+body { font-family: "Noto Serif CJK SC", Georgia, serif; background: var(--bg); color: var(--text); line-height: 1.8; max-width: 720px; margin: 3rem auto; padding: 0 1.5rem; }
+h1 { font-size: 1.6rem; border-bottom: 1px solid #ddd; padding-bottom: 0.5em; }
+
+.compare-slider { position: relative; margin: 1.5rem 0; overflow: hidden; border-radius: var(--radius, 8px); }
+.compare-images { position: relative; width: 100%; cursor: col-resize; user-select: none; -webkit-user-select: none; }
+.compare-after, .compare-before { display: block; width: 100%; height: auto; pointer-events: none; }
+.compare-before-wrap { position: absolute; top: 0; left: 0; height: 100%; overflow: hidden; }
+.compare-handle { position: absolute; top: 0; bottom: 0; width: 3px; background: #fff; cursor: col-resize; box-shadow: -1px 0 4px rgba(0,0,0,0.15), 1px 0 4px rgba(0,0,0,0.15); transform: translateX(-1px); z-index: 2; }
+.compare-handle::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 36px; height: 36px; border-radius: 50%; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.25); z-index: 1; }
+.cmp-arrow { position: absolute; top: 50%; z-index: 3; font-size: 14px; color: #333; transform: translateY(-50%); }
+.cmp-arrow:first-child { left: 3px; }
+.cmp-arrow:last-child { right: 3px; }
+.compare-labels { position: absolute; bottom: 8px; left: 0; right: 0; display: flex; justify-content: space-between; pointer-events: none; padding: 0 8px; z-index: 2; }
+.cmp-label-before, .cmp-label-after { background: rgba(0,0,0,0.55); color: #fff; padding: 0.2em 0.7em; border-radius: 4px; font-size: 0.78rem; font-weight: 600; }
+
+/* Demo placeholder fill - replace with actual images */
+.demo-placeholder { width: 100%; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 700; color: #fff; }
+.demo-before { background: linear-gradient(135deg, #667eea, #764ba2); }
+.demo-after { background: linear-gradient(135deg, #f093fb, #f5576c); }
+</style>
+</head>
+<body style="position:relative;">
+<div class="noise-overlay"><svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><filter id="cmp-noise"><feTurbulence type="fractalNoise" baseFrequency="0.4" numOctaves="6" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncR type="linear" slope="0.15"/><feFuncG type="linear" slope="0.15"/><feFuncB type="linear" slope="0.15"/></feComponentTransfer></filter><rect width="100%" height="100%" filter="url(#cmp-noise)" opacity="1"/></svg></div>
+
+<h1 class="shiny-text">图片前后对比滑块 — 组件示例</h1>
+
+<p>拖拽中间的双箭头手柄查看前后对比。实际使用时将占位图替换为真实图片。</p>
+
+<div class="compare-slider">
+  <div class="compare-images">
+    <div class="demo-placeholder demo-after">之后 (After)</div>
+    <div class="compare-before-wrap" style="width: 50%;">
+      <div class="demo-placeholder demo-before" style="width: 720px;">之前 (Before)</div>
+    </div>
+    <div class="compare-handle" style="left: 50%;">
+      <span class="cmp-arrow">&#8592;</span>
+      <span class="cmp-arrow">&#8594;</span>
+    </div>
+  </div>
+  <div class="compare-labels">
+    <span class="cmp-label-before">之前</span>
+    <span class="cmp-label-after">之后</span>
+  </div>
+</div>
+
+<p>真实使用中将 <code>.demo-placeholder</code> 替换为 <code>&lt;img&gt;</code> 标签即可。</p>
+
+<script>
+(function(){
+  document.querySelectorAll('.compare-slider').forEach(function(s) {
+    var c = s.querySelector('.compare-images');
+    var b = s.querySelector('.compare-before-wrap');
+    var h = s.querySelector('.compare-handle');
+    var d = false;
+    function p(x) {
+      var r = c.getBoundingClientRect();
+      var pct = Math.max(0, Math.min(100, ((x - r.left) / r.width) * 100));
+      b.style.width = pct + '%';
+      h.style.left = pct + '%';
+    }
+    function ms(e) { d = true; e.preventDefault(); }
+    function me() { d = false; }
+    function mv(e) { if (!d) return; e.preventDefault(); p(e.touches ? e.touches[0].clientX : e.clientX); }
+    h.addEventListener('mousedown', ms);
+    document.addEventListener('mousemove', mv);
+    document.addEventListener('mouseup', me);
+    h.addEventListener('touchstart', ms, {passive: false});
+    document.addEventListener('touchmove', mv, {passive: false});
+    document.addEventListener('touchend', me);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="warm">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>context2html — 报告主题预览</title>
+<link rel="stylesheet" href="../theme/report-themes.css">
+<style>
+:root { --font: "Noto Serif CJK SC",Georgia,serif; --lh: 1.6; }
+body { font-family: var(--font); line-height: var(--lh); background: #f5f5f5; color: #333; max-width: 1100px; margin: 0 auto; padding: 2rem; }
+h1 { font-size: 1.6rem; margin-bottom: 0.5rem; }
+h1 span { color: #888; font-weight: 400; font-size: 1rem; }
+.legend { font-size: 0.85rem; color: #666; margin-bottom: 2rem; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+.card { border-radius: 12px; overflow: hidden; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; }
+.card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+.card-preview { padding: var(--preview-pad, 1rem); background: var(--bg, #fff); min-height: 140px; display: flex; flex-direction: column; gap: 6px; }
+.card-preview .title { font-family: var(--font-h, var(--font)); font-weight: 700; font-size: 0.85rem; color: var(--text, #333); }
+.card-preview .accent-line { width: 40px; height: 3px; background: var(--accent, #c0392b); border-radius: 2px; }
+.card-preview .body { font-size: 0.72rem; color: var(--muted, #888); line-height: 1.4; }
+.card-preview .tag-row { display: flex; gap: 4px; flex-wrap: wrap; margin-top: auto; }
+.card-preview .tag-preview { padding: 1px 6px; border-radius: 10px; font-size: 0.6rem; background: var(--tag-bg, rgba(192,57,43,0.1)); color: var(--tag-text, var(--accent, #c0392b)); }
+.card-preview .chart-row { display: flex; gap: 3px; margin-top: 6px; }
+.card-preview .chart-bar { height: 6px; border-radius: 3px; flex: 1; }
+.card-info { padding: 0.6rem 0.8rem; background: #fff; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+.card-info .name { font-size: 0.82rem; font-weight: 600; }
+.card-info .accent-swatch { width: 16px; height: 16px; border-radius: 50%; border: 1px solid #ddd; flex-shrink: 0; }
+.card-info .meta { font-size: 0.72rem; color: #999; }
+.card.selected { outline: 3px solid var(--accent, #333); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<h1>context2html — 报告主题一览 <span>20 themes</span></h1>
+<p class="legend">点击主题查看详细效果。每个主题预览包含色块、标签、图表色板。</p>
+<div class="grid" id="theme-grid"></div>
+
+<script>
+// 从 localStorage 恢复，或默认 warm
+var saved = localStorage.getItem('theme');
+if (saved) document.documentElement.dataset.theme = saved;
+
+// 主题列表 — 与 report-themes.css 同步
+var THEMES = [
+  {id:'warm', label:'暖色', accent:'#c0392b'},
+  {id:'apple', label:'Apple', accent:'#0066cc'},
+  {id:'airbnb', label:'Airbnb', accent:'#ff385c'},
+  {id:'airtable', label:'Airtable', accent:'#181d26'},
+  {id:'binance', label:'Binance', accent:'#fcd535'},
+  {id:'bmw-m', label:'BMW M', accent:'#ffffff'},
+  {id:'claude', label:'Claude', accent:'#cc785c'},
+  {id:'cursor', label:'Cursor', accent:'#f54e00'},
+  {id:'dell-1996', label:'Dell 1996', accent:'#e91d2a'},
+  {id:'figma', label:'Figma', accent:'#000000'},
+  {id:'hp', label:'HP', accent:'#024ad8'},
+  {id:'ibm', label:'IBM', accent:'#0f62fe'},
+  {id:'minimax', label:'Minimax', accent:'#0a0a0a'},
+  {id:'nike', label:'Nike', accent:'#111111'},
+  {id:'notion', label:'Notion', accent:'#5645d4'},
+  {id:'nvidia', label:'NVIDIA', accent:'#76b900'},
+  {id:'spotify', label:'Spotify', accent:'#1ed760'},
+  {id:'tesla', label:'Tesla', accent:'#3e6ae1'},
+  {id:'x.ai', label:'x.ai', accent:'#ffffff'},
+  {id:'zapier', label:'Zapier', accent:'#ff4f00'},
+];
+
+var grid = document.getElementById('theme-grid');
+
+THEMES.forEach(function(t) {
+  var card = document.createElement('div');
+  card.className = 'card' + (document.documentElement.dataset.theme === t.id ? ' selected' : '');
+  card.setAttribute('data-theme-preview', t.id);
+  card.dataset.theme = t.id;
+
+  // 需要从生成的 CSS 中读取变量的值
+  // 创建隐藏元素到 body 中读取
+  var hidden = document.createElement('div');
+  hidden.style.cssText = 'position:fixed;left:-9999px;';
+  hidden.setAttribute('data-theme', t.id);
+  document.body.appendChild(hidden);
+  var styles = getComputedStyle(hidden);
+  var bg = styles.getPropertyValue('--bg').trim() || (t.id === 'warm' ? '#faf9f7' : '#ffffff');
+  var text = styles.getPropertyValue('--text').trim() || '#333';
+  var accent = styles.getPropertyValue('--accent').trim() || t.accent;
+  var muted = styles.getPropertyValue('--muted').trim() || '#888';
+  var c1 = styles.getPropertyValue('--chart-1').trim() || accent;
+  var c2 = styles.getPropertyValue('--chart-2').trim() || accent;
+  var c3 = styles.getPropertyValue('--chart-3').trim() || accent;
+  var c4 = styles.getPropertyValue('--chart-4').trim() || accent;
+  document.body.removeChild(hidden);
+
+  card.innerHTML =
+    '<div class="card-preview" style="--bg:' + bg + ';--text:' + text + ';--accent:' + accent + ';--muted:' + muted + ';--tag-bg:rgba(' + hexToRgb(accent) + ',0.1);--tag-text:' + accent + '">' +
+      '<div class="title" style="font-family:var(--font-h,var(--font))">' + t.label + '</div>' +
+      '<div class="accent-line" style="background:' + accent + '"></div>' +
+      '<div class="body" style="color:' + muted + '">调研报告预览行 · 展示主题色板效果</div>' +
+      '<div class="tag-row">' +
+        '<span class="tag-preview" style="background:rgba(' + hexToRgb(accent) + ',0.1);color:' + accent + '">#市场</span>' +
+        '<span class="tag-preview" style="background:rgba(' + hexToRgb(accent) + ',0.1);color:' + accent + '">#趋势</span>' +
+        '<span class="tag-preview" style="background:rgba(' + hexToRgb(accent) + ',0.1);color:' + accent + '">#分析</span>' +
+      '</div>' +
+      '<div class="chart-row">' +
+        '<div class="chart-bar" style="background:' + c1 + ';flex:' + (c1 === accent ? '2' : '1.2') + '"></div>' +
+        '<div class="chart-bar" style="background:' + c2 + ';flex:1"></div>' +
+        '<div class="chart-bar" style="background:' + c3 + ';flex:0.8"></div>' +
+        '<div class="chart-bar" style="background:' + c4 + ';flex:0.5"></div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="card-info">' +
+      '<div><div class="name">' + t.label + '</div><div class="meta">' + t.id + '</div></div>' +
+      '<div class="accent-swatch" style="background:' + accent + '"></div>' +
+    '</div>';
+
+  card.addEventListener('click', function() {
+    document.documentElement.dataset.theme = t.id;
+    try { localStorage.setItem('theme', t.id); } catch(e) {}
+    document.querySelectorAll('.card').forEach(function(c) { c.classList.remove('selected'); });
+    card.classList.add('selected');
+  });
+
+  grid.appendChild(card);
+});
+
+function hexToRgb(hex) {
+  hex = hex.replace('#', '');
+  if (hex.length === 3) hex = hex.split('').map(function(c) { return c + c; }).join('');
+  var r = parseInt(hex.substring(0,2), 16);
+  var g = parseInt(hex.substring(2,4), 16);
+  var b = parseInt(hex.substring(4,6), 16);
+  return r + ',' + g + ',' + b;
+}
+
+// 键盘导航
+document.addEventListener('keydown', function(e) {
+  if (e.key === 't' && !e.ctrlKey && !e.metaKey) {
+    var cur = document.documentElement.dataset.theme;
+    var idx = THEMES.findIndex(function(t) { return t.id === cur; });
+    var next = THEMES[(idx + 1) % THEMES.length];
+    document.documentElement.dataset.theme = next.id;
+    try { localStorage.setItem('theme', next.id); } catch(e) {}
+    document.querySelectorAll('.card').forEach(function(c) {
+      c.classList.toggle('selected', c.dataset.theme === next.id);
+    });
+  }
+});
+</script>
+</body>
+</html>

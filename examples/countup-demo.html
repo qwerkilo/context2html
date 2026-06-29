@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数值滚动动画 - 组件示例</title>
+<link rel="stylesheet" href="../libs/magicui-effects.css">
+<style>
+:root { --bg: #faf9f7; --text: #1a1a1a; --accent: #c0392b; --radius: 8px; --anim-dur: 0.6s; --anim-y: 24px; }
+body { font-family: "Noto Serif CJK SC", Georgia, serif; background: var(--bg); color: var(--text); line-height: 1.8; max-width: 720px; margin: 3rem auto; padding: 0 1.5rem; }
+h1 { font-size: 1.6rem; border-bottom: 1px solid #ddd; padding-bottom: 0.5em; }
+
+.data-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+.dg-card { background: var(--bg); border: 1px solid #e2e8f0; border-radius: var(--radius, 8px); padding: 1.2em 0.8em; text-align: center; }
+.dg-icon { font-size: 2rem; margin-bottom: 0.25em; line-height: 1; }
+.dg-value { font-size: 1.8rem; font-weight: 800; color: var(--accent); line-height: 1.1; }
+.dg-unit { font-size: 0.8rem; color: var(--accent); font-weight: 500; margin-bottom: 0.5em; }
+.dg-label { font-size: 0.85rem; color: #64748b; line-height: 1.3; }
+
+[data-anim] { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+[data-anim].in-view { opacity: 1; transform: translateY(0); }
+
+.spacer { height: 50vh; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-style: italic; }
+</style>
+</head>
+<body>
+
+<h1 class="shiny-text">数值滚动动画 — 组件示例</h1>
+
+<p>向下滚动查看数字从 0 滚动到目标值的动画。</p>
+
+<div class="spacer">继续向下滚动触发动画 →</div>
+
+<div class="data-grid">
+  <div class="dg-card" data-anim="fade-up">
+    <div class="dg-icon">📉</div>
+    <div class="dg-value gradient-text" data-countup="8848">0</div>
+    <div class="dg-unit">亿美元</div>
+    <div class="dg-label">全球财富蒸发</div>
+  </div>
+  <div class="dg-card" data-anim="fade-up">
+    <div class="dg-icon">🏦</div>
+    <div class="dg-value gradient-text" data-countup="127">0</div>
+    <div class="dg-unit">家</div>
+    <div class="dg-label">倒闭银行数</div>
+  </div>
+  <div class="dg-card" data-anim="fade-up">
+    <div class="dg-icon">🌍</div>
+    <div class="dg-value gradient-text" data-countup="1">0</div>
+    <div class="dg-unit">%</div>
+    <div class="dg-label">全球 GDP 萎缩</div>
+  </div>
+  <div class="dg-card" data-anim="fade-up">
+    <div class="dg-icon">🏠</div>
+    <div class="dg-value gradient-text" data-countup="20">0</div>
+    <div class="dg-unit">%</div>
+    <div class="dg-label">美国房价跌幅</div>
+  </div>
+  <div class="dg-card" data-anim="fade-up">
+    <div class="dg-icon">💼</div>
+    <div class="dg-value gradient-text" data-countup="850">0</div>
+    <div class="dg-unit">万人</div>
+    <div class="dg-label">失业人数增加</div>
+  </div>
+  <div class="dg-card" data-anim="fade-up">
+    <div class="dg-icon">💰</div>
+    <div class="dg-value gradient-text" data-countup="7000">0</div>
+    <div class="dg-unit">亿美元</div>
+    <div class="dg-label">TARP 救助规模</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // IntersectionObserver for entrance animation
+  var obs = new IntersectionObserver(function(es) {
+    es.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('in-view'); });
+  });
+  document.querySelectorAll('[data-anim]').forEach(function(el) { obs.observe(el); });
+})();
+
+(function(){
+  if (!window.IntersectionObserver) return;
+  document.querySelectorAll('[data-countup]').forEach(function(el) {
+    var v = parseFloat(el.dataset.countup) || 0;
+    var d = 2000;
+    var anim;
+    var started = false;
+
+    function animateFrame(timestamp) {
+      if (!started) started = timestamp;
+      var progress = Math.min((timestamp - started) / d, 1);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.round(eased * v).toLocaleString();
+      if (progress < 1) {
+        requestAnimationFrame(animateFrame);
+      }
+    }
+
+    var io = new IntersectionObserver(function(entries) {
+      if (entries[0].isIntersecting) {
+        requestAnimationFrame(animateFrame);
+        io.unobserve(el);
+      }
+    }, { threshold: 0.5 });
+    io.observe(el);
+  });
+})();
+</script>
+</body>
+</html>
