@@ -450,8 +450,8 @@ def main():
             pairs = [
                 ('--bg', c['bg']), ('--text', c['text']), ('--accent', c['accent']),
                 ('--accent-text', c['accent_text']),
-                ('--accent-soft', f'rgba({int(c["accent"].lstrip("#")[0:2],16)},{int(c["accent"].lstrip("#")[2:4],16)},{int(c["accent"].lstrip("#")[4:6],16)},0.12)'),
-                ('--accent-muted', f'rgba({int(c["accent"].lstrip("#")[0:2],16)},{int(c["accent"].lstrip("#")[2:4],16)},{int(c["accent"].lstrip("#")[4:6],16)},0.4)'),
+                ('--accent-soft', hex_to_rgba(c['accent'], 0.12)),
+                ('--accent-muted', hex_to_rgba(c['accent'], 0.4)),
                 ('--surface', c['surface']), ('--surface-raised', c['surface_raised']),
                 ('--border', c['border']), ('--muted', c['muted']), ('--link', c['link']),
                 ('--success', c['success']), ('--warning', c['warning']), ('--error', c['error']),
@@ -513,8 +513,8 @@ def generate_markdown_index(themes):
         'warm': '通用报告',
         'apple': '消费电子、产品评测',
         'nvidia': '技术报告、GPU/芯片分析',
-        'spotify': '娱乐、媒体、文化分析',
-        'tesla': '能源、汽车、工程',
+        'spotify': '音乐、流媒体、娱乐行业',
+        'tesla': '汽车、新能源、工程报告',
         'airbnb': '旅游、生活、消费市场',
         'airtable': 'SaaS、数据分析',
         'binance': '金融、区块链、投资',
@@ -530,8 +530,6 @@ def generate_markdown_index(themes):
         'notion': '知识管理、生产力',
         'x.ai': '前沿AI、深色科技',
         'zapier': '自动化、SaaS 集成',
-        'spotify': '音乐、流媒体、娱乐行业',
-        'tesla': '汽车、新能源、工程报告',
     }
 
     for t in themes:

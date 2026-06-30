@@ -88,6 +88,22 @@ class TestThemeCSS:
         assert len(vr.check_theme_css('<style>@import "data:text/css,..."</style>')) > 0
     def test_relative_path_okay(self):
         assert not vr.check_theme_css('<link href="../theme/report-themes.css" rel="stylesheet">')
+    def test_missing_file_fails_with_base_dir(self, tmp_path):
+        assert len(vr.check_theme_css(
+            '<link href="theme/report-themes.css" rel="stylesheet">', str(tmp_path))) > 0
+    def test_existing_file_passes_with_base_dir(self, tmp_path):
+        (tmp_path / "theme").mkdir()
+        (tmp_path / "theme" / "report-themes.css").write_text("/* */")
+        assert not vr.check_theme_css(
+            '<link href="theme/report-themes.css" rel="stylesheet">', str(tmp_path))
+    def test_cdn_with_base_dir_still_warns(self, tmp_path):
+        assert len(vr.check_theme_css(
+            '<link href="https://cdn.example.com/report-themes.css">', str(tmp_path))) > 0
+    def test_missing_file_error_includes_resolved_path(self, tmp_path):
+        issues = vr.check_theme_css(
+            '<link href="theme/report-themes.css">', str(tmp_path))
+        assert any('missing' in i.lower() for i in issues)
+        assert any(str(tmp_path) in i for i in issues)
 
 
 class TestSVG:
@@ -249,3 +265,93 @@ class TestLibDeps:
     def test_echarts_GL_no_lib_fails(self):
         assert len(vr.check_lib_deps(
             '<html>type: "bar3D"</html>', 'C:\\nonexistent')) > 0
+    def test_echarts_local_script_missing_file_fails(self, tmp_path):
+        assert len(vr.check_lib_deps(
+            '<html><script src="libs/echarts.min.js"></script>echarts.init()</html>',
+            str(tmp_path))) > 0
+    def test_echarts_local_script_existing_file_passes(self, tmp_path):
+        (tmp_path / "libs").mkdir()
+        (tmp_path / "libs" / "echarts.min.js").write_text("// stub")
+        assert not vr.check_lib_deps(
+            '<html><script src="libs/echarts.min.js"></script>echarts.init()</html>',
+            str(tmp_path))
+    def test_three_script_missing_fails(self, tmp_path):
+        assert len(vr.check_lib_deps(
+            '<html><script src="libs/three.min.js"></script>new THREE.Scene()</html>',
+            str(tmp_path))) > 0
+    def test_d3_script_missing_fails(self, tmp_path):
+        assert len(vr.check_lib_deps(
+            '<html><script src="libs/d3.min.js"></script>d3.select("body")</html>',
+            str(tmp_path))) > 0
+    def test_cdn_script_not_checked(self, tmp_path):
+        assert not vr.check_lib_deps(
+            '<html><script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js">'
+            '</script>echarts.init()</html>', str(tmp_path))
+
+
+class TestBarFillWidth:
+    def test_inline_100_passes(self):
+        assert not vr.check_bar_fill_width(
+            '<div class="bar-fill" style="width: 80%;">x</div>')
+    def test_inline_overflow_fails(self):
+        assert len(vr.check_bar_fill_width(
+            '<div class="bar-fill" style="width: 120%;">x</div>')) > 0
+    def test_css_rule_100_passes(self):
+        assert not vr.check_bar_fill_width(
+            '<style>.bar-fill { width: 75%; }</style><div class="bar-fill"></div>')
+    def test_css_rule_overflow_fails(self):
+        assert len(vr.check_bar_fill_width(
+            '<style>.bar-fill { width: 110%; }</style><div class="bar-fill"></div>')) > 0
+    def test_no_bar_fill_passes(self):
+        assert not vr.check_bar_fill_width('<div class="other"></div>')
+
+
+class TestCmpTableResponsive:
+    def test_no_cmp_table_skips(self):
+        assert not vr.check_cmp_table_responsive('<div>no table</div>')
+    def test_responsive_rule_passes(self):
+        html = ('<style>@media (max-width: 600px) { .cmp-table tr { display: block; } }</style>'
+                '<table class="cmp-table"></table>')
+        assert not vr.check_cmp_table_responsive(html)
+    def test_no_responsive_rule_fails(self):
+        html = '<style>.cmp-table { width: 100%; }</style><table class="cmp-table"></table>'
+        assert len(vr.check_cmp_table_responsive(html)) > 0
+    def test_only_wide_breakpoint_fails(self):
+        html = ('<style>@media (max-width: 1200px) { .cmp-table { display: block; } }</style>'
+                '<table class="cmp-table"></table>')
+        assert len(vr.check_cmp_table_responsive(html)) > 0
+
+
+class TestCrossRefs:
+    def test_no_chapters_or_refs_passes(self):
+        assert not vr.check_cross_refs('<div>plain</div>')
+    def test_canonical_ref_passes(self):
+        assert not vr.check_cross_refs(
+            '<section id="ch1"></section><section id="ch2"></section>'
+            '<a href="#ch1">link</a>')
+    def test_non_canonical_ref_fails(self):
+        assert len(vr.check_cross_refs(
+            '<a href="#chapter-one">link</a>')) > 0
+
+
+class TestSVGLinkVariants:
+    def test_object_data_missing_fails(self, tmp_path):
+        assert len(vr.check_svg_links(
+            '<html><object data="missing.svg"></object></html>', str(tmp_path))) > 0
+    def test_object_data_valid_passes(self, tmp_path):
+        (tmp_path / "ok.svg").write_text(
+            '<svg xmlns="http://www.w3.org/2000/svg"><rect width="10" height="10"/></svg>')
+        assert not vr.check_svg_links(
+            '<html><object data="ok.svg"></object></html>', str(tmp_path))
+    def test_iframe_src_missing_fails(self, tmp_path):
+        assert len(vr.check_svg_links(
+            '<html><iframe src="missing.svg"></iframe></html>', str(tmp_path))) > 0
+    def test_source_src_missing_fails(self, tmp_path):
+        assert len(vr.check_svg_links(
+            '<html><source src="missing.svg"></html>', str(tmp_path))) > 0
+    def test_https_skipped(self, tmp_path):
+        assert not vr.check_svg_links(
+            '<html><img src="https://cdn.example.com/x.svg"></html>', str(tmp_path))
+    def test_data_uri_skipped(self, tmp_path):
+        assert not vr.check_svg_links(
+            '<html><img src="data:image/svg+xml;base64,xxx"></html>', str(tmp_path))

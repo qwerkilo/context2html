@@ -14,8 +14,13 @@ FAIL = "[FAIL]"
 def check_svg_links(html, base_dir):
     """Check that all SVG src files exist and are valid XML."""
     issues = []
-    svgs = re.findall(r'<img[^>]*src="([^"]+\.svg)"', html)
+    svgs = set(re.findall(r'<img[^>]*src="([^"]+\.svg)"', html))
+    svgs.update(re.findall(r'<object[^>]*data="([^"]+\.svg)"', html))
+    svgs.update(re.findall(r'<iframe[^>]*src="([^"]+\.svg)"', html))
+    svgs.update(re.findall(r'<source[^>]*src="([^"]+\.svg)"', html))
     for src in svgs:
+        if src.startswith(('http://', 'https://', 'data:')):
+            continue
         path = os.path.join(base_dir, src)
         if not os.path.exists(path):
             issues.append(f"SVG not found: {src}")
@@ -27,12 +32,50 @@ def check_svg_links(html, base_dir):
     return issues
 
 
+def _extract_tag_blocks(html, tag, class_name):
+    """Extract balanced <tag class="...class_name...">...</tag> blocks via depth counting.
+
+    A naive regex like `<tag ...>.*?</tag>` with DOTALL matches an inner closing tag
+    when the block contains nested tags of the same type, producing wrong question
+    bodies. This depth walker tolerates arbitrary nesting.
+    """
+    pattern = re.compile(
+        r'<' + tag + r'\b[^>]*class="[^"]*\b' + re.escape(class_name) + r'\b[^"]*"[^>]*>',
+        re.IGNORECASE,
+    )
+    blocks = []
+    pos = 0
+    while pos < len(html):
+        m = pattern.search(html, pos)
+        if not m:
+            break
+        depth = 1
+        cursor = m.end()
+        open_re = re.compile(r'<' + tag + r'(?=[\s>])', re.IGNORECASE)
+        close_re = re.compile(r'</' + tag + r'\s*>', re.IGNORECASE)
+        while cursor < len(html) and depth > 0:
+            no = open_re.search(html, cursor)
+            nc = close_re.search(html, cursor)
+            if not nc:
+                break
+            if no and no.start() < nc.start():
+                depth += 1
+                cursor = no.end()
+            else:
+                depth -= 1
+                cursor = nc.end()
+        if depth == 0:
+            blocks.append(html[m.start():cursor])
+            pos = cursor
+        else:
+            break
+    return blocks
+
+
 def check_quiz_correct_count(html):
     """Each quiz question should have exactly one data-correct=true per language."""
     issues = []
-    questions = re.findall(
-        r'<div[^>]*class="[^"]*quiz-question[^"]*"[^>]*>.*?</div>', html, re.DOTALL
-    )
+    questions = _extract_tag_blocks(html, 'div', 'quiz-question')
     for i, q in enumerate(questions, 1):
         langs = re.findall(r'data-lang="([^"]+)"', q)
         if langs:
@@ -95,9 +138,7 @@ def check_relative_links(html):
 def check_quiz_completeness(html):
     """Should have exactly 5 questions, each with 3 options per language."""
     issues = []
-    questions = re.findall(
-        r'<div[^>]*class="[^"]*quiz-question[^"]*"[^>]*>.*?</div>', html, re.DOTALL
-    )
+    questions = _extract_tag_blocks(html, 'div', 'quiz-question')
     if len(questions) != 5:
         issues.append(f"Found {len(questions)} quiz questions (expected 5)")
     for i, q in enumerate(questions, 1):
@@ -163,27 +204,46 @@ def check_ppt_js(html):
     return issues
 
 
+_ICON_PARENT_TAGS = ('button', 'a', 'summary', 'label', 'input')
+_ICON_WIDTH_THRESHOLD = 48
+
+
+def _is_in_fenced_code(html, pos):
+    """Return True when the position sits inside an open/unclosed ``` fenced block."""
+    in_fence = False
+    cursor = 0
+    while cursor < pos:
+        nxt = html.find('```', cursor)
+        if nxt == -1 or nxt >= pos:
+            break
+        in_fence = not in_fence
+        cursor = nxt + 3
+    return in_fence
+
+
 def check_inline_svg(html):
     """Inline SVGs must be wrapped in .svg-fig figure, excluding icon SVGs."""
     issues = []
     has_figure = bool(re.search(r'class="[^"]*svg-fig[^"]*"', html))
-    # Find each <svg> opening tag with its attributes
-    for m in re.finditer(r'<svg\s+([^>]*)>', html):
-        tag = m.group()
+    for m in re.finditer(r'<svg\b([^>]*)>', html):
         attrs = m.group(1)
         pos = m.start()
-        # Check if inside a code block
-        code_start = html.rfind("```", 0, pos)
-        code_end = html.find("```", pos)
-        if code_start != -1 and code_end != -1:
+        if _is_in_fenced_code(html, pos):
             continue
-        # Check if it's inside a noise-overlay (decorative SVG texture)
-        before = html[max(0,pos-200):pos]
+        before = html[max(0, pos - 200):pos]
         if 'noise-overlay' in before:
             continue
-        # Check if it's an icon SVG (width <= 28 for UI icons)
-        wm = re.search(r'width="(\d+)"', attrs)
-        if wm and int(wm.group(1)) <= 28:
+        wm = re.search(r'width="(\d+)(?:px)?"', attrs)
+        if wm and int(wm.group(1)) <= _ICON_WIDTH_THRESHOLD:
+            continue
+        last_open = None
+        for am in re.finditer(r'<([a-zA-Z][a-zA-Z0-9]*)\b[^>]*?(/?)>', before):
+            tag = am.group(1).lower()
+            if am.group(2) == '/':
+                continue
+            if tag in _ICON_PARENT_TAGS:
+                last_open = tag
+        if last_open is not None:
             continue
         if not has_figure:
             issues.append("Inline <svg> found without .svg-fig wrapper")
@@ -438,6 +498,26 @@ def check_bilingual(html):
     return issues
 
 
+def _check_local_script_paths(html, base_dir, lib_name):
+    """Verify any local <script src=...> referencing the lib resolves to a real file."""
+    issues = []
+    pattern = re.compile(
+        r'<script\b[^>]*\bsrc="([^"]*)"[^>]*>', re.IGNORECASE)
+    for m in pattern.finditer(html):
+        src = m.group(1).strip()
+        if not src or src.startswith(('http://', 'https://', '//', 'data:')):
+            continue
+        if lib_name not in src:
+            continue
+        if os.path.isabs(src):
+            resolved = src
+        else:
+            resolved = os.path.normpath(os.path.join(base_dir, src))
+        if not os.path.exists(resolved):
+            issues.append(f"{lib_name} <script src=\"{src}\"> points to missing file -> {resolved}")
+    return issues
+
+
 def check_lib_deps(html, base_dir):
     """Verify ECharts, Three.js, D3.js lib files exist when used."""
     issues = []
@@ -446,10 +526,12 @@ def check_lib_deps(html, base_dir):
         has_cdn = "cdn.jsdelivr.net/npm/echarts" in html
         if not has_local and not has_cdn:
             issues.append("ECharts usage found but no libs/echarts.min.js or CDN link")
+        issues.extend(_check_local_script_paths(html, base_dir, "echarts"))
     if re.search(r'bar3D|scatter3D|map3D|globe|\'surface\'', html) or 'echarts-gl' in html:
         has_gl = os.path.exists(os.path.join(base_dir, "libs", "echarts-gl.min.js"))
         if not has_gl:
             issues.append("ECharts GL usage found but no libs/echarts-gl.min.js")
+        issues.extend(_check_local_script_paths(html, base_dir, "echarts-gl"))
     if re.search(r'new THREE\.', html) or re.search(r'\bTHREE\b', html) or 'three@0.185.0' in html:
         has_local_umd = os.path.exists(os.path.join(base_dir, "libs", "three.min.js"))
         has_local_esm = os.path.exists(os.path.join(base_dir, "libs", "three.module.js"))
@@ -457,11 +539,13 @@ def check_lib_deps(html, base_dir):
         has_importmap = "cdn.jsdelivr.net/npm/three@0.185.0" in html
         if not has_local_umd and not has_local_esm and not has_cdn and not has_importmap:
             issues.append("Three.js usage found but no libs/three.min.js, three.module.js, or CDN link")
+        issues.extend(_check_local_script_paths(html, base_dir, "three"))
     if re.search(r'd3\.(forceSimulation|hierarchy|sankey|select)\b', html):
         has_local = os.path.exists(os.path.join(base_dir, "libs", "d3.min.js"))
         has_cdn = "d3js.org/d3" in html
         if not has_local and not has_cdn:
             issues.append("D3.js usage found but no libs/d3.min.js or CDN link")
+        issues.extend(_check_local_script_paths(html, base_dir, "d3"))
     return issues
 
 

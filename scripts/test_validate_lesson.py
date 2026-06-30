@@ -36,6 +36,10 @@ class TestQuizCorrectCount:
         assert len(vl.check_quiz_correct_count(
             '<div class="quiz-question"><button data-correct="true">A</button>'
             '<button data-correct="true">B</button></div>')) > 0
+    def test_nested_divs_two_correct_fails(self):
+        nested = '<div class="quiz-question"><div><button data-correct="true">A</button></div>' \
+                 '<div><button data-correct="true">B</button></div></div>'
+        assert len(vl.check_quiz_correct_count(nested)) > 0
 
 
 class TestQuizCompleteness:
@@ -50,6 +54,14 @@ class TestQuizCompleteness:
         assert len(vl.check_quiz_completeness(
             '<div class="quiz-question"><button class="quiz-option">A</button>'
             '<button class="quiz-option">B</button></div>' * 5)) > 0
+    def test_nested_divs_5_questions_passes(self):
+        assert not vl.check_quiz_completeness(
+            '<div class="quiz-question"><div><button class="quiz-option">A</button></div>'
+            '<div><button class="quiz-option">B</button><button class="quiz-option">C</button></div></div>' * 5)
+    def test_nested_divs_wrong_options_fails(self):
+        assert len(vl.check_quiz_completeness(
+            '<div class="quiz-question"><div><button class="quiz-option">A</button></div>'
+            '<div><button class="quiz-option">B</button></div></div>' * 5)) > 0
 
 
 class TestDataAnimSyntax:
@@ -99,6 +111,30 @@ class TestInlineSVG:
     def test_pie_chart_no_figure_fails(self):
         assert len(vl.check_inline_svg(
             '<svg viewBox="0 0 100 100" width="240"></svg>')) > 0
+    def test_px_unit_icon_passes(self):
+        assert not vl.check_inline_svg(
+            '<svg width="24px" height="24px" viewBox="0 0 24 24"></svg>')
+    def test_32px_icon_passes(self):
+        assert not vl.check_inline_svg(
+            '<span><svg width="32" height="32" viewBox="0 0 24 24"></svg></span>')
+    def test_48px_icon_passes(self):
+        assert not vl.check_inline_svg(
+            '<span><svg width="48" height="48" viewBox="0 0 24 24"></svg></span>')
+    def test_button_icon_40px_passes(self):
+        assert not vl.check_inline_svg(
+            '<button><svg width="40" height="40"></svg></button>')
+    def test_anchor_icon_passes(self):
+        assert not vl.check_inline_svg(
+            '<a href="#"><svg width="32" height="32"></svg></a>')
+    def test_summary_icon_passes(self):
+        assert not vl.check_inline_svg(
+            '<details><summary><svg width="20" height="20"></svg></summary></details>')
+    def test_in_fenced_code_passes(self):
+        html = '```html\n<svg viewBox="0 0 100 100" width="200"></svg>\n```'
+        assert not vl.check_inline_svg(html)
+    def test_60px_outside_icon_container_fails(self):
+        assert len(vl.check_inline_svg(
+            '<svg viewBox="0 0 100 100" width="60"></svg>')) > 0
 
 
 class TestComponentConsistency:

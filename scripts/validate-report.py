@@ -14,8 +14,13 @@ FAIL = "[FAIL]"
 def check_svg_links(html, base_dir):
     """Check that all SVG src files exist and are valid XML."""
     issues = []
-    svgs = re.findall(r'<img[^>]*src="([^"]+\.svg)"', html)
+    svgs = set(re.findall(r'<img[^>]*src="([^"]+\.svg)"', html))
+    svgs.update(re.findall(r'<object[^>]*data="([^"]+\.svg)"', html))
+    svgs.update(re.findall(r'<iframe[^>]*src="([^"]+\.svg)"', html))
+    svgs.update(re.findall(r'<source[^>]*src="([^"]+\.svg)"', html))
     for src in svgs:
+        if src.startswith(('http://', 'https://', 'data:')):
+            continue
         path = os.path.join(base_dir, src)
         if not os.path.exists(path):
             issues.append(f"SVG not found: {src}")
@@ -101,6 +106,26 @@ def check_semantic_html(html):
     return ["No semantic HTML elements found (use <article>/<section>/<nav>/<aside>)"]
 
 
+def _check_local_script_paths(html, base_dir, lib_name):
+    """Verify any local <script src=...> referencing the lib resolves to a real file."""
+    issues = []
+    pattern = re.compile(
+        r'<script\b[^>]*\bsrc="([^"]*)"[^>]*>', re.IGNORECASE)
+    for m in pattern.finditer(html):
+        src = m.group(1).strip()
+        if not src or src.startswith(('http://', 'https://', '//', 'data:')):
+            continue
+        if lib_name not in src:
+            continue
+        if os.path.isabs(src):
+            resolved = src
+        else:
+            resolved = os.path.normpath(os.path.join(base_dir, src))
+        if not os.path.exists(resolved):
+            issues.append(f"{lib_name} <script src=\"{src}\"> points to missing file -> {resolved}")
+    return issues
+
+
 def check_lib_deps(html, base_dir):
     """Verify ECharts, Three.js, D3.js lib files exist when used."""
     issues = []
@@ -109,10 +134,12 @@ def check_lib_deps(html, base_dir):
         has_cdn = "cdn.jsdelivr.net/npm/echarts" in html
         if not has_local and not has_cdn:
             issues.append("ECharts usage found but no libs/echarts.min.js or CDN link")
+        issues.extend(_check_local_script_paths(html, base_dir, "echarts"))
     if re.search(r'bar3D|scatter3D|map3D|globe|\'surface\'', html) or 'echarts-gl' in html:
         has_gl = os.path.exists(os.path.join(base_dir, "libs", "echarts-gl.min.js"))
         if not has_gl:
             issues.append("ECharts GL usage found but no libs/echarts-gl.min.js")
+        issues.extend(_check_local_script_paths(html, base_dir, "echarts-gl"))
     if re.search(r'new THREE\.', html) or re.search(r'\bTHREE\b', html) or 'three@0.185.0' in html:
         has_local_umd = os.path.exists(os.path.join(base_dir, "libs", "three.min.js"))
         has_local_esm = os.path.exists(os.path.join(base_dir, "libs", "three.module.js"))
@@ -120,11 +147,13 @@ def check_lib_deps(html, base_dir):
         has_importmap = "cdn.jsdelivr.net/npm/three@0.185.0" in html
         if not has_local_umd and not has_local_esm and not has_cdn and not has_importmap:
             issues.append("Three.js usage found but no libs/three.min.js, three.module.js, or CDN link")
+        issues.extend(_check_local_script_paths(html, base_dir, "three"))
     if re.search(r'd3\.(forceSimulation|hierarchy|sankey|select)\b', html):
         has_local = os.path.exists(os.path.join(base_dir, "libs", "d3.min.js"))
         has_cdn = "d3js.org/d3" in html
         if not has_local and not has_cdn:
             issues.append("D3.js usage found but no libs/d3.min.js or CDN link")
+        issues.extend(_check_local_script_paths(html, base_dir, "d3"))
     return issues
 
 
@@ -183,18 +212,88 @@ def check_report_footer(html):
     return []
 
 
-def check_theme_css(html):
+def check_theme_css(html, base_dir=None):
     """Check that report-themes.css is referenced and the file exists."""
     issues = []
     refs = re.findall(r'href="([^"]*report-themes\.css)"', html)
     if not refs:
         return ["Missing <link> to theme/report-themes.css"]
     for ref in refs:
-        # Resolve relative to project root (not report location)
-        # Just warn if the reference looks wrong
         if ref.startswith("http"):
             issues.append(f"Theme CSS from CDN/URL: {ref} (prefer local)")
+            continue
+        if base_dir and not os.path.isabs(ref):
+            resolved = os.path.normpath(os.path.join(base_dir, ref))
+            if not os.path.exists(resolved):
+                issues.append(f"Theme CSS link points to missing file: {ref} -> {resolved}")
     return issues
+
+
+def check_bar_fill_width(html):
+    """Bar-fill elements must not exceed 100% width (would overflow container)."""
+    issues = []
+    overflow = []
+    for m in re.finditer(r'class="[^"]*\bbar-fill\b[^"]*"[^>]*style="([^"]*)"', html):
+        style = m.group(1)
+        wm = re.search(r'width\s*:\s*(\d+(?:\.\d+)?)\s*%', style)
+        if wm and float(wm.group(1)) > 100:
+            overflow.append(f"{wm.group(1)}%")
+    style_block = re.search(r'<style[^>]*>(.*?)</style>', html, re.DOTALL)
+    if style_block:
+        css = style_block.group(1)
+        for m in re.finditer(r'\.bar-fill[^{]*\{[^}]*width\s*:\s*(\d+(?:\.\d+)?)\s*%\s*;', css):
+            if float(m.group(1)) > 100:
+                overflow.append(f"{m.group(1)}% (CSS rule)")
+    if overflow:
+        issues.append(f"Bar-fill width exceeds 100%: {', '.join(overflow)}")
+    return issues
+
+
+def check_cmp_table_responsive(html):
+    """Comparison tables must collapse to stacked layout below 600px."""
+    if '.cmp-table' not in html:
+        return []
+    style_block = re.search(r'<style[^>]*>(.*?)</style>', html, re.DOTALL)
+    if not style_block:
+        return [".cmp-table used but no <style> block found for responsive rules"]
+    css = style_block.group(1)
+    narrow_breaks = list(re.finditer(
+        r'@media\s*\([^)]*max-width\s*:\s*(\d+)px[^)]*\)\s*\{',
+        css,
+    ))
+    covers_table = False
+    for mb in narrow_breaks:
+        bp = int(mb.group(1))
+        if bp > 700:
+            continue
+        open_brace = mb.end()
+        depth = 1
+        cursor = open_brace
+        while cursor < len(css) and depth > 0:
+            ch = css[cursor]
+            if ch == '{':
+                depth += 1
+            elif ch == '}':
+                depth -= 1
+            cursor += 1
+        body = css[open_brace:cursor - 1]
+        if '.cmp-table' in body:
+            covers_table = True
+            break
+    if not covers_table:
+        return [".cmp-table used but no @media (max-width: 700px) rule covers it (narrow screens won't stack)"]
+    return []
+
+
+def check_cross_refs(html):
+    """Chapter cross-references should use the #chN anchor convention when used."""
+    bad_refs = []
+    for ref in re.findall(r'href="#([^"#?]+)"', html):
+        if ref.startswith('ch') and not re.match(r'^ch\d+$', ref):
+            bad_refs.append(ref)
+    if bad_refs:
+        return [f"Non-canonical chapter refs (expected #chN where N is a number): {', '.join(bad_refs)}"]
+    return []
 
 
 def run_all(path):
@@ -223,7 +322,11 @@ def run_all(path):
         (".conclusion-page section", check_conclusion_page(html)),
         (".report-footer element", check_report_footer(html)),
         # Theme
-        ("theme/report-themes.css referenced", check_theme_css(html)),
+        ("theme/report-themes.css referenced", check_theme_css(html, base_dir)),
+        # Visual contract
+        ("Bar-fill width <= 100%", check_bar_fill_width(html)),
+        ("Comparison table responsive (max-width 600-700px)", check_cmp_table_responsive(html)),
+        ("Chapter cross-refs use #chN anchors", check_cross_refs(html)),
     ]
 
     all_pass = True

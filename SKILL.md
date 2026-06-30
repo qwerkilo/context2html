@@ -199,7 +199,7 @@ argument-hint: "调研内容描述或文件路径？"
 
 ## 先决条件检查（在 Step 4 使用而不是手动逐项核对）
 
-运行 `python scripts/validate-report.py report-slug.html` 会自动执行全部检查（含 SVG 验证、中文渲染、对比表窄屏折叠、中英双语配对等 14 项）。手动核对见 Step 4 验证清单。
+运行 `python scripts/validate-report.py report-slug.html` 会自动执行全部检查（含 SVG 验证、中文渲染、对比表窄屏折叠、中英双语配对、条形图不溢出、章节交叉引用 `#chN` 等 17 项）。手动核对见 Step 4 验证清单。
 
 ## 失败模式与异常处理
 

@@ -203,7 +203,7 @@ ceil(总字数 / 500) = 报告最少组件数
 
 ## 交付前验证清单
 
-生成报告 HTML 后，必须通过 `python scripts/validate-report.py path/to/report.html` 验证。以下是验证器检查的 14 项：
+生成报告 HTML 后，必须通过 `python scripts/validate-report.py path/to/report.html` 验证。以下是验证器检查的 17 项：
 
 | # | 检查项 | 失败时处理 |
 |---|--------|-----------|
@@ -220,7 +220,10 @@ ceil(总字数 / 500) = 报告最少组件数
 | 11 | `.report-chapter` 至少一个 | 报告必须包含正文章节 |
 | 12 | `.conclusion-page` 存在 | 添加结论与建议段 |
 | 13 | `.report-footer` 存在 | 添加脚注区域 |
-| 14 | `theme/report-themes.css` 被引用 | 在 `<head>` 中添加 `<link>` 引用 |
+| 14 | `theme/report-themes.css` 被引用且文件存在 | 在 `<head>` 中添加 `<link>` 引用，确认文件复制到目标位置 |
+| 15 | `.bar-fill` width 不超过 100% | 检查条形图数据值，修正超过 100% 的设置 |
+| 16 | `.cmp-table` 在 ≤700px 屏幕下有响应式规则 | 在 `<style>` 中添加 `@media (max-width: 700px)` 规则覆盖 `.cmp-table` |
+| 17 | 章节交叉引用使用 `#chN` 锚点 | 把 `href="#chapter-name"` 改为 `href="#chN"` |
 
 ## 视觉设计纪律
 
