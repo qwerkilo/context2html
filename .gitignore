@@ -8,3 +8,8 @@ node_modules/
 docs/
 .cortexkit/
 .codegraph/
+# Windows file-sync conflict copies (OneDrive/Dropbox/Synology Drive)
+*Conflicted copy*.md
+*Conflicted copy*.py
+*Conflicted copy*.ps1
+*Conflicted copy*.html

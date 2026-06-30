@@ -15,8 +15,8 @@ This project has CodeGraph initialized (12 Python/JS files, 900+ nodes). Use `co
 - **One visual component per 500 words minimum** — use `references/decision-guide.md` to pick.
 - **Bilingual always** — every content block must have `data-lang="zh"` + `data-lang="en"`. L key toggles.
 - **Humanize Chinese prose** — follow D1-D5 rules in SKILL.md (vary sentence length, rotate paragraph structure, reduce connectors, substitute terms). Execution is Step 2.5 with its own STOP checkpoint — not optional.
-- **Tags per chapter end** — tag group #17 at the end of every chapter.
-- **Theme** — choose from the 10-row table in `references/decision-guide.md` theme section. Set `<html data-theme="xxx">`.
+- **Tags per chapter end** — tag group #17 at the end of every chapter. **All tags must carry a `#` prefix** unless the user explicitly says otherwise.
+- **Theme** — choose from the 20 themes in `references/decision-guide.md` theme section. Set `<html data-theme="xxx">`.
 
 ## Commands
 
@@ -25,7 +25,7 @@ This project has CodeGraph initialized (12 Python/JS files, 900+ nodes). Use `co
 powershell -ExecutionPolicy Bypass -File scripts/run-tests.ps1
 
 # Run unit tests directly with pytest
-python -m pytest scripts/test_validate_report.py scripts/test_validate_lesson.py -v --tb=short
+python -m pytest scripts/test_validate_report.py scripts/test_validate_lesson.py scripts/test_generate_theme_css.py -v --tb=short
 
 # Validate a single report (required before delivery)
 python scripts/validate-report.py path/to/report.html
@@ -53,5 +53,5 @@ powershell -ExecutionPolicy Bypass -File templates/start-server.ps1
 - **Validator path resolution** — `validate-report.py` resolves `libs/` and SVG paths relative to the report HTML's own directory (`os.path.dirname`), not the project root.
 - **spotify and tesla** have no YAML front matter in their DESIGN.md files — the generator handles them with hardcoded fallback values.
 - **No opencode.json** — the skill is loaded through OpenCode's skill mechanism, not CLI config.
-- **`components/` .md files** were ported from teach_more_pic and still use technical/process language, not report prose. They are reference docs for the agent, not content for the report.
 - **`results.tsv` and `test-prompts.json`** should be updated after any darwin-skill optimization or generation workflow changes.
+- **File-sync conflict files** (`*Conflicted copy*`) can appear in `references/`, `scripts/`, etc. — Windows sync client artifacts. Already covered by `.gitignore`; safe to delete manually if they appear on disk.
