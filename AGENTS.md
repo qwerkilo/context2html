@@ -4,7 +4,7 @@
 
 Sub-skill augmenting **teach_more_pic**. Both loaded via `Skills:`. 29 visual components in `components/` are local copies from teach_more_pic — editable here. Differentiator: report workflow (not course), 20 brand themes, bilingual, D1-D5 humanization.
 
-**SKILL.md is the workflow document** (5 steps: input → plan → select → humanize → generate → validate). Step 2.5 (humanize) has a STOP checkpoint before HTML generation.
+**SKILL.md is the workflow document** (Step 0-5 + Step 2.5 humanize sub-step with STOP checkpoint before HTML generation).
 
 ## No build system
 
@@ -32,6 +32,8 @@ powershell -ExecutionPolicy Bypass -File templates/start-server.ps1   # Windows
 - **Bilingual** — every content block needs `data-lang="zh"` + `data-lang="en"`. L key toggles.
 - **Template-based** — always copy `templates/report-starter.html`. Never start from scratch (loses CSS variable system, toolbar, keyboard nav).
 - **Visual density** — ≥1 component per 500 words. `references/decision-guide.md` for selection.
+- **ECharts priority** — for tabular/comparison data (3+ data points), prefer ECharts #26 over HTML tables #5/#22. The decision tree routes "对比分析 → ECharts #26 ⭐⭐⭐" first.
+- **Responsive tables** — components #5 and #22 now include `@media (max-width: 700px)` stacked layout + `data-label` attributes. No need to write responsive CSS from scratch.
 - **Tag group #17** — required at end of every chapter.
 - **Theme** — pick from 20 themes via `<html data-theme="xxx">`.
 
@@ -51,10 +53,11 @@ Indexed: 5,919 nodes, 23,306 edges. Use `search_graph` / `trace_path` / `get_cod
 - **Theme CSS is auto-generated** (`theme/report-themes.css`). Never hand-edit. Re-run `generate-theme-css.py` after teach_more_pic DESIGN.md changes.
 - **Two manual themes** — `spotify` and `tesla` have no YAML front matter. Handled via `MANUAL_THEMES` dict in generate-theme-css.py.
 - **Template `<link>` path** — `report-starter.html` uses `<link href="../theme/report-themes.css">`. Adjust or inline when distributing standalone.
+- **Three.js WebGPU first** — component #27 uses `importmap` + `type="module"` for WebGPU, falls back to UMD `libs/three.min.js` for WebGL. Both patterns must be included.
 - **Copy `libs/` alongside report** — validator checks both `libs/<lib>.min.js` existence AND `<script src="libs/...">` path resolution.
 - **validator path resolution** — `validate-report.py` resolves SVG paths, `<script src>` paths relative to the report HTML's own directory, NOT project root.
 - **Test imports** — `test_validate_report.py` uses `importlib` to load `validate-report.py` (non-standard import pattern).
 - **Components are .md files** — `components/NN-name.md` contain embedded ```html/css/js code blocks. Copy the blocks, not the whole file.
 - **`examples/report-themes.html` is NOT a valid report** — it's a theme preview page and will fail `validate-report.py`. Use `examples/0001-demo-report.html` for smoke tests.
-- `run-tests.ps1` only covers report+lesson validator tests (not theme-css tests).
+- **Git push** — remote uses SSH key `/root/.ssh/id_rsa_teach` (opencode-teach-sync). `~/.ssh/config` already configured for `github.com`.
 - `results.tsv` and `test-prompts.json` — update after darwin-skill optimization runs.

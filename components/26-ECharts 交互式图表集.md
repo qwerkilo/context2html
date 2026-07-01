@@ -66,9 +66,9 @@ pie.setOption({
     type: 'pie', radius: ['30%','60%'],
     data: [
       { value: 45, name: '消费', itemStyle: { color: 'var(--accent)' } },
-      { value: 25, name: '投资', itemStyle: { color: '#e67e22' } },
-      { value: 20, name: '政府支出', itemStyle: { color: '#2ecc71' } },
-      { value: 10, name: '净出口', itemStyle: { color: '#3498db' } }
+      { value: 25, name: '投资', itemStyle: { color: 'var(--success)' } },
+      { value: 20, name: '政府支出', itemStyle: { color: 'var(--warning)' } },
+      { value: 10, name: '净出口', itemStyle: { color: 'var(--error)' } }
     ],
     label: { color: 'var(--text)' }
   }]

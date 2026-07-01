@@ -542,7 +542,7 @@ def check_lib_deps(html, base_dir):
         if not has_local_umd and not has_local_esm and not has_cdn and not has_importmap:
             issues.append("Three.js usage found but no libs/three.min.js, three.module.js, or CDN link")
         issues.extend(_check_local_script_paths(html, base_dir, "three"))
-    if re.search(r'd3\.(forceSimulation|hierarchy|sankey|select)\b', html):
+    if re.search(r'd3\.(forceSimulation|hierarchy|sankey|select(?:All)?)\b', html):
         has_local = os.path.exists(os.path.join(base_dir, "libs", "d3.min.js"))
         has_cdn = "d3js.org/d3" in html
         if not has_local and not has_cdn:

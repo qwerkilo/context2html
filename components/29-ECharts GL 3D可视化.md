@@ -64,7 +64,7 @@ chart.setOption({
     coordinateSystem: 'globe',
     data: [[116.4,39.9,100],[121.5,25.0,80],[139.7,35.7,120]],
     symbolSize: 8,
-    itemStyle: { color: '#e74c3c', opacity: 0.9 },
+    itemStyle: { color: 'var(--accent)', opacity: 0.9 },
     label: { show: true, formatter: '{b}' }
   }]
 });

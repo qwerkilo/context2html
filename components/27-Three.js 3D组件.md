@@ -65,8 +65,9 @@ if(container && navigator.gpu){
   import('three').then(function(THREE){
     import('three/addons/renderers/webgpu/WebGPURenderer.js').then(function(m){
       var WGR = m.WebGPURenderer;
+      var style = getComputedStyle(document.documentElement);
       var scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xf5f0eb);
+      scene.background = new THREE.Color(style.getPropertyValue('--surface').trim() || '#f5f0eb');
       var camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 100);
       camera.position.set(5, 4, 8); camera.lookAt(0, 0, 0);
       var renderer = new WGR({ antialias: true });
@@ -74,7 +75,8 @@ if(container && navigator.gpu){
       container.appendChild(renderer.domElement);
 
       var data = [3.2, 5.1, 2.8, 4.5, 3.9];
-      var colors = [0xc0392b, 0xe67e22, 0x2ecc71, 0x3498db, 0x9b59b6];
+      var accent = style.getPropertyValue('--accent').trim() || '#c0392b';
+      var colors = [accent, '#e67e22', '#2ecc71', '#3498db', '#9b59b6'];
       for(var i = 0; i < data.length; i++){
         var bar = new THREE.Mesh(
           new THREE.BoxGeometry(0.6, data[i], 0.6),

@@ -148,7 +148,7 @@ def check_lib_deps(html, base_dir):
         if not has_local_umd and not has_local_esm and not has_cdn and not has_importmap:
             issues.append("Three.js usage found but no libs/three.min.js, three.module.js, or CDN link")
         issues.extend(_check_local_script_paths(html, base_dir, "three"))
-    if re.search(r'd3\.(forceSimulation|hierarchy|sankey|select)\b', html):
+    if re.search(r'd3\.(forceSimulation|hierarchy|sankey|select(?:All)?)\b', html):
         has_local = os.path.exists(os.path.join(base_dir, "libs", "d3.min.js"))
         has_cdn = "d3js.org/d3" in html
         if not has_local and not has_cdn:
@@ -233,7 +233,7 @@ def check_bar_fill_width(html):
     """Bar-fill elements must not exceed 100% width (would overflow container)."""
     issues = []
     overflow = []
-    for m in re.finditer(r'class="[^"]*\bbar-fill\b[^"]*"[^>]*style="([^"]*)"', html):
+    for m in re.finditer(r'class="[^"]*(?<![a-zA-Z0-9_-])bar-fill(?![-_])[^"]*"[^>]*style="([^"]*)"', html):
         style = m.group(1)
         wm = re.search(r'width\s*:\s*(\d+(?:\.\d+)?)\s*%', style)
         if wm and float(wm.group(1)) > 100:
@@ -241,7 +241,7 @@ def check_bar_fill_width(html):
     style_block = re.search(r'<style[^>]*>(.*?)</style>', html, re.DOTALL)
     if style_block:
         css = style_block.group(1)
-        for m in re.finditer(r'\.bar-fill[^{]*\{[^}]*width\s*:\s*(\d+(?:\.\d+)?)\s*%\s*;', css):
+        for m in re.finditer(r'\.(?<![a-zA-Z0-9_-])bar-fill(?![-_])[^{]*\{[^}]*width\s*:\s*(\d+(?:\.\d+)?)\s*%\s*;', css):
             if float(m.group(1)) > 100:
                 overflow.append(f"{m.group(1)}% (CSS rule)")
     if overflow:
@@ -269,7 +269,7 @@ def check_cmp_table_responsive(html):
         open_brace = mb.end()
         depth = 1
         cursor = open_brace
-        max_depth = 20
+        max_depth = 100
         while cursor < len(all_css) and depth > 0 and max_depth > 0:
             ch = all_css[cursor]
             if ch == '{':
