@@ -17,7 +17,7 @@ Sub-skill augmenting **teach_more_pic**. Both must be loaded via `Skills:` in AG
 ## Commands
 
 ```bash
-# Unit tests only (pytest, 217 tests across 3 files)
+# Unit tests only (pytest, 223 tests across 3 files)
 python -m pytest scripts/test_validate_report.py scripts/test_validate_lesson.py scripts/test_generate_theme_css.py -v --tb=short
 
 # Or use the wrapper (Windows PowerShell):
@@ -41,24 +41,24 @@ powershell -ExecutionPolicy Bypass -File templates/start-server.ps1
 - `scripts/validate-lesson.py` — inherited from teach_more_pic, used for course HTML.
 - Newer visual-contract checks added 2026-06: `check_bar_fill_width` (no width > 100%), `check_cmp_table_responsive` (must have `@media max-width: 700px` rule covering `.cmp-table`), `check_cross_refs` (chapter refs must be `#chN` form).
 
-## CodeGraph
+## codebase-memory-mcp
 
-Indexed: **15 files (8 Python + 7 JS), 953 nodes, 1794 edges** as of last sync. Use `codegraph_explore` to understand check functions in `scripts/validate-report.py` (faster than reading raw files). `codegraph_search` for symbol lookup.
+Also indexed (145 nodes, 145 edges, full-mode). Covers everything CodeGraph excludes: 8 Python scripts, 35 demo HTMLs, 3 test files, templates, references.
 
-### Recovery: if MCP returns "database disk image is malformed"
+Use cases:
+- **`search_code(pattern, ...)`** — grep across all repo files, including HTML/CSS/JS demos and Python scripts. Faster than raw grep when looking for specific function names or patterns.
+- **`search_graph(query, ...)`** — find files by natural language (e.g. "validate the comparison table" finds `.cmp-table` checks).
+- **`manage_adr()`** — 5 ADRs already stored covering the dual-validator architecture, theme generation, template-based reports, bilingual model, and path resolution. Read with `sections=["all"]` before making architectural changes.
+- **`get_architecture()`** — file tree overview (35 HTML, 8 Python, 6 JS files at a glance).
 
-The SQLite db in `.codegraph/` can corrupt after a crashed daemon. Fix:
+## context7 (library docs)
 
-```bash
-# 1. Kill any codegraph node processes still holding the db
-Get-Process node | Where-Object { $_.Path -match 'codegraph' } | Stop-Process -Force
-# 2. Delete the db files (keep .gitignore + daemon config)
-Remove-Item -Force .codegraph\codegraph.db, .codegraph\codegraph.db-shm, .codegraph\codegraph.db-wal
-# 3. Rebuild
-codegraph init
-```
+Use when generating ECharts/Three.js/D3.js or Python library code. Resolve the library ID first, then query API syntax:
 
-The MCP server caches the old db handle, so `codegraph status` may keep failing until you restart the MCP connection. `codegraph status` from CLI shows the DB is healthy after rebuild — that's the source of truth.
+- **ECharts** — `resolve-library-id(query="echarts interactive chart configuration", libraryName="ECharts")` then `query-docs`
+- **Three.js** — `resolve-library-id(query="Three.js scene setup", libraryName="Three.js")` then `query-docs`
+- **D3.js** — `resolve-library-id(query="D3.js force simulation sankey", libraryName="D3")` then `query-docs`
+- **cheerio / PyYAML / pytest** — same pattern with the matching library name
 
 ## Gotchas
 

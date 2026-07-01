@@ -230,20 +230,22 @@ def check_inline_svg(html):
         pos = m.start()
         if _is_in_fenced_code(html, pos):
             continue
-        before = html[max(0, pos - 200):pos]
+        before = html[max(0, pos - 800):pos]
         if 'noise-overlay' in before:
             continue
         wm = re.search(r'width="(\d+)(?:px)?"', attrs)
         if wm and int(wm.group(1)) <= _ICON_WIDTH_THRESHOLD:
             continue
-        last_open = None
-        for am in re.finditer(r'<([a-zA-Z][a-zA-Z0-9]*)\b[^>]*?(/?)>', before):
+        tag_stack = []
+        for am in re.finditer(r'</?([a-zA-Z][a-zA-Z0-9]*)\b[^>]*?(/?)>', before):
             tag = am.group(1).lower()
-            if am.group(2) == '/':
-                continue
-            if tag in _ICON_PARENT_TAGS:
-                last_open = tag
-        if last_open is not None:
+            self_close = am.group(2) == '/'
+            if am.group(0).startswith('</'):
+                if tag_stack and tag_stack[-1] == tag:
+                    tag_stack.pop()
+            elif not self_close and tag not in ('br', 'img', 'meta', 'link', 'input', 'hr'):
+                tag_stack.append(tag)
+        if any(t in _ICON_PARENT_TAGS for t in tag_stack):
             continue
         if not has_figure:
             issues.append("Inline <svg> found without .svg-fig wrapper")

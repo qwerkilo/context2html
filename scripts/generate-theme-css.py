@@ -192,12 +192,16 @@ def make_chart_colors(accent, colors):
             palette.append(colors[candidate])
     # Add derived shades of accent
     accent_val = accent.lstrip('#')
+    if len(accent_val) == 3:
+        accent_val = ''.join(c*2 for c in accent_val)
     try:
         r, g, b = int(accent_val[0:2], 16), int(accent_val[2:4], 16), int(accent_val[4:6], 16)
         palette.extend([
             f'rgb({min(255,r+50)},{max(0,g-30)},{max(0,b-30)})',
             f'rgb({max(0,r-40)},{min(255,g+40)},{min(255,b+40)})',
         ])
+    except (ValueError, IndexError):
+        palette.extend(['#5470c6', '#91cc75'])
     except:
         pass
     if not palette:

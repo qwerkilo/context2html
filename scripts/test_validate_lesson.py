@@ -132,9 +132,15 @@ class TestInlineSVG:
     def test_in_fenced_code_passes(self):
         html = '```html\n<svg viewBox="0 0 100 100" width="200"></svg>\n```'
         assert not vl.check_inline_svg(html)
-    def test_60px_outside_icon_container_fails(self):
+    def test_button_nested_deep_passes(self):
+        assert not vl.check_inline_svg(
+            '<button><div><span><i><svg width="40" height="40"></svg></i></span></div></button>')
+    def test_anchor_nested_deep_passes(self):
+        assert not vl.check_inline_svg(
+            '<a href="#"><div><div><svg width="32" height="32"></svg></div></div></a>')
+    def test_closed_icon_container_still_fails(self):
         assert len(vl.check_inline_svg(
-            '<svg viewBox="0 0 100 100" width="60"></svg>')) > 0
+            '<button>text</button><svg viewBox="0 0 100 100" width="60"></svg>')) > 0
 
 
 class TestComponentConsistency:

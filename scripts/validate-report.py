@@ -253,13 +253,13 @@ def check_cmp_table_responsive(html):
     """Comparison tables must collapse to stacked layout below 600px."""
     if '.cmp-table' not in html:
         return []
-    style_block = re.search(r'<style[^>]*>(.*?)</style>', html, re.DOTALL)
-    if not style_block:
+    style_blocks = re.findall(r'<style[^>]*>(.*?)</style>', html, re.DOTALL)
+    if not style_blocks:
         return [".cmp-table used but no <style> block found for responsive rules"]
-    css = style_block.group(1)
+    all_css = '\n'.join(style_blocks)
     narrow_breaks = list(re.finditer(
         r'@media\s*\([^)]*max-width\s*:\s*(\d+)px[^)]*\)\s*\{',
-        css,
+        all_css,
     ))
     covers_table = False
     for mb in narrow_breaks:
@@ -269,14 +269,15 @@ def check_cmp_table_responsive(html):
         open_brace = mb.end()
         depth = 1
         cursor = open_brace
-        while cursor < len(css) and depth > 0:
-            ch = css[cursor]
+        max_depth = 20
+        while cursor < len(all_css) and depth > 0 and max_depth > 0:
+            ch = all_css[cursor]
             if ch == '{':
                 depth += 1
             elif ch == '}':
                 depth -= 1
             cursor += 1
-        body = css[open_brace:cursor - 1]
+        body = all_css[open_brace:cursor - 1]
         if '.cmp-table' in body:
             covers_table = True
             break
@@ -286,10 +287,14 @@ def check_cmp_table_responsive(html):
 
 
 def check_cross_refs(html):
-    """Chapter cross-references should use the #chN anchor convention when used."""
+    """Chapter cross-references should use the #chN anchor convention when used.
+
+    Only flags refs that look like attempted chapter references (e.g. ch1-foo,
+    chapter-1) but skip genuine non-chapter anchors like #chart-1 or #checklist.
+    """
     bad_refs = []
     for ref in re.findall(r'href="#([^"#?]+)"', html):
-        if ref.startswith('ch') and not re.match(r'^ch\d+$', ref):
+        if re.match(r'^(?:ch\d+\D|chapter[\d-])', ref, re.IGNORECASE):
             bad_refs.append(ref)
     if bad_refs:
         return [f"Non-canonical chapter refs (expected #chN where N is a number): {', '.join(bad_refs)}"]

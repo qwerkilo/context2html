@@ -72,3 +72,10 @@ class TestMakeChartColors:
         result = gc.make_chart_colors("#3366cc", colors)
         assert "#7e57c2" in result
         assert len(result) == 4
+    def test_short_hex_doesnt_crash(self):
+        result = gc.make_chart_colors("#f00", {})
+        assert len(result) == 4
+        assert isinstance(result[0], str)
+    def test_invalid_hex_doesnt_crash(self):
+        result = gc.make_chart_colors("not-a-color", {})
+        assert len(result) >= 2

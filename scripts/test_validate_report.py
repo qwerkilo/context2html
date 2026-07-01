@@ -320,6 +320,11 @@ class TestCmpTableResponsive:
         html = ('<style>@media (max-width: 1200px) { .cmp-table { display: block; } }</style>'
                 '<table class="cmp-table"></table>')
         assert len(vr.check_cmp_table_responsive(html)) > 0
+    def test_rule_in_second_style_block_passes(self):
+        html = ('<style>body { color: red; }</style>'
+                '<style>@media (max-width: 600px) { .cmp-table tr { display: block; } }</style>'
+                '<table class="cmp-table"></table>')
+        assert not vr.check_cmp_table_responsive(html)
 
 
 class TestCrossRefs:
@@ -329,9 +334,10 @@ class TestCrossRefs:
         assert not vr.check_cross_refs(
             '<section id="ch1"></section><section id="ch2"></section>'
             '<a href="#ch1">link</a>')
-    def test_non_canonical_ref_fails(self):
-        assert len(vr.check_cross_refs(
-            '<a href="#chapter-one">link</a>')) > 0
+    def test_chart_anchor_skipped(self):
+        assert not vr.check_cross_refs('<a href="#chart-1">chart</a>')
+    def test_chapter_format_fails(self):
+        assert len(vr.check_cross_refs('<a href="#chapter-one">link</a>')) > 0
 
 
 class TestSVGLinkVariants:
