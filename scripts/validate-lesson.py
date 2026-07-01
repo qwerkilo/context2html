@@ -82,7 +82,8 @@ def check_quiz_correct_count(html):
             langs = set(langs)
             for lang in langs:
                 corrects = re.findall(
-                    r'data-correct="true"[^>]*data-lang="' + lang + '"', q
+                    r'data-correct="true"[^>]*data-lang="' + lang + r'"|'
+                    r'data-lang="' + lang + r'"[^>]*data-correct="true"', q
                 )
                 if len(corrects) != 1:
                     issues.append(f"Quiz Q{i} ({lang}): {len(corrects)} correct answers (expected 1)")
@@ -148,7 +149,8 @@ def check_quiz_completeness(html):
             langs = set(langs)
             for lang in langs:
                 lang_opts = re.findall(
-                    r'class="[^"]*quiz-option[^"]*"[^>]*data-lang="' + lang + '"', q
+                    r'class="[^"]*quiz-option[^"]*"[^>]*data-lang="' + lang + r'"|'
+                    r'data-lang="' + lang + r'"[^>]*class="[^"]*quiz-option[^"]*"', q
                 )
                 if len(lang_opts) != 3:
                     issues.append(f"Quiz Q{i} ({lang}): {len(lang_opts)} options (expected 3)")
@@ -164,6 +166,15 @@ _LIGHT_FILLS = re.compile(
 _WHITE_TEXT = re.compile(r'fill="(?:#)?(?:fff{1,3})"', re.IGNORECASE)
 
 
+def _check_svg_content(content, issues, label):
+    has_light_fill = bool(_LIGHT_FILLS.search(content))
+    has_white_text = bool(_WHITE_TEXT.search(content))
+    if has_light_fill and has_white_text:
+        issues.append(
+            f"{label}: possible white text on light background -- verify manually"
+        )
+
+
 def check_svg_contrast(html, base_dir):
     """Flag SVGs that may have white text on light backgrounds."""
     issues = []
@@ -175,14 +186,12 @@ def check_svg_contrast(html, base_dir):
         try:
             with open(path, "r", encoding="utf-8") as f:
                 content = f.read()
-            has_light_fill = bool(_LIGHT_FILLS.search(content))
-            has_white_text = bool(_WHITE_TEXT.search(content))
-            if has_light_fill and has_white_text:
-                issues.append(
-                    f"{src}: possible white text on light background -- verify manually"
-                )
+            _check_svg_content(content, issues, src)
         except Exception:
             pass
+    inline_svgs = re.findall(r'<svg[^>]*>(.*?)</svg>', html, re.DOTALL)
+    for svg_content in inline_svgs:
+        _check_svg_content(svg_content, issues, "Inline <svg>")
     return issues
 
 
@@ -324,8 +333,8 @@ def check_spa_integration(html, path):
             if sid in ids:
                 issues.append(f"Duplicate section id=\"lesson-{sid}\"")
             ids.append(sid)
-            if f'</section>' not in html:
-                issues.append(f"Section lesson-{sid}: missing closing </section>")
+        if f'</section>' not in html:
+            issues.append(f"Missing closing </section>")
         return issues
 
     # For regular lesson HTML files (not KG, not template)

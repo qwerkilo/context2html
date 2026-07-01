@@ -62,6 +62,15 @@ _LIGHT_FILLS = re.compile(
 _WHITE_TEXT = re.compile(r'fill="(?:#)?(?:fff{1,3})"', re.IGNORECASE)
 
 
+def _check_svg_content(content, issues, label):
+    has_light_fill = bool(_LIGHT_FILLS.search(content))
+    has_white_text = bool(_WHITE_TEXT.search(content))
+    if has_light_fill and has_white_text:
+        issues.append(
+            f"{label}: possible white text on light background -- verify manually"
+        )
+
+
 def check_svg_contrast(html, base_dir):
     """Flag SVGs that may have white text on light backgrounds."""
     issues = []
@@ -73,14 +82,12 @@ def check_svg_contrast(html, base_dir):
         try:
             with open(path, "r", encoding="utf-8") as f:
                 content = f.read()
-            has_light_fill = bool(_LIGHT_FILLS.search(content))
-            has_white_text = bool(_WHITE_TEXT.search(content))
-            if has_light_fill and has_white_text:
-                issues.append(
-                    f"{src}: possible white text on light background -- verify manually"
-                )
+            _check_svg_content(content, issues, src)
         except Exception:
             pass
+    inline_svgs = re.findall(r'<svg[^>]*>(.*?)</svg>', html, re.DOTALL)
+    for svg_content in inline_svgs:
+        _check_svg_content(svg_content, issues, "Inline <svg>")
     return issues
 
 

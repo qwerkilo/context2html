@@ -102,7 +102,7 @@ def split_yaml_sections(text):
                 next_line = lines[i]
                 if next_line.strip() and not next_line.startswith(' ') and not next_line.startswith('\t') and ':' in next_line:
                     break
-                if next_line.strip():
+                if next_line.strip() and not next_line.strip().startswith('#'):
                     child_lines.append(next_line)
                 i += 1
             children = parse_child_dict(child_lines)
@@ -114,7 +114,7 @@ def split_yaml_sections(text):
             i += 1
             while i < len(lines):
                 next_line = lines[i]
-                if next_line.strip() and not next_line.startswith(' ') and ':' in next_line:
+                if next_line.strip() and not next_line.startswith(' ') and not next_line.startswith('\t') and (':' in next_line or next_line.strip().startswith('#') or next_line.startswith('---')):
                     break
                 desc_lines.append(next_line.strip())
                 i += 1

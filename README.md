@@ -76,7 +76,7 @@ powershell -ExecutionPolicy Bypass -File templates/start-server.ps1
 2. **结构规划** — 设计章节大纲（推荐 3-6 章）、关键发现摘要（3-5 条）、标记可视化数据点
 3. **组件选择** — 按 `references/decision-guide.md` 矩阵选型，对比分析优先 ECharts #26 交互式图表，次选 HTML 对比表 #5/#22，每 500 字 ≥1 视觉元素
 4. **HTML 生成** — 从 `templates/report-starter.html` 复制骨架，填充中英双语正文，合并组件 CSS/JS
-5. **验证输出** — run `scripts/validate-report.py`，17 项检查全通过后交付。对比表需通过窄屏响应式检查（组件 #5/#22 已内置 @media 堆叠布局 + data-label 属性）
+5. **验证输出** — run `scripts/validate-report.py`，17 项检查全通过后交付。对比表、内联 SVG 对比、ECharts 依赖等均已覆盖
 
 ## 项目结构
 
@@ -91,8 +91,7 @@ powershell -ExecutionPolicy Bypass -File templates/start-server.ps1
 │   ├── timeline-horizontal.svg  SVG 模板——水平时间线
 │   └── start-server.ps1/.sh     本地 HTTP 服务器启动脚本
 ├── scripts/
-│   ├── validate-report.py       报告验证脚本（17 项检查）
-│   ├── validate-lesson.py       课程验证脚本（来自 teach_more_pic）
+│   ├── validate-report.py       报告验证脚本（17 项检查，含内联 SVG 对比检测）
 │   └── generate-theme-css.py    从 teach_more_pic DESIGN.md 自动生成主题 CSS（20 主题）
 ├── theme/
 │   ├── report-themes.css        20 主题 CSS（自动生成，含 --chart-* / --shadow-* / --table-* 等 25+ CSS 变量）
