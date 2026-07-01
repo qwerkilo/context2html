@@ -361,3 +361,35 @@ class TestSVGLinkVariants:
     def test_data_uri_skipped(self, tmp_path):
         assert not vr.check_svg_links(
             '<html><img src="data:image/svg+xml;base64,xxx"></html>', str(tmp_path))
+
+
+class TestEnglishLayout:
+    def test_body_overflow_wrap_passes(self):
+        html = '<style>body { overflow-wrap: break-word; }</style>'
+        assert not vr.check_english_layout(html)
+    def test_body_overflow_wrap_missing_fails(self):
+        html = '<style>body { color: red; }</style>'
+        assert len(vr.check_english_layout(html)) > 0
+    def test_cmp_table_fixed_passes(self):
+        html = '<style>body { overflow-wrap: break-word; }.cmp-table { table-layout: fixed; }</style><table class="cmp-table"></table>'
+        assert not vr.check_english_layout(html)
+    def test_cmp_table_fixed_missing_fails(self):
+        html = '<style>.cmp-table { width: 100%; }</style><table class="cmp-table"></table>'
+        assert len(vr.check_english_layout(html)) > 0
+    def test_no_cmp_table_skips_fixed_check(self):
+        html = '<style>body { overflow-wrap: break-word; }</style>'
+        assert not vr.check_english_layout(html)
+
+
+class TestEChartsColorUsage:
+    def test_no_echarts_skips(self):
+        assert not vr.check_echarts_color_usage('<div>plain</div>')
+    def test_gv_helper_passes(self):
+        html = '<script>function gv(n){return getComputedStyle(docEl).getPropertyValue(n).trim()}var c=echarts.init();c.setOption({itemStyle:{color:gv("--accent")}})</script>'
+        assert not vr.check_echarts_color_usage(html)
+    def test_var_direct_fails(self):
+        html = '<script>var c=echarts.init();c.setOption({itemStyle:{color:"var(--accent)"}})</script>'
+        assert len(vr.check_echarts_color_usage(html)) > 0
+    def test_var_direct_single_quote_fails(self):
+        html = "<script>var c=echarts.init();c.setOption({itemStyle:{color:'var(--accent)'}})</script>"
+        assert len(vr.check_echarts_color_usage(html)) > 0

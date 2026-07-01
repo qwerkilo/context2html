@@ -293,6 +293,38 @@ def check_cmp_table_responsive(html):
     return []
 
 
+def check_english_layout(html):
+    """English text is wider than Chinese — body needs overflow-wrap, tables need fixed layout."""
+    issues = []
+    style_blocks = re.findall(r'<style[^>]*>(.*?)</style>', html, re.DOTALL)
+    all_css = '\n'.join(style_blocks)
+    if 'overflow-wrap: break-word' not in all_css and 'overflow-wrap:break-word' not in all_css:
+        issues.append("Missing overflow-wrap: break-word on body (English text may overflow)")
+    if '.cmp-table' in html:
+        has_fixed = False
+        for m in re.finditer(r'\.cmp-table[^{]*\{([^}]*)\}', all_css):
+            if 'table-layout: fixed' in m.group(1) or 'table-layout:fixed' in m.group(1):
+                has_fixed = True
+                break
+        if not has_fixed:
+            issues.append(".cmp-table missing table-layout: fixed (English text may expand columns)")
+    return issues
+
+
+def check_echarts_color_usage(html):
+    """ECharts Canvas rendering ignores CSS var() — warn about direct var() usage in script."""
+    issues = []
+    scripts = re.findall(r'<script[^>]*>(.*?)</script>', html, re.DOTALL)
+    for s in scripts:
+        if ("'var(--" in s or '"var(--' in s) and 'echarts' in s:
+                issues.append(
+                    "ECharts script uses 'var(--xxx)' directly (Canvas2D ignores CSS var())"
+                    " — use gv('--xxx') helper instead"
+                )
+                break
+    return issues
+
+
 def check_cross_refs(html):
     """Chapter cross-references should use the #chN anchor convention when used.
 
@@ -338,6 +370,8 @@ def run_all(path):
         # Visual contract
         ("Bar-fill width <= 100%", check_bar_fill_width(html)),
         ("Comparison table responsive (max-width 600-700px)", check_cmp_table_responsive(html)),
+        ("English layout (overflow-wrap + table-layout:fixed)", check_english_layout(html)),
+        ("ECharts var() not used directly in script", check_echarts_color_usage(html)),
         ("Chapter cross-refs use #chN anchors", check_cross_refs(html)),
     ]
 

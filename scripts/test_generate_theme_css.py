@@ -1,4 +1,4 @@
-import sys, os, importlib.util
+import sys, os, re, importlib.util
 sys.path.insert(0, os.path.dirname(__file__))
 spec = importlib.util.spec_from_file_location(
     "gc", os.path.join(os.path.dirname(__file__), "generate-theme-css.py"))
@@ -79,3 +79,53 @@ class TestMakeChartColors:
     def test_invalid_hex_doesnt_crash(self):
         result = gc.make_chart_colors("not-a-color", {})
         assert len(result) >= 2
+
+
+class TestManualThemeVars:
+    REQUIRED = [
+        '--bg', '--text', '--accent', '--accent-text', '--accent-soft', '--accent-muted',
+        '--surface', '--surface-raised', '--border', '--muted', '--link',
+        '--success', '--warning', '--error',
+        '--font', '--font-h', '--lh', '--radius',
+        '--chart-1', '--chart-2', '--chart-3', '--chart-4',
+        '--shadow-sm', '--shadow-md', '--shadow-lg',
+        '--tag-bg', '--tag-text',
+        '--table-stripe', '--table-header-bg',
+        '--blockquote-border', '--blockquote-bg',
+        '--code-bg', '--code-text',
+        '--section-gap', '--h2-border', '--toc-accent',
+    ]
+    THEME_CSS_PATH = os.path.join(os.path.dirname(__file__), '..', 'theme', 'report-themes.css')
+
+    @staticmethod
+    def _get_theme_blocks():
+        with open(TestManualThemeVars.THEME_CSS_PATH, 'r', encoding='utf-8') as f:
+            css = f.read()
+        blocks = {}
+        for m in re.finditer(r'\[data-theme="([^"]+)"\]\s*\{(.*?)\}', css, re.DOTALL):
+            blocks[m.group(1)] = m.group(2)
+        return blocks
+
+    def test_all_20_themes_present(self):
+        blocks = self._get_theme_blocks()
+        assert len(blocks) >= 20, f"Expected ≥20 themes, got {len(blocks)}"
+
+    def test_spotify_has_all_vars(self):
+        blocks = self._get_theme_blocks()
+        for var in self.REQUIRED:
+            assert var in blocks.get('spotify', ''), f"spotify missing {var}"
+
+    def test_tesla_has_all_vars(self):
+        blocks = self._get_theme_blocks()
+        for var in self.REQUIRED:
+            assert var in blocks.get('tesla', ''), f"tesla missing {var}"
+
+    def test_warm_has_all_vars(self):
+        blocks = self._get_theme_blocks()
+        for var in self.REQUIRED:
+            assert var in blocks.get('warm', ''), f"warm missing {var}"
+
+    def test_airbnb_has_all_vars(self):
+        blocks = self._get_theme_blocks()
+        for var in self.REQUIRED:
+            assert var in blocks.get('airbnb', ''), f"airbnb missing {var}"
