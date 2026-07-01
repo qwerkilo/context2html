@@ -53,6 +53,7 @@ chart.setOption({
 #### 示例：3D 地球
 
 ```js
+function gv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
 chart.setOption({
   globe: {
     baseTexture: 'world.topo.bathy.200401.jpg', // 或使用动态纹理
@@ -64,7 +65,7 @@ chart.setOption({
     coordinateSystem: 'globe',
     data: [[116.4,39.9,100],[121.5,25.0,80],[139.7,35.7,120]],
     symbolSize: 8,
-    itemStyle: { color: 'var(--accent)', opacity: 0.9 },
+    itemStyle: { color: gv('--accent'), opacity: 0.9 },
     label: { show: true, formatter: '{b}' }
   }]
 });
@@ -78,13 +79,14 @@ chart.setOption({
 <div id="gd-map" style="width:100%;height:600px;"></div>
 ```
 ```js
+function gv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
 var geoJson = window.__gdGeoJSON; // 通过 <script> 注入的全局变量
 echarts.registerMap('guangdong', geoJson);
 var chart = echarts.init(document.getElementById('gd-map'));
 chart.setOption({
   visualMap: {
     show: true, min: 0.1, max: 3.5,
-    inRange: { color: ['#3498db','#2ecc71','#f39c12','#e74c3c'] },
+    inRange: { color: [gv('--chart-3'),gv('--chart-4'),gv('--warning'),gv('--accent')] },
     seriesIndex: 0
   },
   series: [{

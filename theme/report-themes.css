@@ -674,6 +674,20 @@
   --chart-2: #ffa42b;
   --chart-3: #f3727f;
   --chart-4: #b3b3b3;
+  --shadow-sm: 0 1px 3px rgba(255,255,255,0.1);
+  --shadow-md: 0 4px 12px rgba(255,255,255,0.1);
+  --shadow-lg: 0 8px 30px rgba(255,255,255,0.12);
+  --tag-bg: rgba(30,215,96,0.1);
+  --tag-text: #1ed760;
+  --table-stripe: rgba(255,255,255,0.04);
+  --table-header-bg: rgba(30,215,96,0.08);
+  --blockquote-border: 4px solid #1ed760;
+  --blockquote-bg: rgba(30,215,96,0.06);
+  --code-bg: #181818;
+  --code-text: #1ed760;
+  --section-gap: 4rem;
+  --h2-border: 2px solid #4d4d4d;
+  --toc-accent: #1ed760;
 }
 
 /* ===== Theme: tesla (manual) ===== */
@@ -700,6 +714,20 @@
   --chart-2: #16a34a;
   --chart-3: #e82127;
   --chart-4: #f4f4f4;
+  --shadow-sm: 0 1px 3px rgba(23,26,32,0.1);
+  --shadow-md: 0 4px 12px rgba(23,26,32,0.1);
+  --shadow-lg: 0 8px 30px rgba(23,26,32,0.12);
+  --tag-bg: rgba(62,106,225,0.1);
+  --tag-text: #3e6ae1;
+  --table-stripe: rgba(23,26,32,0.04);
+  --table-header-bg: rgba(62,106,225,0.08);
+  --blockquote-border: 4px solid #3e6ae1;
+  --blockquote-bg: rgba(62,106,225,0.06);
+  --code-bg: #f4f4f4;
+  --code-text: #3e6ae1;
+  --section-gap: 4rem;
+  --h2-border: 2px solid #d0d1d2;
+  --toc-accent: #3e6ae1;
 }
 
 /* ===== Theme: x.ai ===== */

@@ -18,7 +18,7 @@
 /* · 独立发报告时可将 report-themes.css 内联到此位置 */
 
 /* ===== 正文排版 ===== */
-body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: var(--lh); max-width: 720px; margin: 0 auto; padding: 0 1.5rem; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: var(--lh); max-width: 720px; margin: 0 auto; padding: 0 1.5rem; font-variant-numeric: tabular-nums; -webkit-font-smoothing: antialiased; overflow-wrap: break-word; }
 h1 { font-size: var(--h1-size); font-family: var(--font-h); margin-top: 2rem; text-wrap: pretty; letter-spacing: -0.01em; }
 h2 { font-size: 1.3rem; font-family: var(--font-h); border-bottom: var(--h2-border); padding-bottom: 0.3em; margin-top: 2em; text-wrap: pretty; letter-spacing: -0.01em; }
 p { margin: 1.2em 0; }
@@ -105,8 +105,8 @@ button:active { transform: scale(0.98); }
 .bar-fill { height: 100%; border-radius: 12px; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; font-size: 0.72rem; font-weight: 600; color: #fafafa; transition: width 1s ease; }
 
 /* 对比表 (#5) */
-.cmp-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.85rem; }
-.cmp-table th, .cmp-table td { padding: 0.6em 0.8em; border: 1px solid var(--border); text-align: left; }
+.cmp-table { width: 100%; table-layout: fixed; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.85rem; }
+.cmp-table th, .cmp-table td { padding: 0.6em 0.8em; border: 1px solid var(--border); text-align: left; word-break: break-word; }
 .cmp-table th { background: var(--table-header-bg, var(--accent)); color: var(--accent-text); font-weight: 600; }
 .cmp-table tr:nth-child(even) td { background: var(--table-stripe, var(--surface)); }
 .cmp-table .cmp-yes { color: var(--success); font-weight: 700; }
@@ -247,7 +247,7 @@ button:active { transform: scale(0.98); }
 .lang-btn:hover { opacity: 1; color: var(--cover-text-hover, #ffffff); border-color: var(--cover-accent-hover, rgba(255,255,255,0.5)); }
 [data-lang] { display: none; }
 [data-lang].active { display: inline; }
-h1[data-lang].active, h2[data-lang].active, p[data-lang].active, div[data-lang].active, section[data-lang].active, article[data-lang].active, aside[data-lang].active { display: block; }
+h1[data-lang].active, h2[data-lang].active, p[data-lang].active, div[data-lang].active, section[data-lang].active, article[data-lang].active, aside[data-lang].active, pre[data-lang].active, blockquote[data-lang].active, figure[data-lang].active, ul[data-lang].active, ol[data-lang].active, li[data-lang].active { display: block; }
 td[data-lang].active, th[data-lang].active { display: table-cell; }
 .cover-badge[data-lang].active { display: inline-block; }
 .toc-btn { background: none; border: none; font-size: 1.1rem; cursor: pointer; padding: 0 2px; line-height: 1; opacity: 0.7; transition: opacity 0.2s ease; color: #e0e0e0; }

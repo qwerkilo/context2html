@@ -463,6 +463,20 @@ def main():
                 ('--radius', c['radius']),
                 ('--chart-1', c['chart_colors'][0]), ('--chart-2', c['chart_colors'][1]),
                 ('--chart-3', c['chart_colors'][2]), ('--chart-4', c['chart_colors'][3]),
+                ('--shadow-sm', f'0 1px 3px {hex_to_rgba(c["text"], 0.1)}'),
+                ('--shadow-md', f'0 4px 12px {hex_to_rgba(c["text"], 0.1)}'),
+                ('--shadow-lg', f'0 8px 30px {hex_to_rgba(c["text"], 0.12)}'),
+                ('--tag-bg', hex_to_rgba(c['accent'], 0.1)),
+                ('--tag-text', c['accent']),
+                ('--table-stripe', hex_to_rgba(c['text'], 0.04)),
+                ('--table-header-bg', hex_to_rgba(c['accent'], 0.08)),
+                ('--blockquote-border', f'4px solid {c["accent"]}'),
+                ('--blockquote-bg', hex_to_rgba(c['accent'], 0.06)),
+                ('--code-bg', c['surface']),
+                ('--code-text', c['accent']),
+                ('--section-gap', '4rem'),
+                ('--h2-border', f'2px solid {c["border"]}'),
+                ('--toc-accent', c['accent']),
             ]
             for var, val in pairs:
                 if val:

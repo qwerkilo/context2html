@@ -428,6 +428,7 @@ def check_kg_structure(html, path):
     # ===== New bilingual format (rawNodes with nameZh/nameEn) =====
     if has_bilingual:
         # Check rawNodes
+        node_ids = []
         rn_match = re.search(r'(?:const|var|let)\s+rawNodes\s*=\s*\[(.+?)\]', html, re.DOTALL)
         if not rn_match:
             issues.append("bilingual KG: missing 'rawNodes' array")
@@ -453,7 +454,7 @@ def check_kg_structure(html, path):
         if not rl_match:
             issues.append("bilingual KG: missing 'rawLinks' array")
         else:
-            sub_issues = _check_kg_links(rl_match.group(1), node_ids if 'node_ids' in dir() else [])
+            sub_issues = _check_kg_links(rl_match.group(1), node_ids)
             issues.extend(['bilingual KG: ' + s for s in sub_issues])
         return issues
 

@@ -40,6 +40,29 @@ class TestQuizCorrectCount:
         nested = '<div class="quiz-question"><div><button data-correct="true">A</button></div>' \
                  '<div><button data-correct="true">B</button></div></div>'
         assert len(vl.check_quiz_correct_count(nested)) > 0
+    def test_bilingual_correct_first_passes(self):
+        assert not vl.check_quiz_correct_count(
+            '<div class="quiz-question"><button data-correct="true" data-lang="zh">A</button>'
+            '<button data-correct="false" data-lang="zh">B</button>'
+            '<button data-correct="true" data-lang="en">A</button>'
+            '<button data-correct="false" data-lang="en">B</button></div>')
+    def test_bilingual_data_lang_first_passes(self):
+        assert not vl.check_quiz_correct_count(
+            '<div class="quiz-question"><button data-lang="zh" data-correct="true">A</button>'
+            '<button data-lang="zh" data-correct="false">B</button>'
+            '<button data-lang="en" data-correct="true">A</button>'
+            '<button data-lang="en" data-correct="false">B</button></div>')
+    def test_bilingual_zero_correct_fails(self):
+        assert len(vl.check_quiz_correct_count(
+            '<div class="quiz-question">'
+            '<button data-correct="false" data-lang="zh">A</button>'
+            '<button data-correct="false" data-lang="en">A</button></div>')) > 0
+    def test_bilingual_missing_en_correct_fails(self):
+        assert len(vl.check_quiz_correct_count(
+            '<div class="quiz-question">'
+            '<button data-correct="true" data-lang="zh">A</button>'
+            '<button data-correct="false" data-lang="zh">B</button>'
+            '<button data-correct="false" data-lang="en">A</button></div>')) > 0
 
 
 class TestQuizCompleteness:
@@ -62,6 +85,32 @@ class TestQuizCompleteness:
         assert len(vl.check_quiz_completeness(
             '<div class="quiz-question"><div><button class="quiz-option">A</button></div>'
             '<div><button class="quiz-option">B</button></div></div>' * 5)) > 0
+    def test_bilingual_class_first_passes(self):
+        assert not vl.check_quiz_completeness(
+            '<div class="quiz-question"><button class="quiz-option" data-lang="zh">A</button>'
+            '<button class="quiz-option" data-lang="zh">B</button>'
+            '<button class="quiz-option" data-lang="zh">C</button>'
+            '<button class="quiz-option" data-lang="en">A</button>'
+            '<button class="quiz-option" data-lang="en">B</button>'
+            '<button class="quiz-option" data-lang="en">C</button></div>' * 5)
+    def test_bilingual_data_lang_first_passes(self):
+        assert not vl.check_quiz_completeness(
+            '<div class="quiz-question"><button data-lang="zh" class="quiz-option">A</button>'
+            '<button data-lang="zh" class="quiz-option">B</button>'
+            '<button data-lang="zh" class="quiz-option">C</button>'
+            '<button data-lang="en" class="quiz-option">A</button>'
+            '<button data-lang="en" class="quiz-option">B</button>'
+            '<button data-lang="en" class="quiz-option">C</button></div>' * 5)
+    def test_bilingual_wrong_options_count_fails(self):
+        assert len(vl.check_quiz_completeness(
+            '<div class="quiz-question"><button class="quiz-option" data-lang="zh">A</button>'
+            '<button class="quiz-option" data-lang="zh">B</button>'
+            '<button class="quiz-option" data-lang="en">A</button></div>' * 5)) > 0
+    def test_bilingual_data_lang_first_wrong_options_fails(self):
+        assert len(vl.check_quiz_completeness(
+            '<div class="quiz-question"><button data-lang="zh" class="quiz-option">A</button>'
+            '<button data-lang="zh" class="quiz-option">B</button>'
+            '<button data-lang="en" class="quiz-option">A</button></div>' * 5)) > 0
 
 
 class TestDataAnimSyntax:

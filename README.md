@@ -43,7 +43,7 @@ Skills: teach_more_pic, context2html
 - **#1-7 核心**：SVG 流程图 / 角色卡片 / CSS 时间线 / CSS 条形图 / 对比表 / SVG 容器 / PPT 质感（主题切换 + 语言切换 + 滚动动画 + 键盘导航 + 目录）
 - **#8-14 交互式**：折叠分步详解 / Tab 切换面板 / 图片对比滑块 / 交互式时间线 / 数据卡片网格 / 引文卡片 / 标注式图片
 - **#15-29 数据与辅助**：状态链 / 数值滚动动画 / **标签徽章组**（每章结尾必用，带 `#` 前缀） / 告警条 / 热力图 / 步骤指示器 / 信息面板 / 对比表增强版 / 灯箱 / **ECharts 交互式图表**（柱状/饼/折线/堆叠，需 `libs/echarts.min.js`） / **Three.js 3D**（3D 可视化，需 `libs/three.min.js`，含 Sprite 文字标签） / **D3.js 自定义图表**（力导向图/旭日图/桑基图，需 `libs/d3.min.js` + `d3-sankey.min.js`） / **ECharts GL 3D**（3D 柱状/散点/地球，需 `libs/echarts-gl.min.js`） / 现代浏览器 API（原生折叠/模态/幻灯片/Popover）
-- **20 品牌主题** — 22 个 CSS 变量，`var(--accent/border/surface/...)` 自动跟随
+- **20 品牌主题** — 38+ CSS 变量（含 `--chart-*` / `--shadow-*` / `--table-*` / `--tag-*` 等），`var(--accent/border/surface/...)` 自动跟随
 - **主题切换动画** — 0.35s 平滑过渡，`prefers-reduced-motion` 自动禁用
 - **9 种报告页面类型** — 封面 / 摘要 / 关键数字 / 目录 / 章节正文 / 对比分析 / 结论与建议 / 附录 / 页脚（`references/page-types.md` 含完整代码参考）
 - **3D/GL 增强** — 8 个 3D 可视化场景（ECharts GL 3D 地球、Three.js 3D 柱状图、D3+Three 网络等）
@@ -76,7 +76,7 @@ powershell -ExecutionPolicy Bypass -File templates/start-server.ps1
 2. **结构规划** — 设计章节大纲（推荐 3-6 章）、关键发现摘要（3-5 条）、标记可视化数据点
 3. **组件选择** — 按 `references/decision-guide.md` 矩阵选型，对比分析优先 ECharts #26 交互式图表，次选 HTML 对比表 #5/#22，每 500 字 ≥1 视觉元素
 4. **HTML 生成** — 从 `templates/report-starter.html` 复制骨架，填充中英双语正文，合并组件 CSS/JS
-5. **验证输出** — run `scripts/validate-report.py`，17 项检查全通过后交付。对比表、内联 SVG 对比、ECharts 依赖等均已覆盖
+5. **验证输出** — run `scripts/validate-report.py`，17 项检查全通过后交付。对比表响应式堆叠、内联 SVG 对比、ECharts 依赖路径均已覆盖
 
 ## 项目结构
 
