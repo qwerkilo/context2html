@@ -2,82 +2,59 @@
 
 ## What this is
 
-Sub-skill augmenting **teach_more_pic**. Both must be loaded via `Skills:` in AGENTS.md. The 29 visual components in `components/` are copied from teach_more_pic — they live locally and can be edited here. Differentiator from teach_more_pic: report (not course) workflow, 20 brand themes, bilingual, humanize-D1-D5 writing rules.
+Sub-skill augmenting **teach_more_pic**. Both loaded via `Skills:`. 29 visual components in `components/` are local copies from teach_more_pic — editable here. Differentiator: report workflow (not course), 20 brand themes, bilingual, D1-D5 humanization.
 
-`SKILL.md` is the sole workflow document — follow its 7 steps (input → plan → select → humanize → generate → validate → output) in order. Step 2.5 (humanize) is mandatory and has its own STOP checkpoint before HTML generation.
+**SKILL.md is the workflow document** (5 steps: input → plan → select → humanize → generate → validate). Step 2.5 (humanize) has a STOP checkpoint before HTML generation.
 
-## Generation rules (hard constraints)
+## No build system
 
-- **Bilingual always** — every content block must have `data-lang="zh"` + `data-lang="en"`. L key toggles.
-- **Humanize Chinese prose** — D1-D5 rules in SKILL.md (vary sentence length, rotate paragraph structure, reduce connectors, substitute terms). Read `references/humanize_matrix.md` after writing to apply the 20-row micro-adjustments.
-- **One visual component per 500 words minimum** — use `references/decision-guide.md` matrix.
-- **Tag group #17 at end of every chapter** — all tags must carry `#` prefix unless user explicitly says otherwise.
-- **Theme** — pick from the 20 themes in `references/decision-guide.md`. Set `<html data-theme="xxx">`.
+Pure HTML/CSS/JS. No package.json, no npm. Open directly in browser after generation. `libs/` has offline ECharts/Three.js/D3 packages.
 
 ## Commands
 
 ```bash
-# Unit tests only (pytest, 223 tests across 3 files)
+# All tests (pytest, 223 tests across 3 files)
 python -m pytest scripts/test_validate_report.py scripts/test_validate_lesson.py scripts/test_generate_theme_css.py -v --tb=short
 
-# Or use the wrapper (Windows PowerShell):
-powershell -ExecutionPolicy Bypass -File scripts/run-tests.ps1
-# Note: run-tests.ps1 covers report+lesson validator tests only — theme-css tests are NOT included.
-
-# Validate a single report before delivery (17 checks)
+# Validate a report (17 checks). Paths resolved relative to report HTML directory.
 python scripts/validate-report.py path/to/report.html
 
-# Regenerate theme CSS from teach_more_pic DESIGN.md
+# Regenerate theme CSS from theme/*/DESIGN.md
 python scripts/generate-theme-css.py
 
-# Local preview server
-powershell -ExecutionPolicy Bypass -File templates/start-server.ps1
-# macOS/Linux: bash templates/start-server.sh
+# Preview server
+bash templates/start-server.sh          # Linux/macOS
+powershell -ExecutionPolicy Bypass -File templates/start-server.ps1   # Windows
 ```
 
-## Validator scripts (17 + 24 checks)
+## Hard constraints
 
-- `scripts/validate-report.py` — **17 checks** for report HTML. Path resolution is relative to the HTML file's directory, NOT project root.
-- `scripts/validate-lesson.py` — inherited from teach_more_pic, used for course HTML.
-- Newer visual-contract checks added 2026-06: `check_bar_fill_width` (no width > 100%), `check_cmp_table_responsive` (must have `@media max-width: 700px` rule covering `.cmp-table`), `check_cross_refs` (chapter refs must be `#chN` form).
+- **Bilingual** — every content block needs `data-lang="zh"` + `data-lang="en"`. L key toggles.
+- **Template-based** — always copy `templates/report-starter.html`. Never start from scratch (loses CSS variable system, toolbar, keyboard nav).
+- **Visual density** — ≥1 component per 500 words. `references/decision-guide.md` for selection.
+- **Tag group #17** — required at end of every chapter.
+- **Theme** — pick from 20 themes via `<html data-theme="xxx">`.
+
+## D1-D5 humanization (must read before writing)
+
+Rules in SKILL.md §2.5 + `references/humanize_matrix.md`. Failure modes agents miss:
+- D4: paragraph-initial "首先/其次/最后/综上所述/值得注意的是" = auto-fail
+- D1: every paragraph must mix ≤10‑char and ≥35‑char sentences
+- D5: substitute terms every 800 chars ("增长驱动"→"推力/支撑逻辑")
 
 ## codebase-memory-mcp
 
-Also indexed (145 nodes, 145 edges, full-mode). Covers everything CodeGraph excludes: 8 Python scripts, 35 demo HTMLs, 3 test files, templates, references.
-
-Use cases:
-- **`search_code(pattern, ...)`** — grep across all repo files, including HTML/CSS/JS demos and Python scripts. Faster than raw grep when looking for specific function names or patterns.
-- **`search_graph(query, ...)`** — find files by natural language (e.g. "validate the comparison table" finds `.cmp-table` checks).
-- **`manage_adr()`** — 5 ADRs already stored covering the dual-validator architecture, theme generation, template-based reports, bilingual model, and path resolution. Read with `sections=["all"]` before making architectural changes.
-- **`get_architecture()`** — file tree overview (35 HTML, 8 Python, 6 JS files at a glance).
-
-## context7 (library docs)
-
-Use when generating ECharts/Three.js/D3.js or Python library code. Resolve the library ID first, then query API syntax:
-
-- **ECharts** — `resolve-library-id(query="echarts interactive chart configuration", libraryName="ECharts")` then `query-docs`
-- **Three.js** — `resolve-library-id(query="Three.js scene setup", libraryName="Three.js")` then `query-docs`
-- **D3.js** — `resolve-library-id(query="D3.js force simulation sankey", libraryName="D3")` then `query-docs`
-- **cheerio / PyYAML / pytest** — same pattern with the matching library name
+Indexed: 5,919 nodes, 23,306 edges. Use `search_graph` / `trace_path` / `get_code_snippet` instead of grep/glob for Python scripts and HTML/JS code.
 
 ## Gotchas
 
-- **Theme CSS is auto-generated** (`theme/report-themes.css`). Never hand-edit. Re-run `generate-theme-css.py` after any teach_more_pic DESIGN.md change. Themes without `--font-h` YAML field fall back to `--font`.
-- **Two manual themes** — `spotify` and `tesla` DESIGN.md have no YAML front matter. The generator handles them via hardcoded fallback dict (`MANUAL_THEMES`). If you add another theme without YAML, extend that dict.
-- **Manual theme hex format** — `MANUAL_THEMES` entries must be 6-char hex (e.g. `#1ed760`). The generator now uses `hex_to_rgba()` which handles short hex, so 3-char hex won't crash, but stick to 6-char for consistency.
-- **Template `<link>` path** — `templates/report-starter.html` uses `<link href="../theme/report-themes.css">`. When copying to a new location, adjust or inline the CSS for standalone distribution.
-- **Copy `libs/` alongside reports** — ECharts/Three.js/D3 offline packages must exist at the report's runtime location. The validator checks both local `libs/<lib>.min.js` AND `<script src="libs/...">` path resolution against base_dir.
-- **Validator path resolution** — `validate-report.py` resolves `libs/` and SVG paths relative to the report HTML's own directory. External `<script src="...">` paths in the report must exist there.
-- **No opencode.json** — skill is loaded via OpenCode's `Skills:` mechanism, not CLI config.
-- **`results.tsv` and `test-prompts.json`** — update after darwin-skill optimization or generation workflow changes.
-- **File-sync conflict files** (`*Conflicted copy*`) can appear in `references/`, `scripts/` from Windows sync clients — covered by `.gitignore`, safe to delete.
-- **`start-server.sh` is macOS/Linux only** — on Windows use `templates/start-server.ps1`. The `.sh` file is kept for cross-platform contributors.
-- **Report-themes.html is NOT a valid report** — `examples/report-themes.html` is the theme picker page and will fail `validate-report.py`. Use `examples/0001-demo-report.html` for the smoke test.
-
-## Test artifacts
-
-- `examples/0001-demo-report.html` — full report skeleton, passes `validate-report.py`. Use as smoke test.
-- `examples/report-themes.html` — 20-theme preview page. Press T to cycle themes. NOT a validatable report.
-- `references/humanize_matrix.md` — 20-row D1-D5 change matrix. Read after writing each chapter.
-- `test-prompts.json` — 3 typical scenarios (long, file-based, compact) for manual generation testing.
-- `results.tsv` — darwin-skill optimization history.
+- **Theme CSS is auto-generated** (`theme/report-themes.css`). Never hand-edit. Re-run `generate-theme-css.py` after teach_more_pic DESIGN.md changes.
+- **Two manual themes** — `spotify` and `tesla` have no YAML front matter. Handled via `MANUAL_THEMES` dict in generate-theme-css.py.
+- **Template `<link>` path** — `report-starter.html` uses `<link href="../theme/report-themes.css">`. Adjust or inline when distributing standalone.
+- **Copy `libs/` alongside report** — validator checks both `libs/<lib>.min.js` existence AND `<script src="libs/...">` path resolution.
+- **validator path resolution** — `validate-report.py` resolves SVG paths, `<script src>` paths relative to the report HTML's own directory, NOT project root.
+- **Test imports** — `test_validate_report.py` uses `importlib` to load `validate-report.py` (non-standard import pattern).
+- **Components are .md files** — `components/NN-name.md` contain embedded ```html/css/js code blocks. Copy the blocks, not the whole file.
+- **`examples/report-themes.html` is NOT a valid report** — it's a theme preview page and will fail `validate-report.py`. Use `examples/0001-demo-report.html` for smoke tests.
+- `run-tests.ps1` only covers report+lesson validator tests (not theme-css tests).
+- `results.tsv` and `test-prompts.json` — update after darwin-skill optimization runs.

@@ -38,7 +38,7 @@ Skills: teach_more_pic, context2html
 
 ## 能力
 
-**29 个视觉组件**（完整索引见 SKILL.md + `references/decision-guide.md`）：
+**29 个视觉组件**（完整索引见 SKILL.md + `references/decision-guide.md`）优先选择 ECharts 交互式图表 #26 而非静态 HTML 表格：
 
 - **#1-7 核心**：SVG 流程图 / 角色卡片 / CSS 时间线 / CSS 条形图 / 对比表 / SVG 容器 / PPT 质感（主题切换 + 语言切换 + 滚动动画 + 键盘导航 + 目录）
 - **#8-14 交互式**：折叠分步详解 / Tab 切换面板 / 图片对比滑块 / 交互式时间线 / 数据卡片网格 / 引文卡片 / 标注式图片
@@ -74,9 +74,9 @@ powershell -ExecutionPolicy Bypass -File templates/start-server.ps1
 0. **人类化写作约束** — Agent 遵循 SKILL.md 中 D1-D5 规则生成正文：句长分布多峰、段落结构轮换、信息密度交替、连接词压降到 ≤6/千字、术语变体 ≥1 处/800 字
 1. **输入获取** — 从对话上下文或文件路径读取调研内容
 2. **结构规划** — 设计章节大纲（推荐 3-6 章）、关键发现摘要（3-5 条）、标记可视化数据点
-3. **组件选择** — 按 `references/decision-guide.md` 矩阵选型，每 500 字 ≥1 视觉元素
+3. **组件选择** — 按 `references/decision-guide.md` 矩阵选型，对比分析优先 ECharts #26 交互式图表，次选 HTML 对比表 #5/#22，每 500 字 ≥1 视觉元素
 4. **HTML 生成** — 从 `templates/report-starter.html` 复制骨架，填充中英双语正文，合并组件 CSS/JS
-5. **验证输出** — run `scripts/validate-report.py`，17 项检查全通过后交付
+5. **验证输出** — run `scripts/validate-report.py`，17 项检查全通过后交付。对比表需通过窄屏响应式检查（组件 #5/#22 已内置 @media 堆叠布局 + data-label 属性）
 
 ## 项目结构
 
