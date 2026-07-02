@@ -76,6 +76,15 @@ def parse_front_matter(text):
     return result, body
 
 
+def is_new_key(line):
+    """Check if line looks like a new YAML key (not a URL or value with colons)."""
+    stripped = line.strip()
+    if '://' in stripped:
+        return False
+    # Must have ':' followed by space or end-of-string (YAML key pattern)
+    return re.match(r'^[\w\-]+:', stripped)
+
+
 def split_yaml_sections(text):
     """Split YAML by top-level keys. Returns list of (key, value_or_dict_or_string)."""
     lines = text.split('\n')
@@ -100,7 +109,7 @@ def split_yaml_sections(text):
             i += 1
             while i < len(lines):
                 next_line = lines[i]
-                if next_line.strip() and not next_line.startswith(' ') and not next_line.startswith('\t') and ':' in next_line:
+                if next_line.strip() and not next_line.startswith(' ') and not next_line.startswith('\t') and is_new_key(next_line):
                     break
                 if next_line.strip() and not next_line.strip().startswith('#'):
                     child_lines.append(next_line)
@@ -114,7 +123,19 @@ def split_yaml_sections(text):
             i += 1
             while i < len(lines):
                 next_line = lines[i]
-                if next_line.strip() and not next_line.startswith(' ') and not next_line.startswith('\t') and (':' in next_line or next_line.strip().startswith('#') or next_line.startswith('---')):
+                if next_line.strip() and not next_line.startswith(' ') and not next_line.startswith('\t') and (is_new_key(next_line) or next_line.strip().startswith('#') or next_line.startswith('---')):
+                    break
+                desc_lines.append(next_line.strip())
+                i += 1
+            result.append((key, ' '.join(desc_lines)))
+
+        # > block → folded multi-line string
+        elif val == '>':
+            desc_lines = []
+            i += 1
+            while i < len(lines):
+                next_line = lines[i]
+                if next_line.strip() and not next_line.startswith(' ') and not next_line.startswith('\t') and (is_new_key(next_line) or next_line.strip().startswith('#')):
                     break
                 desc_lines.append(next_line.strip())
                 i += 1
@@ -206,9 +227,19 @@ def make_chart_colors(accent, colors):
         pass
     if not palette:
         return ['#5470c6', '#91cc75', '#fac858', '#ee6666']
-    result = []
-    for i in range(4):
-        result.append(palette[i % len(palette)] if palette else accent)
+    # Pad to 4 distinct colors by deriving more accent variants
+    while len(palette) < 4:
+        try:
+            r, g, b = int(accent_val[0:2], 16), int(accent_val[2:4], 16), int(accent_val[4:6], 16)
+            n = len(palette)
+            offset_r = min(255, max(0, r + (50 if n % 2 == 0 else -30)))
+            offset_g = min(255, max(0, g + (40 if n < 3 else -50)))
+            offset_b = min(255, max(0, b + (60 if n == 1 else -20)))
+            palette.append(f'rgb({offset_r},{offset_g},{offset_b})')
+        except:
+            palette.extend(['#5470c6', '#91cc75', '#fac858'])
+            break
+    result = palette[:4]
     return result
 
 
@@ -402,9 +433,11 @@ def main():
     themes.append({
         'name': 'warm',
         'accent': '#c0392b',
+        'accent_text': '#ffffff',
         'bg': '#faf9f7',
         'text': '#1a1a1a',
         'font': 'Noto Serif CJK SC, Georgia, serif',
+        'font_h': 'Noto Serif CJK SC, Georgia, serif',
         'chart_colors': ['#c0392b', '#e67e22', '#2980b9', '#27ae60'],
         'radius': '8px',
         'has_dark_bg': False,
@@ -486,8 +519,9 @@ def main():
             all_css_parts.append(gen_css)
 
             meta = {
-                'name': td, 'accent': c['accent'], 'bg': c['bg'],
-                'text': c['text'], 'font': c['font'], 'chart_colors': c['chart_colors'],
+                'name': td, 'accent': c['accent'], 'accent_text': c['accent_text'],
+                'bg': c['bg'], 'text': c['text'], 'font': c['font'], 'font_h': c['font_h'],
+                'chart_colors': c['chart_colors'],
                 'radius': c['radius'], 'has_dark_bg': is_dark(c['bg']),
             }
             themes.append(meta)

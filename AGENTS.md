@@ -16,7 +16,10 @@ Pure HTML/CSS/JS. No package.json, no npm. Open directly in browser after genera
 # All tests (pytest, 245 tests across 3 files)
 python -m pytest scripts/test_validate_report.py scripts/test_validate_lesson.py scripts/test_generate_theme_css.py -v --tb=short
 
-# Validate a report (17 checks). Paths resolved relative to report HTML directory.
+# Same via helper script (also validates report-starter.html + demo report)
+powershell -ExecutionPolicy Bypass -File scripts/run-tests.ps1
+
+# Validate a report (20 checks). Paths resolved relative to report HTML directory.
 python scripts/validate-report.py path/to/report.html
 
 # Regenerate theme CSS from theme/*/DESIGN.md
@@ -44,10 +47,6 @@ Rules in SKILL.md §2.5 + `references/humanize_matrix.md`. Failure modes agents 
 - D1: every paragraph must mix ≤10‑char and ≥35‑char sentences
 - D5: substitute terms every 800 chars ("增长驱动"→"推力/支撑逻辑")
 
-## codebase-memory-mcp
-
-Indexed: 5,928 nodes, 23,089 edges. Use `search_graph` / `trace_path` / `get_code_snippet` instead of grep/glob for Python scripts and HTML/JS code.
-
 ## Gotchas
 
 - **Theme CSS is auto-generated** (`theme/report-themes.css`). Never hand-edit. Re-run `generate-theme-css.py` after teach_more_pic DESIGN.md changes.
@@ -55,7 +54,7 @@ Indexed: 5,928 nodes, 23,089 edges. Use `search_graph` / `trace_path` / `get_cod
 - **Template `<link>` path** — `report-starter.html` uses `<link href="../theme/report-themes.css">`. Adjust or inline when distributing standalone.
 - **Three.js WebGPU first** — component #27 uses `importmap` + `type="module"` for WebGPU, falls back to UMD `libs/three.min.js` for WebGL. Both patterns must be included.
 - **Copy `libs/` alongside report** — validator checks both `libs/<lib>.min.js` existence AND `<script src="libs/...">` path resolution.
-- **validator path resolution** — `validate-report.py` resolves SVG paths, `<script src>` paths relative to the report HTML's own directory, NOT project root.
+- **Validator path resolution** — `validate-report.py` resolves SVG paths, `<script src>` paths relative to the report HTML's own directory, NOT project root.
 - **Test imports** — `test_validate_report.py` uses `importlib` to load `validate-report.py` (non-standard import pattern).
 - **Components are .md files** — `components/NN-name.md` contain embedded ```html/css/js code blocks. Copy the blocks, not the whole file.
 - **ECharts color in Canvas** — `var(--accent)` in ECharts options does NOT resolve (Canvas2D ignores CSS var()). Always use `gv('--accent')` helper (`function gv(n){return getComputedStyle(docEl).getPropertyValue(n).trim()}`). Three.js #27 correctly already uses `getComputedStyle`.

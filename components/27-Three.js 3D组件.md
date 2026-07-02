@@ -86,9 +86,10 @@ if(container && navigator.gpu){
         scene.add(bar);
       }
 
+      var floorColor = style.getPropertyValue('--border').trim() || '#ddd8d0';
       var floor = new THREE.Mesh(
         new THREE.PlaneGeometry(8, 3),
-        new THREE.MeshLambertMaterial({ color: 0xddd8d0, side: THREE.DoubleSide })
+        new THREE.MeshLambertMaterial({ color: new THREE.Color(floorColor), side: THREE.DoubleSide })
       );
       floor.rotation.x = -Math.PI / 2; floor.position.y = -0.05;
       scene.add(floor);

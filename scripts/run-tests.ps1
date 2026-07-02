@@ -7,7 +7,7 @@ $fail = 0
 
 # --- Pytest unit tests ---
 Write-Host "--- Unit tests (pytest): validate-report + validate-lesson ---" -ForegroundColor Yellow
-$unitOut = & python -m pytest scripts/test_validate_report.py scripts/test_validate_lesson.py -v --tb=short 2>&1
+$unitOut = & python -m pytest scripts/test_validate_report.py scripts/test_validate_lesson.py scripts/test_generate_theme_css.py -v --tb=short 2>&1
 $unitLines = $unitOut -join "`n"
 Write-Host $unitLines
 if ($LASTEXITCODE -eq 0) {

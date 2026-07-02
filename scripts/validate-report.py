@@ -14,10 +14,11 @@ FAIL = "[FAIL]"
 def check_svg_links(html, base_dir):
     """Check that all SVG src files exist and are valid XML."""
     issues = []
-    svgs = set(re.findall(r'<img[^>]*src="([^"]+\.svg)"', html))
-    svgs.update(re.findall(r'<object[^>]*data="([^"]+\.svg)"', html))
-    svgs.update(re.findall(r'<iframe[^>]*src="([^"]+\.svg)"', html))
-    svgs.update(re.findall(r'<source[^>]*src="([^"]+\.svg)"', html))
+    svgs = set(re.findall(r'<img[^>]*src="([^"]+\.svg(?:[?#][^"]*)?)"', html))
+    svgs.update(re.findall(r'<img[^>]*src=\'([^\']+\.svg(?:[?#][^\']*)?)\'', html))
+    svgs.update(re.findall(r'<object[^>]*data="([^"]+\.svg(?:[?#][^"]*)?)"', html))
+    svgs.update(re.findall(r'<iframe[^>]*src="([^"]+\.svg(?:[?#][^"]*)?)"', html))
+    svgs.update(re.findall(r'<source[^>]*src="([^"]+\.svg(?:[?#][^"]*)?)"', html))
     for src in svgs:
         if src.startswith(('http://', 'https://', 'data:')):
             continue
@@ -49,7 +50,7 @@ def check_h1_count(html):
 def check_relative_links(html):
     """Cross-report links must use relative paths, not / or http."""
     issues = []
-    links = re.findall(r'<a[^>]*href="([^"]+\.html)"', html)
+    links = re.findall(r'<a[^>]*href="([^"]+)"', html)
     for href in links:
         if href.startswith("/") or href.startswith("http"):
             issues.append(f"Absolute link found: {href} (use relative path)")
@@ -59,7 +60,7 @@ def check_relative_links(html):
 _LIGHT_FILLS = re.compile(
     r'fill="(?:#)?(?:fef2f2|f0fdf4|eff6ff|fff7ed|ffffff|f8fafc)"', re.IGNORECASE
 )
-_WHITE_TEXT = re.compile(r'fill="(?:#)?(?:fff{1,3})"', re.IGNORECASE)
+_WHITE_TEXT = re.compile(r'fill="(?:#)?(?:f{3}|f{6})"', re.IGNORECASE)
 
 
 def _check_svg_content(content, issues, label):
@@ -142,7 +143,7 @@ def check_lib_deps(html, base_dir):
         if not has_local and not has_cdn:
             issues.append("ECharts usage found but no libs/echarts.min.js or CDN link")
         issues.extend(_check_local_script_paths(html, base_dir, "echarts"))
-    if re.search(r'bar3D|scatter3D|map3D|globe|\'surface\'', html) or 'echarts-gl' in html:
+    if re.search(r'bar3D|scatter3D|map3D|[\'\"]globe[\'\"]|\'surface\'', html) or 'echarts-gl' in html:
         has_gl = os.path.exists(os.path.join(base_dir, "libs", "echarts-gl.min.js"))
         if not has_gl:
             issues.append("ECharts GL usage found but no libs/echarts-gl.min.js")
@@ -240,11 +241,15 @@ def check_bar_fill_width(html):
     """Bar-fill elements must not exceed 100% width (would overflow container)."""
     issues = []
     overflow = []
-    for m in re.finditer(r'class="[^"]*(?<![a-zA-Z0-9_-])bar-fill(?![-_])[^"]*"[^>]*style="([^"]*)"', html):
-        style = m.group(1)
-        wm = re.search(r'width\s*:\s*(\d+(?:\.\d+)?)\s*%', style)
-        if wm and float(wm.group(1)) > 100:
-            overflow.append(f"{wm.group(1)}%")
+    for pat in [
+        r'class="[^"]*(?<![a-zA-Z0-9_-])bar-fill(?![-_])[^"]*"[^>]*style="([^"]*)"',
+        r'style="([^"]*)"[^>]*class="[^"]*(?<![a-zA-Z0-9_-])bar-fill(?![-_])[^"]*"',
+    ]:
+        for m in re.finditer(pat, html):
+            style = m.group(1)
+            wm = re.search(r'width\s*:\s*(\d+(?:\.\d+)?)\s*%', style)
+            if wm and float(wm.group(1)) > 100:
+                overflow.append(f"{wm.group(1)}%")
     style_block = re.search(r'<style[^>]*>(.*?)</style>', html, re.DOTALL)
     if style_block:
         css = style_block.group(1)

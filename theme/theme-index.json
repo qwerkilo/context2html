@@ -2,9 +2,11 @@
   {
     "name": "warm",
     "accent": "#c0392b",
+    "accent_text": "#ffffff",
     "bg": "#faf9f7",
     "text": "#1a1a1a",
     "font": "Noto Serif CJK SC, Georgia, serif",
+    "font_h": "Noto Serif CJK SC, Georgia, serif",
     "chart_colors": [
       "#c0392b",
       "#e67e22",
@@ -25,8 +27,8 @@
     "chart_colors": [
       "rgb(255,26,62)",
       "rgb(215,96,132)",
-      "rgb(255,26,62)",
-      "rgb(215,96,132)"
+      "rgb(255,96,72)",
+      "rgb(225,6,72)"
     ],
     "radius": "14px",
     "has_dark_bg": false
@@ -42,8 +44,8 @@
     "chart_colors": [
       "rgb(74,0,8)",
       "rgb(0,69,78)",
-      "rgb(74,0,8)",
-      "rgb(0,69,78)"
+      "rgb(74,69,18)",
+      "rgb(0,0,18)"
     ],
     "radius": "10px",
     "has_dark_bg": false
@@ -59,8 +61,8 @@
     "chart_colors": [
       "rgb(50,72,174)",
       "rgb(0,142,244)",
-      "rgb(50,72,174)",
-      "rgb(0,142,244)"
+      "rgb(50,142,184)",
+      "rgb(0,52,184)"
     ],
     "radius": "11px",
     "has_dark_bg": false
@@ -76,8 +78,8 @@
     "chart_colors": [
       "rgb(255,183,23)",
       "rgb(212,253,93)",
-      "rgb(255,183,23)",
-      "rgb(212,253,93)"
+      "rgb(255,253,33)",
+      "rgb(222,163,33)"
     ],
     "radius": "6px",
     "has_dark_bg": false
@@ -93,8 +95,8 @@
     "chart_colors": [
       "rgb(255,225,225)",
       "rgb(215,255,255)",
-      "rgb(255,225,225)",
-      "rgb(215,255,255)"
+      "rgb(255,255,235)",
+      "rgb(225,205,235)"
     ],
     "radius": "6px",
     "has_dark_bg": true
@@ -110,8 +112,8 @@
     "chart_colors": [
       "rgb(254,90,62)",
       "rgb(164,160,132)",
-      "rgb(254,90,62)",
-      "rgb(164,160,132)"
+      "rgb(254,160,72)",
+      "rgb(174,70,72)"
     ],
     "radius": "8px",
     "has_dark_bg": false
@@ -127,8 +129,8 @@
     "chart_colors": [
       "rgb(255,48,0)",
       "rgb(205,118,40)",
-      "rgb(255,48,0)",
-      "rgb(205,118,40)"
+      "rgb(255,118,0)",
+      "rgb(215,28,0)"
     ],
     "radius": "8px",
     "has_dark_bg": false
@@ -144,8 +146,8 @@
     "chart_colors": [
       "rgb(255,0,12)",
       "rgb(193,69,82)",
-      "rgb(255,0,12)",
-      "rgb(193,69,82)"
+      "rgb(255,69,22)",
+      "rgb(203,0,22)"
     ],
     "radius": "8px",
     "has_dark_bg": false
@@ -178,8 +180,8 @@
     "chart_colors": [
       "rgb(52,44,186)",
       "rgb(0,114,255)",
-      "rgb(52,44,186)",
-      "rgb(0,114,255)"
+      "rgb(52,114,196)",
+      "rgb(0,24,196)"
     ],
     "radius": "4px",
     "has_dark_bg": false
@@ -195,8 +197,8 @@
     "chart_colors": [
       "rgb(65,68,224)",
       "rgb(0,138,255)",
-      "rgb(65,68,224)",
-      "rgb(0,138,255)"
+      "rgb(65,138,234)",
+      "rgb(0,48,234)"
     ],
     "radius": "6px",
     "has_dark_bg": false
@@ -212,8 +214,8 @@
     "chart_colors": [
       "rgb(60,0,0)",
       "rgb(0,50,50)",
-      "rgb(60,0,0)",
-      "rgb(0,50,50)"
+      "rgb(60,50,0)",
+      "rgb(0,0,0)"
     ],
     "radius": "8px",
     "has_dark_bg": false
@@ -230,7 +232,7 @@
       "#d6d1ff",
       "rgb(67,0,0)",
       "rgb(0,57,57)",
-      "#d6d1ff"
+      "rgb(0,0,0)"
     ],
     "radius": "24px",
     "has_dark_bg": false
@@ -246,8 +248,8 @@
     "chart_colors": [
       "rgb(136,39,182)",
       "rgb(46,109,252)",
-      "rgb(136,39,182)",
-      "rgb(46,109,252)"
+      "rgb(136,109,192)",
+      "rgb(56,19,192)"
     ],
     "radius": "8px",
     "has_dark_bg": false
@@ -272,9 +274,11 @@
   {
     "name": "spotify",
     "accent": "#1ed760",
+    "accent_text": "#000000",
     "bg": "#121212",
     "text": "#ffffff",
     "font": "\"SpotifyMixUI\",sans-serif",
+    "font_h": "\"SpotifyMixUITitle\",sans-serif",
     "chart_colors": [
       "#1ed760",
       "#ffa42b",
@@ -287,9 +291,11 @@
   {
     "name": "tesla",
     "accent": "#3e6ae1",
+    "accent_text": "#ffffff",
     "bg": "#ffffff",
     "text": "#171a20",
     "font": "\"Universal Sans Text\",sans-serif",
+    "font_h": "\"Universal Sans Display\",sans-serif",
     "chart_colors": [
       "#3e6ae1",
       "#16a34a",
@@ -327,8 +333,8 @@
     "chart_colors": [
       "rgb(255,49,0)",
       "rgb(215,119,40)",
-      "rgb(255,49,0)",
-      "rgb(215,119,40)"
+      "rgb(255,119,0)",
+      "rgb(225,29,0)"
     ],
     "radius": "12px",
     "has_dark_bg": false

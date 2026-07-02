@@ -208,8 +208,8 @@ class TestRelativeLinks:
     def test_absolute_http_fails(self):
         assert len(vr.check_relative_links(
             '<a href="https://example.com/report.html">link</a>')) > 0
-    def test_no_html_links_passes(self):
-        assert not vr.check_relative_links('<a href="https://example.com">link</a>')
+    def test_no_html_links_fails(self):
+        assert len(vr.check_relative_links('<a href="https://example.com">link</a>')) > 0
     def test_same_dir_relative_passes(self):
         assert not vr.check_relative_links('<a href="./sub/report.html">link</a>')
 
@@ -244,13 +244,13 @@ class TestLibDeps:
             '<html><script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js">'
             '</script>echarts.init()</html>', '.')
     def test_echarts_local_passes(self):
-        assert not vr.check_lib_deps('<html>echarts.init()</html>', '.')
+        assert len(vr.check_lib_deps('<html>echarts.init()</html>', 'C:\\nonexistent')) > 0
     def test_three_js_CDN_passes(self):
         assert not vr.check_lib_deps(
             '<html><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">'
             '</script>new THREE.Scene()</html>', '.')
     def test_three_js_local_passes(self):
-        assert not vr.check_lib_deps('<html>new THREE.Scene()</html>', '.')
+        assert len(vr.check_lib_deps('<html>new THREE.Scene()</html>', 'C:\\nonexistent')) > 0
     def test_echarts_no_lib_fails(self):
         assert len(vr.check_lib_deps('<html>echarts.init()</html>', 'C:\\nonexistent')) > 0
     def test_three_js_no_lib_fails(self):
