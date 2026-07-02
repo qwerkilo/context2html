@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="warm">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GSAP 滚动动画集 Demo</title>
+<style>
+:root {
+  --font: "Noto Serif CJK SC",Georgia,"Times New Roman",serif;
+  --lh: 1.8; --h1-size: 2rem;
+  --body-size: 1rem; --radius: 8px;
+  --anim-dur: 0.3s; --anim-y: 18px;
+}
+body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: var(--lh); max-width: 720px; margin: 0 auto; padding: 1.5rem; -webkit-font-smoothing: antialiased; overflow-wrap: break-word; }
+h1 { font-size: var(--h1-size); margin-top: 2rem; }
+h2 { font-size: 1.3rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.3em; margin-top: 3em; }
+p { margin: 1.2em 0; color: var(--muted); }
+
+/* ===== GSAP 滚动动画集 (#30) ===== */
+.gsap-wrap { margin: 2.5rem 0; }
+.gsap-item { will-change: transform, opacity; backface-visibility: hidden; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; }
+
+[data-gsap="fade"] .gsap-item,
+[data-gsap="stagger"] .gsap-item,
+[data-gsap="zoom"] .gsap-item {
+  opacity: 0;
+}
+
+[data-gsap="flip"] .gsap-item {
+  perspective: 800px;
+  opacity: 0;
+}
+
+[data-gsap="parallax"] .gsap-item {
+  will-change: transform;
+}
+
+.gsap-item h4 { margin: 0 0 0.3em; color: var(--accent); }
+.gsap-item p { margin: 0; font-size: 0.9rem; }
+
+@media (max-width: 700px) {
+  .gsap-wrap { margin: 1.5rem 0; }
+  .gsap-item { padding: 1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-gsap] .gsap-item { opacity: 1 !important; transform: none !important; }
+}
+
+/* ===== warm theme ===== */
+[data-theme="warm"] {
+  --bg: #faf9f7; --text: #1a1a1a; --accent: #c0392b;
+  --surface: #f5f0eb; --border: #ddd8d0; --muted: #888888;
+}
+
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+.demo-section { min-height: 300px; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 0.85rem; }
+</style>
+</head>
+<body>
+
+<h1>GSAP 滚动动画集 · 5 种模式演示</h1>
+<p>向下滚动查看每种模式的动画效果。GSAP 分别在桌面端使用 libs/ 离线包、移动端使用 CDN 加载。</p>
+
+<!-- ===== fade ===== -->
+<h2>模式：fade — 逐个渐入</h2>
+<div class="gsap-wrap" data-gsap="fade">
+  <div class="gsap-item"><h4>洞察一</h4><p>每个卡片独立触发 ScrollTrigger，滚动到视口 85% 位置时开始动画。</p></div>
+  <div class="gsap-item"><h4>洞察二</h4><p>逐个渐入 + 上移 30px，间隔 0.1s，支持 reverse 回退。</p></div>
+  <div class="gsap-item"><h4>洞察三</h4><p>ease: power2.out 保证结束平滑自然。</p></div>
+</div>
+
+<div class="demo-section">继续向下滚动 →</div>
+
+<!-- ===== stagger ===== -->
+<h2>模式：stagger — 错开序列</h2>
+<div class="gsap-wrap" data-gsap="stagger">
+  <div class="gsap-item"><h4>第一步</h4><p>所有 items 作为一组触发，彼此错开 0.12s 渐入。</p></div>
+  <div class="gsap-item"><h4>第二步</h4><p>比独立 fade 更整齐，适合列表/网格场景。</p></div>
+  <div class="gsap-item"><h4>第三步</h4><p>容器触发点：top 80%。</p></div>
+</div>
+
+<div class="demo-section">继续向下滚动 →</div>
+
+<!-- ===== parallax ===== -->
+<h2>模式：parallax — 视差滚动</h2>
+<div class="gsap-wrap" data-gsap="parallax">
+  <div class="gsap-item"><h4>背景层</h4><p>视差速度系数：0.08，移动量最少。</p></div>
+  <div class="gsap-item"><h4>中间层</h4><p>速度系数：0.14，适度偏移。</p></div>
+  <div class="gsap-item"><h4>前景层</h4><p>速度系数：0.20，移动最明显，层次感最强。</p></div>
+</div>
+
+<div class="demo-section">继续向下滚动 →</div>
+
+<!-- ===== flip ===== -->
+<h2>模式：flip — 3D 翻转</h2>
+<div class="gsap-wrap" data-gsap="flip">
+  <div class="gsap-item"><h4>Y 轴翻转</h4><p>从 rotationY: -180deg 翻转到 0deg，duration: 0.9s。</p></div>
+  <div class="gsap-item"><h4>透视 800px</h4><p>perspective: 800px 保证 3D 景深效果。</p></div>
+  <div class="gsap-item"><h4>适合卡片</h4><p>正面→反面翻转展示的双面卡片中最出彩。</p></div>
+</div>
+
+<div class="demo-section">继续向下滚动 →</div>
+
+<!-- ===== zoom ===== -->
+<h2>模式：zoom — 缩放渐入</h2>
+<div class="gsap-wrap" data-gsap="zoom">
+  <div class="gsap-item"><h4>核心指标</h4><p>从 scale: 0.3 + opacity: 0 放大到正常尺寸，适合高亮关键数据。</p></div>
+  <div class="gsap-item"><h4>重大结论</h4><p>缩放动画天然传达"重要感"。</p></div>
+  <div class="gsap-item"><h4>关键图表</h4><p>与 ECharts/Three.js 图表配合使用效果更佳。</p></div>
+</div>
+
+<!-- ===== GSAP 脚本（动态加载，移动端 CDN 降级） ===== -->
+<script>
+(function(){
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.querySelectorAll('.gsap-item').forEach(function(el) {
+      el.style.opacity = '1'; el.style.transform = 'none';
+    });
+    return;
+  }
+
+  var isMobile = ('ontouchstart' in window || navigator.maxTouchPoints > 0)
+    && window.innerWidth < 1024;
+
+  var baseURL = isMobile
+    ? 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/'
+    : 'libs/';
+
+  var loaded = 0;
+  var total = 2;
+
+  function onLibLoad() {
+    loaded++;
+    if (loaded === total) initGSAP();
+  }
+
+  ['gsap.min.js', 'ScrollTrigger.min.js'].forEach(function(file) {
+    var s = document.createElement('script');
+    s.src = baseURL + file;
+    s.onload = onLibLoad;
+    s.onerror = function() {
+      if (!isMobile) {
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/' + file;
+        s.onerror = null;
+      }
+    };
+    document.head.appendChild(s);
+  });
+
+  function initGSAP() {
+    if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+    gsap.registerPlugin(ScrollTrigger);
+
+    document.querySelectorAll('[data-gsap]').forEach(function(section) {
+      var mode = section.dataset.gsap;
+      var items = section.querySelectorAll('.gsap-item');
+      if (!items.length) return;
+
+      switch (mode) {
+        case 'fade':
+          items.forEach(function(el, i) {
+            gsap.fromTo(el, { opacity: 0, y: 30 }, {
+              opacity: 1, y: 0, duration: 0.7, delay: i * 0.1,
+              scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none reverse' }
+            });
+          });
+          break;
+
+        case 'stagger':
+          gsap.fromTo(items, { opacity: 0, y: 40 }, {
+            opacity: 1, y: 0, duration: 0.6, stagger: 0.12,
+            scrollTrigger: { trigger: section, start: 'top 80%' }
+          });
+          break;
+
+        case 'parallax':
+          items.forEach(function(el, i) {
+            var speed = 0.08 + i * 0.06;
+            gsap.to(el, {
+              y: window.innerHeight * speed * 0.4, ease: 'none',
+              scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true }
+            });
+          });
+          break;
+
+        case 'flip':
+          items.forEach(function(el) {
+            gsap.fromTo(el, { rotationY: -180, opacity: 0 }, {
+              rotationY: 0, opacity: 1, duration: 0.9,
+              scrollTrigger: { trigger: el, start: 'top 80%' }
+            });
+          });
+          break;
+
+        case 'zoom':
+          items.forEach(function(el, i) {
+            gsap.fromTo(el, { scale: 0.3, opacity: 0 }, {
+              scale: 1, opacity: 1, duration: 0.8, delay: i * 0.1,
+              scrollTrigger: { trigger: el, start: 'top 85%' }
+            });
+          });
+          break;
+      }
+    });
+
+    ScrollTrigger.refresh();
+  }
+})();
+</script>
+
+</body>
+</html>

@@ -393,3 +393,51 @@ class TestEChartsColorUsage:
     def test_var_direct_single_quote_fails(self):
         html = "<script>var c=echarts.init();c.setOption({itemStyle:{color:'var(--accent)'}})</script>"
         assert len(vr.check_echarts_color_usage(html)) > 0
+
+
+class TestGSAPComponent:
+    def test_no_gsap_skips_lib_check(self):
+        assert not vr.check_lib_deps('<html><p>hello</p></html>', '.')
+
+    def test_gsap_local_libs_missing_fails(self, tmp_path):
+        html = '<html><div data-gsap="fade">x</div></html>'
+        issues = vr.check_lib_deps(html, str(tmp_path))
+        assert len(issues) > 0
+
+    def test_gsap_local_libs_exist_passes(self, tmp_path):
+        (tmp_path / "libs").mkdir()
+        (tmp_path / "libs" / "gsap.min.js").write_text("// stub")
+        (tmp_path / "libs" / "ScrollTrigger.min.js").write_text("// stub")
+        html = '<html><div data-gsap="stagger">x</div></html>'
+        assert not vr.check_lib_deps(html, str(tmp_path))
+
+    def test_gsap_cdn_passes_without_libs(self, tmp_path):
+        html = '<html><script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script> x</html>'
+        assert not vr.check_lib_deps(html, str(tmp_path))
+
+    def test_gsap_register_plugin_detected(self, tmp_path):
+        (tmp_path / "libs").mkdir()
+        (tmp_path / "libs" / "gsap.min.js").write_text("// stub")
+        (tmp_path / "libs" / "ScrollTrigger.min.js").write_text("// stub")
+        html = '<html><script>gsap.registerPlugin(ScrollTrigger)</script></html>'
+        assert not vr.check_lib_deps(html, str(tmp_path))
+
+    def test_gsap_fromTo_detected(self, tmp_path):
+        (tmp_path / "libs").mkdir()
+        (tmp_path / "libs" / "gsap.min.js").write_text("// stub")
+        (tmp_path / "libs" / "ScrollTrigger.min.js").write_text("// stub")
+        html = '<html><script>gsap.fromTo(el,{x:0},{x:100})</script></html>'
+        assert not vr.check_lib_deps(html, str(tmp_path))
+
+    def test_gsap_mode_valid_passes(self):
+        for mode in ['fade', 'stagger', 'parallax', 'flip', 'zoom']:
+            assert not vr.check_gsap_modes(f'<div data-gsap="{mode}">x</div>')
+
+    def test_gsap_mode_invalid_fails(self):
+        assert len(vr.check_gsap_modes('<div data-gsap="slide">x</div>')) > 0
+
+    def test_gsap_mode_empty_fails(self):
+        assert len(vr.check_gsap_modes('<div data-gsap="">x</div>')) > 0
+
+    def test_gsap_no_attr_skips(self):
+        assert not vr.check_gsap_modes('<div>plain</div>')

@@ -2,7 +2,7 @@
 
 ## What this is
 
-Sub-skill augmenting **teach_more_pic**. Both loaded via `Skills:`. 29 visual components in `components/` are local copies from teach_more_pic — editable here. Differentiator: report workflow (not course), 20 brand themes, bilingual, D1-D5 humanization.
+Sub-skill augmenting **teach_more_pic**. Both loaded via `Skills:`. 29 visual components in `components/` are local copies from teach_more_pic (+ 1 custom, #30 GSAP) — editable here. Differentiator: report workflow (not course), 20 brand themes, bilingual, D1-D5 humanization.
 
 **SKILL.md is the workflow document** (Step 0-5 + Step 2.5 humanize sub-step with STOP checkpoint before HTML generation).
 
@@ -13,7 +13,7 @@ Pure HTML/CSS/JS. No package.json, no npm. Open directly in browser after genera
 ## Commands
 
 ```bash
-# All tests (pytest, 245 tests across 3 files)
+# All tests (pytest, 255 tests across 3 files)
 python -m pytest scripts/test_validate_report.py scripts/test_validate_lesson.py scripts/test_generate_theme_css.py -v --tb=short
 
 # Same via helper script (also validates report-starter.html + demo report)
@@ -63,3 +63,17 @@ Rules in SKILL.md §2.5 + `references/humanize_matrix.md`. Failure modes agents 
 - **`examples/report-themes.html` is NOT a valid report** — it's a theme preview page and will fail `validate-report.py`. Use `examples/0001-demo-report.html` for smoke tests.
 - **Git push** — remote uses SSH key `/root/.ssh/id_rsa_teach` (opencode-teach-sync). `~/.ssh/config` already configured for `github.com`.
 - `results.tsv` and `test-prompts.json` — update after darwin-skill optimization runs.
+
+## Agent skills
+
+### Issue tracker
+
+Issues live as GitHub issues. External PRs are not a triage surface. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default label vocabulary (needs-triage, needs-info, ready-for-agent, ready-for-human, wontfix). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context layout (one CONTEXT.md + docs/adr/ at root, created lazily). See `docs/agents/domain.md`.

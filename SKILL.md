@@ -3,7 +3,7 @@ name: context2html
 description: >
   将调研内容/研究报告自动转化为可视化 HTML 报告。
   从对话上下文提取已有调研结果，或读取外部文件路径。
-  完整复用 teach_more_pic 的 29 个视觉组件（SVG 流程图、ECharts、Three.js、D3.js 等）。
+  完整复用 teach_more_pic 的 29 个视觉组件 + 1 个自定义组件（GSAP 滚动动画 #30）。
   Triggers: "报告", "调研", "research", "report", "生成报告", "把内容做成报告",
   "调研报告", "visual report", "可视化报告", "research report", "出报告".
 disable-model-invocation: true
@@ -12,7 +12,7 @@ argument-hint: "调研内容描述或文件路径？"
 
 # context2html — 调研报告可视化工具
 
-将调研内容/研究报告自动转化为可视化 HTML 报告。完整复用 `teach_more_pic` 的 29 个视觉组件（SVG 流程图、ECharts、Three.js 3D、D3.js 力导向图等）和离线库。
+将调研内容/研究报告自动转化为可视化 HTML 报告。完整复用 `teach_more_pic` 的 29 个视觉组件 + 1 个自定义 GSAP 组件和离线库。
 
 ## 前置条件
 
@@ -73,6 +73,7 @@ argument-hint: "调研内容描述或文件路径？"
 | 来源引用 | 引文卡片 #13 | ⭐⭐ |
 | 复杂概念分步 | 折叠分步 #8 / Tab 面板 #9 | ⭐⭐ |
 | 关系网络 | D3 力导向图 #28 | ⭐ |
+| 滚动动画 | GSAP 滚动动画集 #30 | ⭐⭐⭐ |
 | 状态/进度 | 状态链 #15 / 步骤指示器 #20 | ⭐ |
 | 提示/警告 | 告警条 #18 | ⭐ |
 | 补充信息 | 信息面板 #21 | ⭐ |
@@ -164,7 +165,7 @@ argument-hint: "调研内容描述或文件路径？"
 | 路径 | 用途 | 工作流中引用处 |
 |------|------|--------------|
 | `templates/report-starter.html` | 报告骨架模板（所有报告的起点） | Step 3 |
-| `components/NN-name.md` | 组件代码（29 个） | Step 2/3 |
+| `components/NN-name.md` | 组件代码（29 + 1 自定义） | Step 2/3 |
 | `references/decision-guide.md` | 组件选择矩阵 | Step 2 |
 | `references/page-types.md` | 9 种页面类型代码参考 | Step 3 |
 | `libs/` | 离线包（echarts/three/d3） | Step 5 |
@@ -199,7 +200,7 @@ argument-hint: "调研内容描述或文件路径？"
 
 ## 先决条件检查（在 Step 4 使用而不是手动逐项核对）
 
-运行 `python scripts/validate-report.py report-slug.html` 会自动执行全部检查（含 SVG 验证、中文渲染、对比表窄屏折叠、中英双语配对、条形图不溢出、章节交叉引用 `#chN` 等 17 项）。手动核对见 Step 4 验证清单。
+运行 `python scripts/validate-report.py report-slug.html` 会自动执行全部检查（含 SVG 验证、中文渲染、对比表窄屏折叠、中英双语配对、条形图不溢出、章节交叉引用 `#chN` 等 19 项）。手动核对见 Step 4 验证清单。
 
 ## 失败模式与异常处理
 

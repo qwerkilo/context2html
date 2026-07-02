@@ -23,7 +23,7 @@ THEME_DIRS = [
     os.path.join(os.path.dirname(PROJECT_DIR), "teach_more_pic", "theme"),
 ]
 
-THEME_DIR = None
+THEME_DIR: str = ''
 for p in THEME_DIRS:
     if os.path.isdir(p):
         THEME_DIR = p
@@ -223,8 +223,6 @@ def make_chart_colors(accent, colors):
         ])
     except (ValueError, IndexError):
         palette.extend(['#5470c6', '#91cc75'])
-    except:
-        pass
     if not palette:
         return ['#5470c6', '#91cc75', '#fac858', '#ee6666']
     # Pad to 4 distinct colors by deriving more accent variants

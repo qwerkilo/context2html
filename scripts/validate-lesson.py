@@ -5,40 +5,17 @@ Usage: python validate-lesson.py <path-to-lesson.html>
 import re
 import sys
 import os
-import xml.etree.ElementTree as ET
 
-PASS = "[PASS]"
-FAIL = "[FAIL]"
-
-
-def check_svg_links(html, base_dir):
-    """Check that all SVG src files exist and are valid XML."""
-    issues = []
-    svgs = set(re.findall(r'<img[^>]*src="([^"]+\.svg)"', html))
-    svgs.update(re.findall(r'<object[^>]*data="([^"]+\.svg)"', html))
-    svgs.update(re.findall(r'<iframe[^>]*src="([^"]+\.svg)"', html))
-    svgs.update(re.findall(r'<source[^>]*src="([^"]+\.svg)"', html))
-    for src in svgs:
-        if src.startswith(('http://', 'https://', 'data:')):
-            continue
-        path = os.path.join(base_dir, src)
-        if not os.path.exists(path):
-            issues.append(f"SVG not found: {src}")
-        else:
-            try:
-                ET.parse(path)
-            except Exception as e:
-                issues.append(f"SVG invalid XML: {src} -- {e}")
-    return issues
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _validate_common import (
+    PASS, FAIL,
+    check_svg_links, check_h1_count, check_relative_links,
+    check_svg_contrast, check_focus_visible, check_tabular_nums,
+    check_semantic_html, check_lib_deps, check_bilingual,
+)
 
 
 def _extract_tag_blocks(html, tag, class_name):
-    """Extract balanced <tag class="...class_name...">...</tag> blocks via depth counting.
-
-    A naive regex like `<tag ...>.*?</tag>` with DOTALL matches an inner closing tag
-    when the block contains nested tags of the same type, producing wrong question
-    bodies. This depth walker tolerates arbitrary nesting.
-    """
     pattern = re.compile(
         r'<' + tag + r'\b[^>]*class="[^"]*\b' + re.escape(class_name) + r'\b[^"]*"[^>]*>',
         re.IGNORECASE,
@@ -73,7 +50,6 @@ def _extract_tag_blocks(html, tag, class_name):
 
 
 def check_quiz_correct_count(html):
-    """Each quiz question should have exactly one data-correct=true per language."""
     issues = []
     questions = _extract_tag_blocks(html, 'div', 'quiz-question')
     for i, q in enumerate(questions, 1):
@@ -94,30 +70,15 @@ def check_quiz_correct_count(html):
     return issues
 
 
-def check_h1_count(html):
-    """Each lesson must have exactly one h1 (or one per language with data-lang)."""
-    h1s = re.findall(r"<h1[^>]*>", html)
-    lang_h1s = re.findall(r'<h1[^>]*data-lang=["\']([^"\']+)["\']', html)
-    if lang_h1s:
-        if len(h1s) == len(set(lang_h1s)):
-            return []
-    if len(h1s) != 1:
-        return [f"Found {len(h1s)} h1 tags (expected 1, or 1 per language with data-lang)"]
-    return []
-
-
 def check_data_anim_syntax(html):
-    """data-anim values should be valid."""
     valid = {"fade-up", "fade", "slide-left", "blur"}
-    anims = re.findall(r'data-anim="([^"]+)"', html)
-    bad = [a for a in anims if a not in valid]
+    bad = [a for a in re.findall(r'data-anim="([^"]+)"', html) if a not in valid]
     if bad:
         return [f"Invalid data-anim values: {set(bad)}"]
     return []
 
 
 def check_container_width(html):
-    """Container max-width should be between 700-800px."""
     m = re.search(r"\.container\s*\{[^}]*max-width:\s*(\d+)", html)
     if m:
         w = int(m.group(1))
@@ -126,18 +87,7 @@ def check_container_width(html):
     return []
 
 
-def check_relative_links(html):
-    """Cross-lesson links must use relative paths, not / or http."""
-    issues = []
-    links = re.findall(r'<a[^>]*href="([^"]+\.html)"', html)
-    for href in links:
-        if href.startswith("/") or href.startswith("http"):
-            issues.append(f"Absolute link found: {href} (use relative path)")
-    return issues
-
-
 def check_quiz_completeness(html):
-    """Should have exactly 5 questions, each with 3 options per language."""
     issues = []
     questions = _extract_tag_blocks(html, 'div', 'quiz-question')
     if len(questions) != 5:
@@ -160,43 +110,7 @@ def check_quiz_completeness(html):
     return issues
 
 
-_LIGHT_FILLS = re.compile(
-    r'fill="(?:#)?(?:fef2f2|f0fdf4|eff6ff|fff7ed|ffffff|f8fafc)"', re.IGNORECASE
-)
-_WHITE_TEXT = re.compile(r'fill="(?:#)?(?:fff{1,3})"', re.IGNORECASE)
-
-
-def _check_svg_content(content, issues, label):
-    has_light_fill = bool(_LIGHT_FILLS.search(content))
-    has_white_text = bool(_WHITE_TEXT.search(content))
-    if has_light_fill and has_white_text:
-        issues.append(
-            f"{label}: possible white text on light background -- verify manually"
-        )
-
-
-def check_svg_contrast(html, base_dir):
-    """Flag SVGs that may have white text on light backgrounds."""
-    issues = []
-    svgs = re.findall(r'<img[^>]*src="([^"]+\.svg)"', html)
-    for src in svgs:
-        path = os.path.join(base_dir, src)
-        if not os.path.exists(path):
-            continue
-        try:
-            with open(path, "r", encoding="utf-8") as f:
-                content = f.read()
-            _check_svg_content(content, issues, src)
-        except Exception:
-            pass
-    inline_svgs = re.findall(r'<svg[^>]*>(.*?)</svg>', html, re.DOTALL)
-    for svg_content in inline_svgs:
-        _check_svg_content(svg_content, issues, "Inline <svg>")
-    return issues
-
-
 def check_ppt_js(html):
-    """Check for theme switching and keyboard nav JS."""
     issues = []
     has_themes = bool(re.search(r"data-theme", html))
     if has_themes:
@@ -218,7 +132,6 @@ _ICON_WIDTH_THRESHOLD = 48
 
 
 def _is_in_fenced_code(html, pos):
-    """Return True when the position sits inside an open/unclosed ``` fenced block."""
     in_fence = False
     cursor = 0
     while cursor < pos:
@@ -231,7 +144,6 @@ def _is_in_fenced_code(html, pos):
 
 
 def check_inline_svg(html):
-    """Inline SVGs must be wrapped in .svg-fig figure, excluding icon SVGs."""
     issues = []
     has_figure = bool(re.search(r'class="[^"]*svg-fig[^"]*"', html))
     for m in re.finditer(r'<svg\b([^>]*)>', html):
@@ -262,29 +174,21 @@ def check_inline_svg(html):
     return issues
 
 
-
 def check_component_consistency(html):
-    """Check that component HTML attributes have matching target elements."""
     issues = []
-    # Lightbox: data-lbox="X" must have corresponding id="lbox-X"
     lbox_triggers = re.findall(r'data-lbox="([^"]+)"', html)
     for lid in lbox_triggers:
         if f'id="lbox-{lid}"' not in html:
             issues.append(f"Lightbox trigger data-lbox=\"{lid}\" has no matching #lbox-{lid}")
-    # Info panel: data-panel="X" must have corresponding id="panel-X"
     panel_triggers = re.findall(r'data-panel="([^"]+)"', html)
     for pid in panel_triggers:
         if f'id="panel-{pid}"' not in html:
             issues.append(f"Info panel trigger data-panel=\"{pid}\" has no matching #panel-{pid}")
-    # Popover: popovertarget="X" must have matching id="X" with popover attribute
     popover_triggers = re.findall(r'popovertarget="([^"]+)"', html)
     for pid in popover_triggers:
         target = f'id="{pid}"'
         if target not in html:
             issues.append(f"Popover trigger popovertarget=\"{pid}\" has no matching element")
-        elif f'popover' not in html:
-            pass  # popover content may not be in same file
-    # Dialog: <dialog> should have close mechanism
     dialogs = len(re.findall(r'<dialog[\s>]', html))
     close_methods = len(re.findall(r'close\(\)|showModal\(\)', html))
     if dialogs > 0 and close_methods == 0:
@@ -292,34 +196,10 @@ def check_component_consistency(html):
     return issues
 
 
-def check_focus_visible(html):
-    """Must have :focus-visible outline styles."""
-    if not re.search(r":focus-visible", html):
-        return ["Missing :focus-visible outline rule"]
-    return []
-
-
-def check_tabular_nums(html):
-    """Should have font-variant-numeric: tabular-nums for number alignment."""
-    if not re.search(r"tabular-nums", html):
-        return ["Missing font-variant-numeric: tabular-nums"]
-    return []
-
-
-def check_semantic_html(html):
-    """Should use at least one semantic element (article/section/nav/aside)."""
-    for tag in ("<article", "<section", "<nav", "<aside", "<main"):
-        if tag in html:
-            return []
-    return ["No semantic HTML elements found (use <article>/<section>/<nav>/<aside>)"]
-
-
 def check_spa_integration(html, path):
-    """Check lesson HTML has proper SPA section structure."""
     issues = []
     filename = os.path.basename(path).lower()
 
-    # If this is index.html, check section structure
     if filename == "index.html":
         sections = re.findall(
             r'<section\s+class="([^"]*)"\s+id="lesson-(\d+)"[^>]*>', html
@@ -337,9 +217,8 @@ def check_spa_integration(html, path):
             issues.append(f"Missing closing </section>")
         return issues
 
-    # For regular lesson HTML files (not KG, not template)
     if "graphdata" in html.lower():
-        return []  # KG files skip SPA check
+        return []
 
     m = re.search(r'id="lesson-(\d+)"', html)
     if not m:
@@ -354,7 +233,6 @@ def check_spa_integration(html, path):
 
 
 def _check_kg_nodes(nodes_text, cats, require_name=True):
-    """Shared node validation (old and new format)."""
     issues = []
     node_ids = []
     node_objs = re.findall(r'\{(.+?)\}', nodes_text, re.DOTALL)
@@ -391,7 +269,6 @@ def _check_kg_nodes(nodes_text, cats, require_name=True):
 
 
 def _check_kg_links(links_text, node_ids):
-    """Shared link validation."""
     issues = []
     link_objs = re.findall(r'\{(.+?)\}', links_text, re.DOTALL)
     if len(link_objs) < 1:
@@ -417,7 +294,6 @@ def _check_kg_links(links_text, node_ids):
 
 
 def check_kg_structure(html, path):
-    """Validate knowledge graph data structure (old + bilingual format)."""
     issues = []
     has_graphdata = 'graphData' in html and ('rawNodes' in html or 'const graphData' in html)
     has_bilingual = bool(re.search(r'(?:const|var|let)\s+rawNodes\s*=', html)) and bool(re.search(r'(?:const|var|let)\s+rawLinks\s*=', html))
@@ -425,23 +301,19 @@ def check_kg_structure(html, path):
     if not has_graphdata:
         return []
 
-    # ===== New bilingual format (rawNodes with nameZh/nameEn) =====
     if has_bilingual:
-        # Check rawNodes
         node_ids = []
         rn_match = re.search(r'(?:const|var|let)\s+rawNodes\s*=\s*\[(.+?)\]', html, re.DOTALL)
         if not rn_match:
             issues.append("bilingual KG: missing 'rawNodes' array")
         else:
             rn_text = rn_match.group(1)
-            # Check for nameZh + nameEn on each node
             rn_objs = re.findall(r'\{(.+?)\}', rn_text, re.DOTALL)
             for i, nobj in enumerate(rn_objs):
                 if 'nameZh' not in nobj:
                     issues.append(f"rawNodes #{i+1}: missing 'nameZh'")
                 if 'nameEn' not in nobj:
                     issues.append(f"rawNodes #{i+1}: missing 'nameEn'")
-            # Extract categories from catNames
             cats = []
             cn_match = re.search(r'"zh"\s*:\s*\[([^\]]+)\]', html)
             if cn_match:
@@ -449,7 +321,6 @@ def check_kg_structure(html, path):
             sub_issues, node_ids = _check_kg_nodes(rn_text, cats)
             issues.extend(['bilingual KG: ' + s for s in sub_issues])
 
-        # Check rawLinks
         rl_match = re.search(r'(?:const|var|let)\s+rawLinks\s*=\s*\[(.+?)\]', html, re.DOTALL)
         if not rl_match:
             issues.append("bilingual KG: missing 'rawLinks' array")
@@ -458,7 +329,6 @@ def check_kg_structure(html, path):
             issues.extend(['bilingual KG: ' + s for s in sub_issues])
         return issues
 
-    # ===== Old inline format (const graphData = { ... }) =====
     cats = []
     cat_match = re.search(r'"categories"\s*:\s*\[([^\]]+)\]', html)
     if not cat_match:
@@ -487,80 +357,6 @@ def check_kg_structure(html, path):
     return issues
 
 
-def check_bilingual(html):
-    """Check for bilingual content with data-lang and language toggle."""
-    issues = []
-    has_zh = 'data-lang="zh"' in html
-    has_en = 'data-lang="en"' in html
-    has_toggle = 'data-lang-btn' in html
-    has_l_key = "key==='l'" in html or 'key==="l"' in html
-
-    if not has_zh and not has_en:
-        return []  # Not bilingual, skip (legacy lessons)
-
-    if not has_zh:
-        issues.append("Missing data-lang=\"zh\" (Chinese content)")
-    if not has_en:
-        issues.append("Missing data-lang=\"en\" (English content)")
-    if not has_toggle:
-        issues.append("Missing language toggle button ([data-lang-btn])")
-    if not has_l_key:
-        issues.append("Missing L key handler for language switching")
-
-    return issues
-
-
-def _check_local_script_paths(html, base_dir, lib_name):
-    """Verify any local <script src=...> referencing the lib resolves to a real file."""
-    issues = []
-    pattern = re.compile(
-        r'<script\b[^>]*\bsrc="([^"]*)"[^>]*>', re.IGNORECASE)
-    for m in pattern.finditer(html):
-        src = m.group(1).strip()
-        if not src or src.startswith(('http://', 'https://', '//', 'data:')):
-            continue
-        if lib_name not in src:
-            continue
-        if os.path.isabs(src):
-            resolved = src
-        else:
-            resolved = os.path.normpath(os.path.join(base_dir, src))
-        if not os.path.exists(resolved):
-            issues.append(f"{lib_name} <script src=\"{src}\"> points to missing file -> {resolved}")
-    return issues
-
-
-def check_lib_deps(html, base_dir):
-    """Verify ECharts, Three.js, D3.js lib files exist when used."""
-    issues = []
-    if re.search(r'echarts\.init\(', html):
-        has_local = os.path.exists(os.path.join(base_dir, "libs", "echarts.min.js"))
-        has_cdn = "cdn.jsdelivr.net/npm/echarts" in html
-        if not has_local and not has_cdn:
-            issues.append("ECharts usage found but no libs/echarts.min.js or CDN link")
-        issues.extend(_check_local_script_paths(html, base_dir, "echarts"))
-    if re.search(r'bar3D|scatter3D|map3D|globe|\'surface\'', html) or 'echarts-gl' in html:
-        has_gl = os.path.exists(os.path.join(base_dir, "libs", "echarts-gl.min.js"))
-        if not has_gl:
-            issues.append("ECharts GL usage found but no libs/echarts-gl.min.js")
-        issues.extend(_check_local_script_paths(html, base_dir, "echarts-gl"))
-    if re.search(r'new THREE\.', html) or re.search(r'\bTHREE\b', html) or 'three@0.185.0' in html:
-        has_local_umd = os.path.exists(os.path.join(base_dir, "libs", "three.min.js"))
-        has_local_esm = os.path.exists(os.path.join(base_dir, "libs", "three.module.js"))
-        has_cdn = "cdnjs.cloudflare.com/ajax/libs/three.js" in html
-        has_importmap = "cdn.jsdelivr.net/npm/three@0.185.0" in html
-        if not has_local_umd and not has_local_esm and not has_cdn and not has_importmap:
-            issues.append("Three.js usage found but no libs/three.min.js, three.module.js, or CDN link")
-        issues.extend(_check_local_script_paths(html, base_dir, "three"))
-    if re.search(r'd3\.(forceSimulation|hierarchy|sankey|select(?:All)?)\b', html):
-        has_local = os.path.exists(os.path.join(base_dir, "libs", "d3.min.js"))
-        has_cdn = "d3js.org/d3" in html
-        if not has_local and not has_cdn:
-            issues.append("D3.js usage found but no libs/d3.min.js or CDN link")
-        issues.extend(_check_local_script_paths(html, base_dir, "d3"))
-    return issues
-
-
 def run_all(path):
     if not os.path.exists(path):
         print(f"{FAIL} File not found: {path}")
@@ -578,7 +374,6 @@ def run_all(path):
         ("SVG files exist & valid", check_svg_links(html, base_dir)),
     ]
 
-    # KG files and index.html skip lesson-specific checks
     if not is_kg and not is_index:
         results += [
             ("Quiz: exactly 1 correct per question", check_quiz_correct_count(html)),
