@@ -17,7 +17,7 @@ Pure HTML/CSS/JS. No package.json, no npm. Open directly in browser after genera
 ## Commands
 
 ```bash
-# All tests (270 tests across 3 files)
+# All tests (274 tests across 3 files: validate_report 145, validate_lesson 107, theme_css 22)
 python -m pytest scripts/test_validate_report.py scripts/test_validate_lesson.py scripts/test_generate_theme_css.py -v --tb=short
 
 # Or just `pytest` (works directly, no python -m needed when pytest is on PATH)

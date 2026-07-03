@@ -1,6 +1,6 @@
 # context2html — 调研报告可视化
 
-把调研内容/研究报告自动转化为可视化 HTML 报告。完整复用 [teach_more_pic](../teach_more_pic/) 的 29 个视觉组件体系 + 1 个自定义 GSAP 滚动动画组件（SVG 流程图、ECharts、Three.js 3D、D3.js、CSS 条形图、时间线、对比表、GSAP 动画集等），新增报告专用模板和人类化写作约束。生成的报告支持 20 种品牌主题切换、中英双语、键盘导航。
+把调研内容/研究报告自动转化为可视化 HTML 报告。完整复用 [teach_more_pic](../teach_more_pic/) 的 29 个视觉组件体系 + 2 个自定义组件（GSAP #30、SVG.js #31）：SVG 流程图、ECharts、Three.js 3D、D3.js、CSS 条形图、时间线、对比表、GSAP 动画集等，新增报告专用模板和人类化写作约束。生成的报告支持 20 种品牌主题切换、中英双语、键盘导航。
 
 > 本 skill 是 [teach_more_pic](../teach_more_pic/) 的兄弟技能——共用同一套视觉组件体系，差异化在报告场景（而非课程）。
 
@@ -78,13 +78,13 @@ powershell -ExecutionPolicy Bypass -File templates/start-server.ps1
 2. **结构规划** — 设计章节大纲（推荐 3-6 章）、关键发现摘要（3-5 条）、标记可视化数据点
 3. **组件选择** — 按 `references/decision-guide.md` 矩阵选型，对比分析优先 ECharts #26 交互式图表，次选 HTML 对比表 #5/#22，每 500 字 ≥1 视觉元素
 4. **HTML 生成** — 从 `templates/report-starter.html` 复制骨架，填充中英双语正文，合并组件 CSS/JS
-5. **验证输出** — run `scripts/validate-report.py`，**22 项硬性检查 + 3 项人类化建议（warning）** 全通过后交付。对比表响应式堆叠、内联 SVG 对比、ECharts 依赖路径、英文布局（overflow-wrap + table-layout:fixed）、ECharts Canvas 颜色用法、GSAP data-gsap 模式验证、章节交叉引用 `#chN`、data-anim 语法、D1 句长交替、D4 连接词控制、D5 术语变体均已覆盖
+5. **验证输出** — run `scripts/validate-report.py`，**21 项硬性检查 + 3 项人类化建议（warning）** 全通过后交付。对比表响应式堆叠、内联 SVG 对比、ECharts 依赖路径、英文布局（overflow-wrap + table-layout:fixed）、ECharts Canvas 颜色用法、GSAP data-gsap 模式验证、章节交叉引用 `#chN`、data-anim 语法、D1 句长交替、D4 连接词控制、D5 术语变体均已覆盖
 
 ## 项目结构
 
 ```
 ├── SKILL.md                     ← 唯一入口，含 5 步工作流 + D1-D5 人类化写作指令
-├── components/                  30 个视觉组件 .md（29来自 teach_more_pic + 1自定义 GSAP #30）
+├── components/                  31 个视觉组件 .md（29来自 teach_more_pic + 2自定义 GSAP #30 + SVG.js #31）
 ├── templates/
 │   ├── report-starter.html      报告骨架模板（9 种页面类型 + 工具栏 + 主题系统）
 │   ├── flowchart-vertical.svg   SVG 模板——垂直流程图
@@ -94,9 +94,9 @@ powershell -ExecutionPolicy Bypass -File templates/start-server.ps1
 │   └── start-server.ps1/.sh     本地 HTTP 服务器启动脚本
 ├── scripts/
 │   ├── _validate_common.py      共享验证核心（12 个共享 check_* 函数）
-│   ├── validate-report.py       报告验证脚本（22 硬性 + 3 warning）
+│   ├── validate-report.py       报告验证脚本（21 硬性 + 3 warning）
 │   ├── validate-lesson.py       课程验证脚本（继承共享核心 + 课程专有检查）
-│   ├── test_validate_report.py  报告验证测试（141 tests）
+│   ├── test_validate_report.py  报告验证测试（145 tests）
 │   ├── test_validate_lesson.py  课程验证测试（107 tests）
 │   ├── test_generate_theme_css.py  主题 CSS 测试（22 tests）
 │   └── generate-theme-css.py    从 teach_more_pic DESIGN.md 自动生成主题 CSS（20 主题）

@@ -3,3 +3,7 @@ timestamp\tcommit\tskill\told_score\tnew_score\tstatus\tdimension\tnote\teval_mo
 2026-06-29T14:55	7c6fe9a	context2html	80.5	84.0	keep	failure_mode	Step 0/1/3/4 嵌入失败分支 + 异常表新增2行 + 验证失败三级降级	full_test
 2026-06-29T15:00	7a13e3d	context2html	84.0	85.1	keep	checkpoint	Step 3 新增正文确认 STOP 检查点	full_test
 2026-06-29T15:05	26aa8ae	context2html	85.1	88.1	keep	architecture	删除冗余错误检查清单，交叉引用合并入 Step 4	full_test
+2026-07-03T16:00	609f334	context2html	88.1	90.0	keep	duplication	删 Step 2 内联组件表(22行→0)，指向 decision-guide.md	dry_run
+2026-07-03T16:05	138d332	context2html	90.0	91.0	keep	specificity	Step 3 补充每章组件数量阈值"2-4/5+"	dry_run
+2026-07-03T16:10	9dc3533	context2html	91.0	92.0	keep	checkpoint	STOP 三色分级：🔵确认/🟢理解/🔴阻塞	dry_run
+2026-07-03T16:20	6bb9894	context2html	92.0	94.0	keep	writing-great-skills	4 changes: sharpen criterion, co-locate design rules, remove duplicate checklists, raise leading word '可视化'	dry_run
