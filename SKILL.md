@@ -128,7 +128,7 @@ argument-hint: "调研内容描述或文件路径？"
 
 - 报告文件：`report-slug.html`
 - 首次使用时复制 `libs/` 目录到报告同级目录（echarts/three/d3 离线包）
-- 可选：运行 `powershell -ExecutionPolicy Bypass -File templates/start-server.ps1` 启动本地服务器预览
+- 可选：运行 `bash templates/start-server.sh`（Linux/macOS）或 `powershell -ExecutionPolicy Bypass -File templates/start-server.ps1`（Windows）启动本地 HTTP 服务器预览
 
 ## 文件资源速查
 
