@@ -7,3 +7,4 @@ timestamp\tcommit\tskill\told_score\tnew_score\tstatus\tdimension\tnote\teval_mo
 2026-07-03T16:05	138d332	context2html	90.0	91.0	keep	specificity	Step 3 补充每章组件数量阈值"2-4/5+"	dry_run
 2026-07-03T16:10	9dc3533	context2html	91.0	92.0	keep	checkpoint	STOP 三色分级：🔵确认/🟢理解/🔴阻塞	dry_run
 2026-07-03T16:20	6bb9894	context2html	92.0	94.0	keep	writing-great-skills	4 changes: sharpen criterion, co-locate design rules, remove duplicate checklists, raise leading word '可视化'	dry_run
+2026-07-03T23:00	3b4cb1c	context2html	94.0	95.5	keep	structural-consistency	Fix #4 JS block convention; Fix #5 component 16 JS format; Fix #6 component 29 CSS note	dry_run
