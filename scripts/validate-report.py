@@ -21,7 +21,8 @@ from _validate_common import (
 
 
 def check_exec_summary(html):
-    if '.exec-summary' not in html:
+    if not re.search(r'class="[^"]*\bexec-summary\b[^"]*"', html) and \
+       not re.search(r"class='[^']*\bexec-summary\b[^']*'", html):
         return ["Missing .exec-summary section (required: key findings summary)"]
     return []
 
@@ -34,13 +35,15 @@ def check_report_chapters(html):
 
 
 def check_conclusion_page(html):
-    if '.conclusion-page' not in html:
+    if not re.search(r'class="[^"]*\bconclusion-page\b[^"]*"', html) and \
+       not re.search(r"class='[^']*\bconclusion-page\b[^']*'", html):
         return ["Missing .conclusion-page section (required: conclusions & recommendations)"]
     return []
 
 
 def check_report_footer(html):
-    if '.report-footer' not in html:
+    if not re.search(r'class="[^"]*\breport-footer\b[^"]*"', html) and \
+       not re.search(r"class='[^']*\breport-footer\b[^']*'", html):
         return ["Missing .report-footer element (required: report footer)"]
     return []
 

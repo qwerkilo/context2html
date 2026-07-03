@@ -7,7 +7,7 @@ spec.loader.exec_module(vr)
 class TestReportSections:
     def test_exec_summary_present(self):
         assert not vr.check_exec_summary(
-            '<style>.exec-summary{}</style><div class="exec-summary"><p>Key findings</p></div>')
+            '<div class="exec-summary"><p>Key findings</p></div>')
     def test_exec_summary_missing(self):
         assert len(vr.check_exec_summary('<div class="summary">no exec here</div>')) > 0
     def test_exec_summary_empty(self):
@@ -27,7 +27,7 @@ class TestReportSections:
 
     def test_conclusion_page_present(self):
         assert not vr.check_conclusion_page(
-            '<style>.conclusion-page{}</style><section class="conclusion-page"><p>Conclusion</p></section>')
+            '<section class="conclusion-page"><p>Conclusion</p></section>')
     def test_conclusion_page_missing(self):
         assert len(vr.check_conclusion_page(
             '<section class="results">no conclusion</section>')) > 0
@@ -36,7 +36,7 @@ class TestReportSections:
 
     def test_report_footer_present(self):
         assert not vr.check_report_footer(
-            '<style>.report-footer{}</style><footer class="report-footer"><p>Footer</p></footer>')
+            '<footer class="report-footer"><p>Footer</p></footer>')
     def test_report_footer_missing(self):
         assert len(vr.check_report_footer(
             '<footer>no report-footer here</footer>')) > 0
