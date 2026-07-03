@@ -10,7 +10,7 @@ disable-model-invocation: true
 argument-hint: "调研内容描述或文件路径？"
 ---
 
-# context2html — 调研报告可视化工具
+# context2html — 调研内容可视化工具
 
 将调研内容/研究报告自动转化为可视化 HTML 报告。完整复用 `teach_more_pic` 的 29 个视觉组件 + 2 个自定义组件（GSAP + SVG.js）和离线库。
 
@@ -28,7 +28,7 @@ argument-hint: "调研内容描述或文件路径？"
 - 保留模板的完整 CSS 变量系统（`:root` + 20 个 `[data-theme]`）、工具栏（主题/语言/目录）、键盘快捷键（T/L/←→）。
 - 视觉组件在模板预留的 `<!-- INSERT: 视觉组件 HTML -->` 注释处追加。
 
-## 报告生成工作流
+## 可视化工作流
 
 ### Step 0: 输入获取
 
@@ -42,7 +42,7 @@ argument-hint: "调研内容描述或文件路径？"
   · 是否有明确的结论或建议需要突出
 - 🔵 CHECKPOINT：等待用户确认后再继续
 
-### Step 1: 报告结构规划
+### Step 1: 可视化结构规划
 
 - 根据内容量决定章节数（推荐 3-6 章）
   · 内容不足 3 章 → 展开 sub-section 细节，或合并为 2 章加附录
@@ -75,9 +75,17 @@ argument-hint: "调研内容描述或文件路径？"
 
 工具：完成全文后对照 `references/humanize_matrix.md` 中的 20 条案例逐条微调。
 
-- 🟢 CHECKPOINT：已逐条确认 D1-D5 规则，理解每维度约束。用户确认后再开始正文写作。
+- 🟢 CHECKPOINT：逐条输出 D1-D5 自检结果（每维度写一句应用计划）。用户确认后再开始正文写作。
 
 ### Step 3: 生成 HTML
+
+**设计纪律** — 生成 HTML 时全程遵守：
+- **最多 1 个强调色**，饱和度 < 80%。禁止 AI 默认的紫/蓝渐变
+- **禁止热暖系蜡笔色默认**（#f5f1ea 等米白背景、#b08947 等黄铜强调色）
+- **禁止纯黑 `#000000`**，用 off-black（zinc-950、`#1a1a1a`）；**禁止纯白 `#ffffff`**，用 off-white
+- 渐变文本只用于极小标题，禁止大标题全渐变
+- 一页只用一个字体族
+- **到 `templates/report-starter.html` 中去取最新的 CSS 变量和组件 CSS**，不要从其他源复制。
 
 1. 复制 `templates/report-starter.html` 为 `report-slug.html`
    · 模板路径不存在 → 检查 `templates/` 目录下文件名 → 从 teach_more_pic 重新复制
@@ -109,18 +117,7 @@ argument-hint: "调研内容描述或文件路径？"
 
 ### Step 4: 验证
 
-运行 `python scripts/validate-report.py report-slug.html` 检查：
-
-- SVG 文件通过了 XML 验证
-- 所有 SVG 文字颜色与背景有足够对比度
-- SVG 中的中文渲染正常（font-family 包含中文字体）
-- 条形图 width 百分比 < 100%
-- 对比表在窄屏（<600px）下折叠为堆叠布局
-- 中英文内容成对标记（`data-lang="zh"` + `data-lang="en"`）
-- 语言切换按钮和 L 键快捷键存在
-- `theme/report-themes.css` 存在且被引用
-- 章节间交叉引用使用 `#chN` 锚点链接
-- 人类化 D1-D5 自检：句长交替 ✓ 段落结构轮换 ✓ 信息密度交替 ✓ 连接词无滥用 ✓ 术语有变体 ✓
+运行 `python scripts/validate-report.py report-slug.html` — 自动检查 22 项硬性约束 + 3 项人类化 warning（D1 句长/D4 连接词/D5 术语变体）。
 
 · 验证失败 → 对照"失败模式与异常处理"表锁定具体问题 → 修复 → 重新验证
 · 连续 3 轮验证仍不通过 → 降级为纯文字报告输出（不附加视觉组件）
@@ -150,17 +147,7 @@ argument-hint: "调研内容描述或文件路径？"
 | `templates/cycle-diagram.svg` | 循环图模板 | Step 2/3 |
 | `templates/timeline-horizontal.svg` | 水平时间线 SVG 模板 | Step 2/3 |
 
-## 视觉设计纪律
-
-- **最多 1 个强调色**，饱和度 < 80%。禁止 AI 默认的紫/蓝渐变
-- **禁止热暖系蜡笔色默认**（#f5f1ea 等米白背景、#b08947 等黄铜强调色）
-- **禁止纯黑 `#000000`**，用 off-black（zinc-950、`#1a1a1a`）；**禁止纯白 `#ffffff`**，用 off-white
-- 渐变文本只用于极小标题，禁止大标题全渐变
-- 一页只用一个字体族
-- **到报告模板的 `templates/report-starter.html` 中去取最新的 CSS 变量和组件 CSS**，不要从其他源复制。
-
 ## 反模式黑名单
-
 | # | 反模式 | 为什么 | 替代做法 |
 |---|--------|--------|---------|
 | 1 | 视觉组件不足 / 连续 500+ 字无视觉元素 | 读者疲劳 | 每 500 字至少 1 个视觉元素 |
@@ -170,10 +157,6 @@ argument-hint: "调研内容描述或文件路径？"
 | 5 | 缺少 PPT 质感（无主题切换/键盘导航） | 交互体验差 | report-starter.html 已内置 |
 | 6 | 图表库只加载部分依赖 | 一种图表空白 | 用到几个库就加载几个 libs 文件 |
 | 7 | 从零写 HTML 而非复制模板 | 丢失 CSS 变量/主题系统 | 始终从 report-starter.html 复制 |
-
-## 先决条件检查（在 Step 4 使用而不是手动逐项核对）
-
-运行 `python scripts/validate-report.py report-slug.html` 会自动执行 22 项硬性检查 + 3 项人类化建议（warning，含 D1 句长交替/D4 连接词/D5 术语变体）。手动核对见 Step 4 验证清单。
 
 ## 失败模式与异常处理
 
