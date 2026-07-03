@@ -23,7 +23,7 @@ python -m pytest scripts/test_validate_report.py scripts/test_validate_lesson.py
 # Or just `pytest` (works directly, no python -m needed when pytest is on PATH)
 pytest scripts/test_validate_report.py -v --tb=short
 
-# Validate a report (22 hard checks + 3 humanization warnings). Paths resolved relative to report HTML directory.
+# Validate a report (21 hard checks + 3 humanization warnings). Paths resolved relative to report HTML directory.
 python scripts/validate-report.py path/to/report.html
 
 # Regenerate theme CSS from theme/*/DESIGN.md
@@ -66,20 +66,10 @@ Rules in SKILL.md §2.5 + `references/humanize_matrix.md`. Failure modes agents 
 - **English text overflows on lang toggle** — English is wider than Chinese; template body has `overflow-wrap: break-word`, `.cmp-table` has `table-layout: fixed` + `word-break: break-word`. Do NOT remove these.
 - **Bilingual block-level elements** — `[data-lang].active` default is `display: inline`. Overrides exist for h1/h2/p/div/section/article/aside/td/th/cover-badge PLUS pre/blockquote/figure/ul/ol/li. If adding a new block-level element with `data-lang`, add it to the override chain.
 - **`examples/report-themes.html` is NOT a valid report** — it's a theme preview page and will fail `validate-report.py`. Use `examples/0001-demo-report.html` for smoke tests.
-- **Git push** — remote uses SSH key `/root/.ssh/id_rsa_teach` (opencode-teach-sync). `~/.ssh/config` already configured for `github.com`.
 - **`docs/` is gitignored** — `.gitignore` excludes `docs/`. Agent skill config files there won't be tracked.
+- **`CONTEXT.md`** exists at root with 5 resolved domain terms (可视化报告/人类化/视觉组件/双语/验证). Read before generating a report.
 - `results.tsv` and `test-prompts.json` — update after darwin-skill optimization runs.
 
-## Agent skills
+## Issue triage
 
-### Issue tracker
-
-Issues live as GitHub issues. External PRs are not a triage surface. See `docs/agents/issue-tracker.md`.
-
-### Triage labels
-
-Default label vocabulary (needs-triage, needs-info, ready-for-agent, ready-for-human, wontfix). See `docs/agents/triage-labels.md`.
-
-### Domain docs
-
-Single-context layout (one CONTEXT.md + docs/adr/ at root, created lazily). See `docs/agents/domain.md`.
+Issues are GitHub issues (create via `gh issue create`). PRs are not a triage surface. Standard labels: needs-triage / needs-info / ready-for-agent / ready-for-human / wontfix.
