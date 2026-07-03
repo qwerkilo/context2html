@@ -288,6 +288,27 @@ class TestLibDeps:
             '<html><script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js">'
             '</script>echarts.init()</html>', str(tmp_path))
 
+    def test_svg_js_CDN_passes(self):
+        assert not vr.check_lib_deps(
+            '<html><script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.2.4/dist/svg.min.js">'
+            '</script>SVG().addTo("#x")</html>', '.')
+
+    def test_svg_js_no_lib_fails(self):
+        assert len(vr.check_lib_deps(
+            '<html>SVG().addTo("#x")</html>', str('C:\\nonexistent'))) > 0
+
+    def test_svg_js_local_script_existing_file_passes(self, tmp_path):
+        (tmp_path / "libs").mkdir()
+        (tmp_path / "libs" / "svg.min.js").write_text("// stub")
+        assert not vr.check_lib_deps(
+            '<html><script src="libs/svg.min.js"></script>'
+            'var d=SVG().addTo("#x");</html>', str(tmp_path))
+
+    def test_svg_js_local_script_missing_file_fails(self, tmp_path):
+        assert len(vr.check_lib_deps(
+            '<html><script src="libs/svg.min.js"></script>'
+            'var d=SVG().addTo("#x");</html>', str(tmp_path))) > 0
+
 
 class TestBarFillWidth:
     def test_inline_100_passes(self):

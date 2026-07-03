@@ -151,6 +151,12 @@ def check_lib_deps(html, base_dir):
             issues.append("GSAP usage found but no libs/ScrollTrigger.min.js or CDN link")
         issues.extend(_check_local_script_paths(html, base_dir, "gsap"))
         issues.extend(_check_local_script_paths(html, base_dir, "ScrollTrigger"))
+    if re.search(r'\bSVG\(|\bSVG\.|draw\.SVG\b|svgdotjs', html):
+        has_local = os.path.exists(os.path.join(base_dir, "libs", "svg.min.js"))
+        has_cdn = "cdn.jsdelivr.net/npm/@svgdotjs/svg.js" in html or "svgjs.in" in html
+        if not has_local and not has_cdn:
+            issues.append("SVG.js usage found but no libs/svg.min.js or CDN link")
+        issues.extend(_check_local_script_paths(html, base_dir, "svg.min.js"))
     return issues
 
 

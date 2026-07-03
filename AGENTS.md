@@ -2,13 +2,13 @@
 
 ## What this is
 
-Sub-skill augmenting **teach_more_pic**. Both loaded via `Skills:`. 30 visual components in `components/` are local copies from teach_more_pic (+ 1 custom, #30 GSAP) — editable here. Differentiator: report workflow (not course), 20 brand themes, bilingual, D1-D5 humanization.
+Sub-skill augmenting **teach_more_pic**. Both loaded via `Skills:`. 31 visual components in `components/` are local copies from teach_more_pic (#1-29) + 2 custom (#30 GSAP, #31 SVG.js) — editable here. Differentiator: report workflow (not course), 20 brand themes, bilingual, D1-D5 humanization.
 
 **SKILL.md is the workflow document** (Step 0-5 + Step 2.5 humanize sub-step with STOP checkpoint before HTML generation).
 
 ## Vanilla JS only
 
-**No JS frameworks.** No React/Vue/Svelte/jQuery/Alpine. Template uses ES5 IIFE + try/catch wrapping for maximum browser compatibility. All app logic is inline `<script>`, no external modules. Pre-downloaded libraries (ECharts, D3, Three.js, GSAP) go in `libs/` loaded via `<script src>` tags. Do NOT introduce build tools, bundlers, or framework runtimes.
+**No JS frameworks.** No React/Vue/Svelte/jQuery/Alpine. Template uses ES5 IIFE + try/catch wrapping for maximum browser compatibility. All app logic is inline `<script>`, no external modules. Pre-downloaded libraries (ECharts, D3, Three.js, GSAP, SVG.js) go in `libs/` loaded via `<script src>` tags. Do NOT introduce build tools, bundlers, or framework runtimes.
 
 ## No build system
 

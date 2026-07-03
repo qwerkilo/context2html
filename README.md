@@ -38,12 +38,13 @@ Skills: teach_more_pic, context2html
 
 ## 能力
 
-**30 个视觉组件**（29 来自 teach_more_pic + 1 自定义，完整索引见 SKILL.md + `references/decision-guide.md`）优先选择 ECharts 交互式图表 #26 而非静态 HTML 表格：
+**31 个视觉组件**（29 来自 teach_more_pic + 2 自定义，完整索引见 SKILL.md + `references/decision-guide.md`）优先选择 ECharts 交互式图表 #26 而非静态 HTML 表格：
 
 - **#1-7 核心**：SVG 流程图 / 角色卡片 / CSS 时间线 / CSS 条形图 / 对比表 / SVG 容器 / PPT 质感（主题切换 + 语言切换 + 滚动动画 + 键盘导航 + 目录）
 - **#8-14 交互式**：折叠分步详解 / Tab 切换面板 / 图片对比滑块 / 交互式时间线 / 数据卡片网格 / 引文卡片 / 标注式图片
 - **#15-29 数据与辅助**：状态链 / 数值滚动动画 / **标签徽章组**（每章结尾必用，带 `#` 前缀） / 告警条 / 热力图 / 步骤指示器 / 信息面板 / 对比表增强版 / 灯箱 / **ECharts 交互式图表**（柱状/饼/折线/堆叠，需 `libs/echarts.min.js`） / **Three.js 3D**（3D 可视化，需 `libs/three.min.js`，含 Sprite 文字标签） / **D3.js 自定义图表**（力导向图/旭日图/桑基图，需 `libs/d3.min.js` + `d3-sankey.min.js`） / **ECharts GL 3D**（3D 柱状/散点/地球，需 `libs/echarts-gl.min.js`） / 现代浏览器 API（原生折叠/模态/幻灯片/Popover）
 - **#30 GSAP 滚动动画集**：5 种模式（fade / stagger / parallax / flip / zoom），桌面端离线加载 `libs/gsap.min.js` + `libs/ScrollTrigger.min.js`，移动端自动降级 CDN
+- **#31 SVG.js 动态图表**：4 种图表（动态柱状/多系列折线/流程图/进度环），轻量级（78KB），CSS 变量响应式 + 内置动画 `element.animate()`，需 `libs/svg.min.js`
 - **20 品牌主题** — 38+ CSS 变量（含 `--chart-*` / `--shadow-*` / `--table-*` / `--tag-*` 等），`var(--accent/border/surface/...)` 自动跟随
 - **主题切换动画** — 0.35s 平滑过渡，`prefers-reduced-motion` 自动禁用
 - **9 种报告页面类型** — 封面 / 摘要 / 关键数字 / 目录 / 章节正文 / 对比分析 / 结论与建议 / 附录 / 页脚（`references/page-types.md` 含完整代码参考）
@@ -102,7 +103,7 @@ powershell -ExecutionPolicy Bypass -File templates/start-server.ps1
 ├── theme/
 │   ├── report-themes.css        20 主题 CSS（自动生成，含 --chart-* / --shadow-* / --table-* 等 25+ CSS 变量）
 │   └── theme-index.json         主题元数据索引
-├── libs/                        外部库（echarts / three / d3 / gsap / ScrollTrigger 离线包）
+├── libs/                        外部库（echarts / echarts-gl / three / d3 / d3-sankey / gsap / ScrollTrigger / svg 离线包）
 ├── references/
 │   ├── decision-guide.md        报告场景组件选择矩阵 + 主题推荐表
 │   └── page-types.md            9 种页面类型 HTML/CSS 代码参考
