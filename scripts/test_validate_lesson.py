@@ -135,9 +135,13 @@ class TestPPTJS:
     def test_theme_nav_present_passes(self):
         assert not vl.check_ppt_js(
             '<html data-theme="warm"><h2>A</h2><h2>B</h2>'
-            'key==="t" key==="ArrowRight" tp-btn-toggle tp-item</html>')
+            'key==="t" key==="l" key==="ArrowRight" tp-btn-toggle tp-item</html>')
     def test_missing_T_key_fails(self):
         assert len(vl.check_ppt_js('<html data-theme="warm">tp-item</html>')) > 0
+    def test_missing_L_key_fails(self):
+        assert len(vl.check_ppt_js(
+            '<html data-theme="warm"><h2>A</h2><h2>B</h2>'
+            'key==="t" key==="ArrowRight" tp-btn-toggle tp-item</html>')) > 0
 
 
 class TestInlineSVG:

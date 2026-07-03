@@ -460,10 +460,10 @@ body, body * { transition: background-color 0.35s ease-out, color 0.35s ease-out
   <h3 data-lang="zh" style="font-size:1rem;margin-top:1.5em;">AI 芯片细分市场规模（2025 年，亿美元）</h3>
   <h3 data-lang="en" style="font-size:1rem;margin-top:1.5em;">AI Chip Market by Segment (2025, USD B)</h3>
   <div class="bar-chart">
-    <div class="bar-item"><span class="bar-label">GPU</span><div class="bar-track"><div class="bar-fill" style="width:60%;background:#c0392b;">588</div></div></div>
-    <div class="bar-item"><span class="bar-label">ASIC</span><div class="bar-track"><div class="bar-fill" style="width:22%;background:#e67e22;">215</div></div></div>
-    <div class="bar-item"><span class="bar-label">FPGA</span><div class="bar-track"><div class="bar-fill" style="width:10%;background:#3498db;">98</div></div></div>
-    <div class="bar-item"><span class="bar-label">其他</span><div class="bar-track"><div class="bar-fill" style="width:8%;background:#27ae60;">79</div></div></div>
+    <div class="bar-item"><span class="bar-label">GPU</span><div class="bar-track"><div class="bar-fill" style="width:60%;background:var(--chart-1);">588</div></div></div>
+    <div class="bar-item"><span class="bar-label">ASIC</span><div class="bar-track"><div class="bar-fill" style="width:22%;background:var(--chart-2);">215</div></div></div>
+    <div class="bar-item"><span class="bar-label">FPGA</span><div class="bar-track"><div class="bar-fill" style="width:10%;background:var(--chart-3);">98</div></div></div>
+    <div class="bar-item"><span class="bar-label">其他</span><div class="bar-track"><div class="bar-fill" style="width:8%;background:var(--chart-4);">79</div></div></div>
   </div>
 </section>
 
@@ -474,9 +474,9 @@ body, body * { transition: background-color 0.35s ease-out, color 0.35s ease-out
   <p data-lang="zh">格局用一个词概括：一超多强。NVIDIA 盘踞顶端——它靠 CUDA 生态和 Hopper/Blackwell 架构筑起的壁垒，在独立 GPU 市场拿下了 88% 的份额。AMD 的 MI300X 在数据中心 GPU 领域咬得很紧；Intel 的 Gaudi 加速器则在推理市场不断试探。这三家之外，还有一群虎视眈眈的定制芯片玩家。</p>
   <p data-lang="en">The AI chip competitive landscape is centered around NVIDIA with multiple players pursuing differentiated strategies. Leveraging its CUDA ecosystem and powerful Hopper/Blackwell architecture, NVIDIA dominates both training and inference markets with 88% discrete GPU share. AMD is catching up in data center GPUs with the MI300X series, while Intel targets AI inference with its Gaudi accelerators.</p>
   <p data-lang="zh">定制 ASIC 的增长更猛。Google TPU、Amazon Trainium 在云厂商内部大规模部署——每瓦性能比通用 GPU 强太多。2025 年这个市场已经到 215 亿，未来三年 CAGR 超过 45%。</p>
-  <p data-lang="en">Custom ASICs (Google TPU, Amazon Trainium) are growing rapidly in cloud-deployed scenarios, offering superior performance per watt. The ASIC market reached approximately $21.5B in 2025 and is expected to grow at over 45% CAGR over the next three years. Chinese vendors like Huawei (Ascend series) and Cambricon are growing fast amid the domestic substitution wave, though gaps remain versus international leaders.</p>
+  <p data-lang="en">Custom ASICs (Google TPU, Amazon Trainium) are growing rapidly in cloud-deployed scenarios, offering superior performance per watt. The ASIC market reached approximately $21.5B in 2025 and is expected to grow at over 45% CAGR over the next three years.</p>
   <p data-lang="zh">国内也在追赶。华为昇腾、寒武纪受益于国产替代浪潮，出货量快速攀升。不过要说跟国际一线水平 PK——差距还在。</p>
-  <p data-lang="en">Custom ASICs (Google TPU, Amazon Trainium) are growing rapidly in cloud-deployed scenarios, offering superior performance per watt. The ASIC market reached approximately $21.5B in 2025 and is expected to grow at over 45% CAGR over the next three years. Chinese vendors like Huawei (Ascend series) and Cambricon are growing fast amid the domestic substitution wave, though gaps remain versus international leaders.</p>
+  <p data-lang="en">Chinese vendors are catching up fast. Huawei's Ascend series and Cambricon are seeing rapid shipment growth fueled by the domestic substitution wave. But the technology gap with international leaders remains significant.</p>
 
   <!-- 数据卡片网格 -->
   <div class="dg-grid">
@@ -539,14 +539,14 @@ body, body * { transition: background-color 0.35s ease-out, color 0.35s ease-out
   <div class="tp-grid" role="listbox" aria-label="选择主题">
     <button class="tp-item active" data-theme="warm" style="--tp-color:#c0392b;">暖色</button>
     <button class="tp-item" data-theme="apple" style="--tp-color:#0066cc;">Apple</button>
-    <button class="tp-item" data-theme="minimax" style="--tp-color:#ff5530;">Minimax</button>
+    <button class="tp-item" data-theme="minimax" style="--tp-color:#0a0a0a;">Minimax</button>
     <button class="tp-item" data-theme="nvidia" style="--tp-color:#76b900;">NVIDIA</button>
     <button class="tp-item" data-theme="spotify" style="--tp-color:#1ed760;">Spotify</button>
     <button class="tp-item" data-theme="tesla" style="--tp-color:#3e6ae1;">Tesla</button>
     <button class="tp-item" data-theme="airbnb" style="--tp-color:#ff385c;">Airbnb</button>
     <button class="tp-item" data-theme="airtable" style="--tp-color:#181d26;">Airtable</button>
     <button class="tp-item" data-theme="binance" style="--tp-color:#fcd535;">Binance</button>
-    <button class="tp-item" data-theme="bmw-m" style="--tp-color:#3c3c3c;">BMW M</button>
+    <button class="tp-item" data-theme="bmw-m" style="--tp-color:#ffffff;">BMW M</button>
     <button class="tp-item" data-theme="claude" style="--tp-color:#cc785c;">Claude</button>
     <button class="tp-item" data-theme="cursor" style="--tp-color:#f54e00;">Cursor</button>
     <button class="tp-item" data-theme="dell-1996" style="--tp-color:#e91d2a;">Dell 1996</button>
@@ -555,7 +555,7 @@ body, body * { transition: background-color 0.35s ease-out, color 0.35s ease-out
     <button class="tp-item" data-theme="ibm" style="--tp-color:#0f62fe;">IBM</button>
     <button class="tp-item" data-theme="nike" style="--tp-color:#111111;">Nike</button>
     <button class="tp-item" data-theme="notion" style="--tp-color:#5645d4;">Notion</button>
-    <button class="tp-item" data-theme="x.ai" style="--tp-color:#636363;">x.ai</button>
+    <button class="tp-item" data-theme="x.ai" style="--tp-color:#ffffff;">x.ai</button>
     <button class="tp-item" data-theme="zapier" style="--tp-color:#ff4f00;">Zapier</button>
   </div>
 </nav>
@@ -573,8 +573,8 @@ document.querySelector('.tp-panel').classList.remove('open');});});
 try{document.querySelector('.tp-btn-toggle').addEventListener('click',function(){
 document.querySelector('.tp-panel').classList.toggle('open');});
 }catch(e){}
-try{var mc=document.querySelector('.meteors-container');if(mc){for(var mi=0;mi<15;mi++){var m=document.createElement('div');m.className='meteor';m.style.setProperty('--angle',-215+'deg');m.style.left=Math.random()*innerWidth+'px';m.style.animationDelay=(Math.random()*1+0.2)+'s';m.style.animationDuration=(Math.floor(Math.random()*8+2))+'s';mc.appendChild(m);}}}catch(e){}
-try{document.addEventListener('keydown',function(e){if(e.key==='t'&&!e.ctrlKey&&!e.metaKey){i=(i+1)%t.length;d.dataset.theme=t[i];
+try{var mc=document.querySelector('.meteors-container');if(mc){for(var mi=0;mi<15;mi++){var m=document.createElement('div');m.className='meteor';m.style.setProperty('--angle',-215+'deg');m.style.left=Math.random()*window.innerWidth+'px';m.style.animationDelay=(Math.random()*1+0.2)+'s';m.style.animationDuration=(Math.floor(Math.random()*8+2))+'s';mc.appendChild(m);}}}catch(e){}
+try{document.addEventListener('keydown',function(e){if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')return;if(e.key==='t'&&!e.ctrlKey&&!e.metaKey){i=(i+1)%t.length;d.dataset.theme=t[i];
 try{localStorage.setItem('theme',t[i]);}catch(e){}
 document.querySelectorAll('.tp-item').forEach(function(x){x.classList.toggle('active',x.dataset.theme===t[i]);});}});
 }catch(e){}
@@ -582,13 +582,13 @@ try{document.addEventListener('click',function(e){if(!e.target.closest('.ui-tool
 document.querySelector('.tp-panel').classList.remove('open');}});
 }catch(e){}
 try{var tl=document.querySelector('.toc-list');var tocBtn=document.querySelector('.toc-btn');var to;function buildTOC(){if(!tl)return;var lang='zh';try{var ls=localStorage.getItem('lang');if(ls)lang=ls;}catch(e){}var allH2s=document.querySelectorAll('h2');var h2s=[];allH2s.forEach(function(h){if(!h.hasAttribute('data-lang')||h.dataset.lang===lang)h2s.push(h);});tl.innerHTML='';h2s.forEach(function(h,i){var li=document.createElement('li');li.className='toc-item';li.textContent=h.textContent;li.addEventListener('click',function(){h.scrollIntoView({behavior:'smooth'});document.querySelector('.toc-panel').classList.remove('open');});tl.appendChild(li);});if(to)to.disconnect();to=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){var idx=Array.from(h2s).indexOf(e.target);document.querySelectorAll('.toc-item').forEach(function(x,i){x.classList.toggle('active',i===idx);});}});},{rootMargin:'-80px 0px -60% 0px'});h2s.forEach(function(h){to.observe(h);});}if(tocBtn)tocBtn.addEventListener('click',function(){document.querySelector('.toc-panel').classList.toggle('open');});document.addEventListener('click',function(e){if(!e.target.closest('.ui-toolbar')&&!e.target.closest('.toc-panel')){document.querySelector('.toc-panel').classList.remove('open');}});buildTOC();}catch(e){}
-try{var la=['zh','en'];var li=la.indexOf(localStorage.getItem('lang'));if(li<0)li=0;var lb=document.querySelector('[data-lang-btn]');function sw(l){document.querySelectorAll('[data-lang]').forEach(function(x){x.classList.toggle('active',x.dataset.lang===l);});try{localStorage.setItem('lang',l);}catch(e){}if(lb){lb.textContent=l==='zh'?'中':'EN';}if(typeof buildTOC==='function')buildTOC();}sw(la[li]);if(lb){lb.addEventListener('click',function(){li=(li+1)%la.length;sw(la[li]);});}document.addEventListener('keydown',function(e){if(e.key==='l'&&!e.ctrlKey&&!e.metaKey){li=(li+1)%la.length;sw(la[li]);}});}catch(e){}
+try{var la=['zh','en'];var li=la.indexOf(localStorage.getItem('lang'));if(li<0)li=0;var lb=document.querySelector('[data-lang-btn]');function sw(l){document.querySelectorAll('[data-lang]').forEach(function(x){x.classList.toggle('active',x.dataset.lang===l);});try{localStorage.setItem('lang',l);}catch(e){}if(lb){lb.textContent=l==='zh'?'中':'EN';}if(typeof buildTOC==='function')buildTOC();}sw(la[li]);if(lb){lb.addEventListener('click',function(){li=(li+1)%la.length;sw(la[li]);});}document.addEventListener('keydown',function(e){if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')return;if(e.key==='l'&&!e.ctrlKey&&!e.metaKey){li=(li+1)%la.length;sw(la[li]);}});}catch(e){}
 try{document.querySelectorAll('.spotlight-card').forEach(function(c){c.addEventListener('mousemove',function(e){var r=c.getBoundingClientRect();c.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');c.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%');});});}catch(e){}
 try{var o=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)e.target.classList.add('in-view');});});
 document.querySelectorAll('[data-anim]').forEach(function(el){o.observe(el);});
 }catch(e){document.querySelectorAll('[data-anim]').forEach(function(el){el.style.opacity='1';el.style.transform='none';});}
 try{var s=document.querySelectorAll('h2');
-document.addEventListener('keydown',function(e){if((e.key==='ArrowRight'||e.key==='ArrowLeft')&&!e.ctrlKey&&!e.metaKey){e.preventDefault();
+document.addEventListener('keydown',function(e){if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')return;if((e.key==='ArrowRight'||e.key==='ArrowLeft')&&!e.ctrlKey&&!e.metaKey){e.preventDefault();
 var lang='zh';try{var ls=localStorage.getItem('lang');if(ls)lang=ls;}catch(e){}
 var h2s=[];s.forEach(function(h){if(!h.hasAttribute('data-lang')||h.dataset.lang===lang)h2s.push(h);});
 var c=h2s.findIndex(function(h){var r=h.getBoundingClientRect();return r.top>=0&&r.top<window.innerHeight/2;});

@@ -75,6 +75,7 @@ chart.setOption({
 
 ```html
 <!-- GeoJSON 必须通过 <script> 标签加载（file:// 协议下 fetch 不可用） -->
+<!-- libs/guangdong.js 格式：`window.__gdGeoJSON = {...GeoJSON...}` — 全局变量赋值 -->
 <script src="libs/guangdong.js"></script>
 <div id="gd-map" style="width:100%;height:600px;"></div>
 ```

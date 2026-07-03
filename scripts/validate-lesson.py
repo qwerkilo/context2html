@@ -12,6 +12,7 @@ from _validate_common import (
     check_svg_links, check_h1_count, check_relative_links,
     check_svg_contrast, check_focus_visible, check_tabular_nums,
     check_semantic_html, check_lib_deps, check_bilingual,
+    check_cross_refs, check_data_anim_syntax,
 )
 
 
@@ -70,14 +71,6 @@ def check_quiz_correct_count(html):
     return issues
 
 
-def check_data_anim_syntax(html):
-    valid = {"fade-up", "fade", "slide-left", "blur"}
-    bad = [a for a in re.findall(r'data-anim="([^"]+)"', html) if a not in valid]
-    if bad:
-        return [f"Invalid data-anim values: {set(bad)}"]
-    return []
-
-
 def check_container_width(html):
     m = re.search(r"\.container\s*\{[^}]*max-width:\s*(\d+)", html)
     if m:
@@ -120,10 +113,15 @@ def check_ppt_js(html):
             issues.append("Missing theme picker UI (.tp-btn-toggle / .tp-item elements)")
 
     has_sections = len(re.findall(r"<h2[^>]*>", html)) > 1
-    if has_sections and not re.search(
-        r"key\s*===?\s*['\"]Arrow(?:Right|Left)['\"]", html, re.IGNORECASE
-    ):
-        issues.append("Missing keyboard navigation JS (arrow key handler)")
+    if has_sections:
+        if not re.search(
+            r"key\s*===?\s*['\"]Arrow(?:Right|Left)['\"]", html, re.IGNORECASE
+        ):
+            issues.append("Missing keyboard navigation JS (arrow key handler)")
+        if not re.search(
+            r"data-lang-btn|key\s*===?\s*['\"]l['\"]", html, re.IGNORECASE
+        ):
+            issues.append("Missing language toggle (L key handler or [data-lang-btn])")
     return issues
 
 
@@ -391,6 +389,7 @@ def run_all(path):
             ("Semantic HTML elements", check_semantic_html(html)),
             ("Library deps (ECharts/Three.js)", check_lib_deps(html, base_dir)),
             ("Bilingual (data-lang zh/en + toggle)", check_bilingual(html)),
+            ("Chapter cross-refs use #chN anchors", check_cross_refs(html)),
             ("SPA integration (lesson-view section)", check_spa_integration(html, path)),
         ]
     else:

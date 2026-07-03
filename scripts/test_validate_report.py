@@ -243,13 +243,13 @@ class TestLibDeps:
         assert not vr.check_lib_deps(
             '<html><script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js">'
             '</script>echarts.init()</html>', '.')
-    def test_echarts_local_passes(self):
+    def test_echarts_local_missing_fails(self):
         assert len(vr.check_lib_deps('<html>echarts.init()</html>', 'C:\\nonexistent')) > 0
     def test_three_js_CDN_passes(self):
         assert not vr.check_lib_deps(
             '<html><script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js">'
             '</script>new THREE.Scene()</html>', '.')
-    def test_three_js_local_passes(self):
+    def test_three_js_local_missing_fails(self):
         assert len(vr.check_lib_deps('<html>new THREE.Scene()</html>', 'C:\\nonexistent')) > 0
     def test_echarts_no_lib_fails(self):
         assert len(vr.check_lib_deps('<html>echarts.init()</html>', 'C:\\nonexistent')) > 0
@@ -441,3 +441,66 @@ class TestGSAPComponent:
 
     def test_gsap_no_attr_skips(self):
         assert not vr.check_gsap_modes('<div>plain</div>')
+
+
+class TestD4Connectors:
+    def test_no_paragraphs_skips(self):
+        assert not vr.check_d4_connectors('<html></html>')
+
+    def test_clean_paragraph_passes(self):
+        html = '<p data-lang="zh">市场在增长。需求在上升。供给也在扩大。</p>'
+        assert not vr.check_d4_connectors(html)
+
+    def test_banned_starter_fails(self):
+        html = '<p data-lang="zh">此外，技术架构也需要升级。</p>'
+        assert len(vr.check_d4_connectors(html)) > 0
+
+    def test_multiple_banned_starters_fail(self):
+        html = ('<p data-lang="zh">首先，我们看市场规模。</p>'
+                '<p data-lang="zh">其次，分析竞争格局。</p>'
+                '<p data-lang="zh">最后，给出结论。</p>')
+        assert len(vr.check_d4_connectors(html)) > 0
+
+    def test_too_many_connectors_fails(self):
+        text = '因此，同时，此外，然而，但是，不过，所以，总之' * 10
+        html = f'<p data-lang="zh">{text}</p>'
+        assert len(vr.check_d4_connectors(html)) > 0
+
+
+class TestD1SentenceLength:
+    def test_no_paragraphs_skips(self):
+        assert not vr.check_d1_sentence_length('<html></html>')
+
+    def test_varied_lengths_passes(self):
+        html = '<p data-lang="zh">涨了。2024 年 AI 芯片市场冲到了 1200 亿美元——增速远超预期，所有头部厂商都在加码，供应链全线吃紧。</p>'
+        assert not vr.check_d1_sentence_length(html)
+
+    def test_mid_only_sentences_fails(self):
+        html = '<p data-lang="zh">市场规模在不断扩大。竞争格局也在变化。技术路线开始分化。</p>'
+        assert len(vr.check_d1_sentence_length(html)) > 0
+
+
+class TestD5TermVariety:
+    def test_no_paragraphs_skips(self):
+        assert not vr.check_d5_term_variety('<html></html>')
+
+    def test_clean_text_passes(self):
+        html = '<p data-lang="zh">市场增长很快。技术迭代不断。竞争格局清晰。</p>'
+        assert not vr.check_d5_term_variety(html)
+
+    def test_overused_terms_fails(self):
+        text = '这个重要趋势非常重要，具有重要战略意义。这是重要的行业发展方向。'
+        html = f'<p data-lang="zh">{text}</p>'
+        assert len(vr.check_d5_term_variety(html)) > 0
+
+
+class TestDataAnimSyntax:
+    def test_valid_values_pass(self):
+        assert not vr.check_data_anim_syntax('<div data-anim="fade-up"></div>')
+        assert not vr.check_data_anim_syntax('<div data-anim="fade"></div>')
+        assert not vr.check_data_anim_syntax('<div data-anim="slide-left"></div>')
+        assert not vr.check_data_anim_syntax('<div data-anim="blur"></div>')
+    def test_invalid_value_fails(self):
+        assert len(vr.check_data_anim_syntax('<div data-anim="zoom-in"></div>')) > 0
+    def test_no_data_anim_skips(self):
+        assert not vr.check_data_anim_syntax('<div>plain</div>')

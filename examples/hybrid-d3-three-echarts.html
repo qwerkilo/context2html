@@ -12,7 +12,7 @@
 <script>if(typeof THREE==='undefined')document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>')</script>
 <script>if(typeof echarts==='undefined')document.write('<script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"><\/script>')</script>
 <style>
-:root{--bg:#faf9f7;--text:#1a1a1a;--accent:#c0392b;--surface:#f5f0eb;--border:#ddd8d0;--muted:#888;--radius:8px;--font:"Noto Serif CJK SC",Georgia,serif}
+:root{--bg:#faf9f7;--text:#1a1a1a;--accent:#c0392b;--surface:#f5f0eb;--border:#ddd8d0;--muted:#888;--success:#2ecc71;--radius:8px;--font:"Noto Serif CJK SC",Georgia,serif;--chart-1:#c0392b;--chart-2:#e67e22;--chart-3:#2980b9;--chart-4:#27ae60}
 body{font-family:var(--font);background:var(--bg);color:var(--text);max-width:960px;margin:0 auto;padding:2rem;-webkit-font-smoothing:antialiased}
 h1{border-bottom:2px solid var(--accent);padding-bottom:.5em}
 h2{margin-top:2em}
@@ -45,6 +45,7 @@ p{color:var(--muted);font-size:.9rem;margin:.5em 0}
 <noscript><p style="text-align:center;padding:2rem;">需要 JavaScript</p></noscript>
 
 <script>
+function gv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
 /* ===== 工具：页面内错误显示 ===== */
 function showError(id, msg) {
   var el = document.getElementById(id);
@@ -150,7 +151,7 @@ function showError(id, msg) {
       series:cats.map(function(c,i){return{
         name:c,type:'bar',stack:'total',emphasis:{focus:'series'},
         data:echartData.map(function(d){return d[c];}),
-        itemStyle:{color:['#e74c3c','#3498db','#2ecc71'][i]}
+        itemStyle:{color:[gv('--chart-1'),gv('--chart-3'),gv('--chart-4')][i]}
       };})
     });
     window.addEventListener('resize',function(){chart.resize();});
@@ -207,7 +208,7 @@ function showError(id, msg) {
       series:[{
         type:'line',data:data.map(function(d){return parseFloat(d.val.toFixed(1));}),
         smooth:true,lineStyle:{width:3},areaStyle:{opacity:0.15},
-        itemStyle:{color:'#3498db'},
+        itemStyle:{color:gv('--chart-3')},
         markPoint:{data:[{type:'max',name:'最高'},{type:'min',name:'最低'}]}
       }]
     });

@@ -77,7 +77,7 @@ powershell -ExecutionPolicy Bypass -File templates/start-server.ps1
 2. **结构规划** — 设计章节大纲（推荐 3-6 章）、关键发现摘要（3-5 条）、标记可视化数据点
 3. **组件选择** — 按 `references/decision-guide.md` 矩阵选型，对比分析优先 ECharts #26 交互式图表，次选 HTML 对比表 #5/#22，每 500 字 ≥1 视觉元素
 4. **HTML 生成** — 从 `templates/report-starter.html` 复制骨架，填充中英双语正文，合并组件 CSS/JS
-5. **验证输出** — run `scripts/validate-report.py`，20 项检查全通过后交付。对比表响应式堆叠、内联 SVG 对比、ECharts 依赖路径、英文布局（overflow-wrap + table-layout:fixed）、ECharts Canvas 颜色用法、GSAP data-gsap 模式验证均已覆盖
+5. **验证输出** — run `scripts/validate-report.py`，**22 项硬性检查 + 3 项人类化建议（warning）** 全通过后交付。对比表响应式堆叠、内联 SVG 对比、ECharts 依赖路径、英文布局（overflow-wrap + table-layout:fixed）、ECharts Canvas 颜色用法、GSAP data-gsap 模式验证、章节交叉引用 `#chN`、data-anim 语法、D1 句长交替、D4 连接词控制、D5 术语变体均已覆盖
 
 ## 项目结构
 
@@ -92,11 +92,12 @@ powershell -ExecutionPolicy Bypass -File templates/start-server.ps1
 │   ├── timeline-horizontal.svg  SVG 模板——水平时间线
 │   └── start-server.ps1/.sh     本地 HTTP 服务器启动脚本
 ├── scripts/
-│   ├── _validate_common.py      共享验证核心（10 个共享 check_* 函数）
-│   ├── validate-report.py       报告验证脚本（20 项检查）
+│   ├── _validate_common.py      共享验证核心（12 个共享 check_* 函数）
+│   ├── validate-report.py       报告验证脚本（22 硬性 + 3 warning）
 │   ├── validate-lesson.py       课程验证脚本（继承共享核心 + 课程专有检查）
-│   ├── test_validate_report.py  报告验证测试（127 tests）
-│   ├── test_validate_lesson.py  课程验证测试（106 tests）
+│   ├── test_validate_report.py  报告验证测试（141 tests）
+│   ├── test_validate_lesson.py  课程验证测试（107 tests）
+│   ├── test_generate_theme_css.py  主题 CSS 测试（22 tests）
 │   └── generate-theme-css.py    从 teach_more_pic DESIGN.md 自动生成主题 CSS（20 主题）
 ├── theme/
 │   ├── report-themes.css        20 主题 CSS（自动生成，含 --chart-* / --shadow-* / --table-* 等 25+ CSS 变量）
@@ -135,17 +136,19 @@ powershell -ExecutionPolicy Bypass -File templates/start-server.ps1
 
 所有效果适配 CSS 变量（`var(--accent)`、`var(--surface)` 等），自动跟随主题切换。
 
-## 人类化维度（D1-D5）
+## 人类化维度（D1-D5，自动化检查）
 
 报告正文默认执行人类化写作约束（SKILL.md 中完整定义）：
 
-| 维度 | 约束 | 检测指标 |
+| 维度 | 约束 | 自动化检查位置 |
 |------|------|---------|
-| D1-句长分布 | 每段 ≤10 字短句 + ≥35 字长句各 ≥1 | 句长多峰分布（非 15-25 单峰） |
-| D2-段落结构 | 相邻段落使用不同结构模板（5 种轮换） | 结构相似度 < 0.5 |
-| D3-信息密度 | 连续两段密度差 ≥ 15%，高-低-高交替 | 密度波动 40%-85% |
-| D4-连接词 | ≤6 个/千字，禁止段首 AI 高频词 | 连接词密度低且聚集 |
-| D5-术语变体 | 每 800 字 ≥ 1 处同义学术替代 | 术语匹配度非 100% |
+| D1-句长分布 | 每段 ≤10 字短句 + ≥35 字长句各 ≥1 | `validate-report.py:check_d1_sentence_length`（warning） |
+| D2-段落结构 | 相邻段落使用不同结构模板（5 种轮换） | 人工检查（参考 `references/humanize_matrix.md`） |
+| D3-信息密度 | 连续两段密度差 ≥ 15%，高-低-高交替 | 人工检查 |
+| D4-连接词 | ≤6 个/千字，禁止段首 AI 高频词 | `validate-report.py:check_d4_connectors`（warning） |
+| D5-术语变体 | 每 800 字 ≥ 1 处同义学术替代 | `validate-report.py:check_d5_term_variety`（warning） |
+
+D1/D4/D5 三项已实现为 warning 级自动化检查（不阻断构建但提示需修复）。D2/D3 仍需人工 review。
 
 ## 依赖
 

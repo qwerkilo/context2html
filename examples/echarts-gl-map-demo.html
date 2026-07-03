@@ -9,7 +9,7 @@
 <script src="../libs/echarts-gl.min.js"></script>
 <script src="../libs/guangdong.js"></script>
 <style>
-:root{--bg:#faf9f7;--text:#1a1a1a;--accent:#3498db;--surface:#f5f0eb;--radius:8px;--font:"Noto Serif CJK SC",Georgia,serif}
+:root{--bg:#faf9f7;--text:#1a1a1a;--accent:#3498db;--surface:#f5f0eb;--muted:#888;--success:#2ecc71;--warning:#f39c12;--error:#e74c3c;--radius:8px;--font:"Noto Serif CJK SC",Georgia,serif;--chart-1:#3498db;--chart-2:#2ecc71;--chart-3:#f39c12;--chart-4:#e74c3c}
 body{font-family:var(--font);background:var(--bg);color:var(--text);max-width:960px;margin:0 auto;padding:2rem;-webkit-font-smoothing:antialiased}
 h1{border-bottom:2px solid var(--accent);padding-bottom:.5em}
 h2{margin-top:2em}
@@ -35,6 +35,7 @@ window.onerror = function(msg, url, line){
 </script>
 
 <script>
+function gv(n){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()}
 (function(){
   var el = document.getElementById('gd-map');
   var status = document.getElementById('load-status');
@@ -76,7 +77,7 @@ window.onerror = function(msg, url, line){
         min: 0.1,
         max: 3.5,
         text: ['高', '低'],
-        inRange: { color: ['#3498db','#2ecc71','#f39c12','#e74c3c'] },
+        inRange: { color: [gv('--chart-1'),gv('--chart-2'),gv('--warning'),gv('--chart-4')] },
         left: 'left', bottom: 20,
         seriesIndex: 0
       },
@@ -90,10 +91,10 @@ window.onerror = function(msg, url, line){
           borderColor: 'rgba(255,255,255,0.4)',
           borderWidth: 0.5
         },
-        label: { show: true, color: '#1a1a1a', fontSize: 9 },
+        label: { show: true, color: gv('--text'), fontSize: 9 },
         emphasis: {
-          label: { fontSize: 13, color: '#c0392b' },
-          itemStyle: { areaColor: '#c0392b' }
+          label: { fontSize: 13, color: gv('--accent') },
+          itemStyle: { areaColor: gv('--accent') }
         },
         viewControl: {
           autoRotate: true, autoRotateSpeed: 5,

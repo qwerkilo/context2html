@@ -525,7 +525,7 @@ def main():
             themes.append(meta)
             print(f'  [MANUAL] {td}/ — {c["accent"]}')
         else:
-            print(f'  [WARN] {td}/ — no YAML front matter found')
+            print(f'  [WARN] {td}/ — DESIGN.md has no YAML front matter AND no MANUAL_THEMES entry — theme SKIPPED. Add YAML or extend MANUAL_THEMES dict.')
 
     # 写入 CSS
     css_header = '''/* ===== context2html — Report Themes ===== */

@@ -2,24 +2,28 @@
 
 ## What this is
 
-Sub-skill augmenting **teach_more_pic**. Both loaded via `Skills:`. 29 visual components in `components/` are local copies from teach_more_pic (+ 1 custom, #30 GSAP) — editable here. Differentiator: report workflow (not course), 20 brand themes, bilingual, D1-D5 humanization.
+Sub-skill augmenting **teach_more_pic**. Both loaded via `Skills:`. 30 visual components in `components/` are local copies from teach_more_pic (+ 1 custom, #30 GSAP) — editable here. Differentiator: report workflow (not course), 20 brand themes, bilingual, D1-D5 humanization.
 
 **SKILL.md is the workflow document** (Step 0-5 + Step 2.5 humanize sub-step with STOP checkpoint before HTML generation).
 
+## Vanilla JS only
+
+**No JS frameworks.** No React/Vue/Svelte/jQuery/Alpine. Template uses ES5 IIFE + try/catch wrapping for maximum browser compatibility. All app logic is inline `<script>`, no external modules. Pre-downloaded libraries (ECharts, D3, Three.js, GSAP) go in `libs/` loaded via `<script src>` tags. Do NOT introduce build tools, bundlers, or framework runtimes.
+
 ## No build system
 
-Pure HTML/CSS/JS. No package.json, no npm. Open directly in browser after generation. `libs/` has offline ECharts/Three.js/D3 packages.
+Pure HTML/CSS/JS. No package.json, no npm. Open directly in browser after generation.
 
 ## Commands
 
 ```bash
-# All tests (pytest, 255 tests across 3 files)
+# All tests (270 tests across 3 files)
 python -m pytest scripts/test_validate_report.py scripts/test_validate_lesson.py scripts/test_generate_theme_css.py -v --tb=short
 
-# Same via helper script (also validates report-starter.html + demo report)
-powershell -ExecutionPolicy Bypass -File scripts/run-tests.ps1
+# Or just `pytest` (works directly, no python -m needed when pytest is on PATH)
+pytest scripts/test_validate_report.py -v --tb=short
 
-# Validate a report (20 checks). Paths resolved relative to report HTML directory.
+# Validate a report (22 hard checks + 3 humanization warnings). Paths resolved relative to report HTML directory.
 python scripts/validate-report.py path/to/report.html
 
 # Regenerate theme CSS from theme/*/DESIGN.md
@@ -32,6 +36,7 @@ powershell -ExecutionPolicy Bypass -File templates/start-server.ps1   # Windows
 
 ## Hard constraints
 
+- **Vanilla JS** — no frameworks, no build tools, no bundlers
 - **Bilingual** — every content block needs `data-lang="zh"` + `data-lang="en"`. L key toggles.
 - **Template-based** — always copy `templates/report-starter.html`. Never start from scratch (loses CSS variable system, toolbar, keyboard nav).
 - **Visual density** — ≥1 component per 500 words. `references/decision-guide.md` for selection.
@@ -50,7 +55,7 @@ Rules in SKILL.md §2.5 + `references/humanize_matrix.md`. Failure modes agents 
 ## Gotchas
 
 - **Theme CSS is auto-generated** (`theme/report-themes.css`). Never hand-edit. Re-run `generate-theme-css.py` after teach_more_pic DESIGN.md changes.
-- **Two manual themes** — `spotify` and `tesla` have no YAML front matter. Handled via `MANUAL_THEMES` dict in generate-theme-css.py.
+- **Two manual themes** — `spotify` and `tesla` have NO YAML front matter in their DESIGN.md, so `generate-theme-css.py` falls back to the `MANUAL_THEMES` dict at the top of the script. **Editing their DESIGN.md will have no effect on the generated CSS** — edit `MANUAL_THEMES` instead. All other 18 themes are generated from `theme/*/DESIGN.md` YAML front matter.
 - **Template `<link>` path** — `report-starter.html` uses `<link href="../theme/report-themes.css">`. Adjust or inline when distributing standalone.
 - **Three.js WebGPU first** — component #27 uses `importmap` + `type="module"` for WebGPU, falls back to UMD `libs/three.min.js` for WebGL. Both patterns must be included.
 - **Copy `libs/` alongside report** — validator checks both `libs/<lib>.min.js` existence AND `<script src="libs/...">` path resolution.
@@ -62,6 +67,7 @@ Rules in SKILL.md §2.5 + `references/humanize_matrix.md`. Failure modes agents 
 - **Bilingual block-level elements** — `[data-lang].active` default is `display: inline`. Overrides exist for h1/h2/p/div/section/article/aside/td/th/cover-badge PLUS pre/blockquote/figure/ul/ol/li. If adding a new block-level element with `data-lang`, add it to the override chain.
 - **`examples/report-themes.html` is NOT a valid report** — it's a theme preview page and will fail `validate-report.py`. Use `examples/0001-demo-report.html` for smoke tests.
 - **Git push** — remote uses SSH key `/root/.ssh/id_rsa_teach` (opencode-teach-sync). `~/.ssh/config` already configured for `github.com`.
+- **`docs/` is gitignored** — `.gitignore` excludes `docs/`. Agent skill config files there won't be tracked.
 - `results.tsv` and `test-prompts.json` — update after darwin-skill optimization runs.
 
 ## Agent skills

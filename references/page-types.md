@@ -196,27 +196,59 @@ description: 报告模板中可用的 9 种页面类型及完整代码示例
 
 ```javascript
 // 模板内置 — 自动编号目录逻辑
-var tocList = document.querySelector('.toc-list');
-if (tocList) {
-  var headings = document.querySelectorAll('h2[data-lang]');
-  headings.forEach(function(h, i) {
+var tl = document.querySelector('.toc-list');         // 浮动面板的 <ul>
+var tocBtn = document.querySelector('.toc-btn');        // 工具栏触发按钮
+var to;                                                  // IntersectionObserver 实例
+function buildTOC() {
+  if (!tl) return;
+  var lang = 'zh';
+  try { var ls = localStorage.getItem('lang'); if (ls) lang = ls; } catch (e) {}
+
+  var allH2s = document.querySelectorAll('h2');
+  var h2s = [];
+  allH2s.forEach(function (h) {
+    // 收集当前语言的 h2（无 data-lang 的标题也收集）
+    if (!h.hasAttribute('data-lang') || h.dataset.lang === lang) {
+      h2s.push(h);
+    }
+  });
+  tl.innerHTML = '';
+  h2s.forEach(function (h) {
     var li = document.createElement('li');
     li.className = 'toc-item';
     li.textContent = h.textContent;
-    li.addEventListener('click', function() {
+    li.addEventListener('click', function () {
       h.scrollIntoView({ behavior: 'smooth' });
+      document.querySelector('.toc-panel').classList.remove('open');
     });
-    tocList.appendChild(li);
+    tl.appendChild(li);
   });
+
+  // 滚动时高亮当前章节
+  if (to) to.disconnect();
+  to = new IntersectionObserver(function (es) {
+    es.forEach(function (e) {
+      if (e.isIntersecting) {
+        var idx = Array.from(h2s).indexOf(e.target);
+        document.querySelectorAll('.toc-item').forEach(function (x, i) {
+          x.classList.toggle('active', i === idx);
+        });
+      }
+    });
+  }, { rootMargin: '-80px 0px -60% 0px' });
+  h2s.forEach(function (h) { to.observe(h); });
 }
+// 切换语言时重建（sw() 内部调用 buildTOC）
+buildTOC();
 ```
 
 **规则：**
-- JS 扫描 DOM 中所有 `<h2>` 元素，读取其 `data-lang` 属性
-- 只显示与当前选中语言匹配的标题（切换语言时自动重建）
-- 每个标题作为一个 `toc-item` 插入浮动面板
-- 点击条目平滑滚动到对应 `<h2>` 位置
-- 滚动时 `IntersectionObserver` 高亮当前可见章节
+- JS 扫描 DOM 中所有 `<h2>` 元素
+- 只显示与**当前选中语言**匹配的标题（无 `data-lang` 属性的标题也保留）
+- 切换语言时**重新构建**目录（`sw(l)` 触发 `buildTOC()`）
+- 每个标题作为 `toc-item` 插入浮动面板
+- 点击条目平滑滚动到对应 `<h2>`，并关闭浮动面板
+- 滚动时 `IntersectionObserver`（`rootMargin: -80px 0px -60% 0px`）高亮当前可见章节
 
 > **注意：** `<h2>` 的文本内容决定了目录项的文字。请确保每个 `<h2>` `data-lang="zh"` 和 `data-lang="en"` 填写完整可读的章节名。
 

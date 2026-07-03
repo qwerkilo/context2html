@@ -20,8 +20,11 @@ def check_svg_links(html, base_dir):
     svgs = set(re.findall(r'<img[^>]*src="([^"]+\.svg(?:[?#][^"]*)?)"', html))
     svgs.update(re.findall(r'<img[^>]*src=\'([^\']+\.svg(?:[?#][^\']*)?)\'', html))
     svgs.update(re.findall(r'<object[^>]*data="([^"]+\.svg(?:[?#][^"]*)?)"', html))
+    svgs.update(re.findall(r'<object[^>]*data=\'([^\']+\.svg(?:[?#][^\']*)?)\'', html))
     svgs.update(re.findall(r'<iframe[^>]*src="([^"]+\.svg(?:[?#][^"]*)?)"', html))
+    svgs.update(re.findall(r'<iframe[^>]*src=\'([^\']+\.svg(?:[?#][^\']*)?)\'', html))
     svgs.update(re.findall(r'<source[^>]*src="([^"]+\.svg(?:[?#][^"]*)?)"', html))
+    svgs.update(re.findall(r'<source[^>]*src=\'([^\']+\.svg(?:[?#][^\']*)?)\'', html))
     for src in svgs:
         if src.startswith(('http://', 'https://', 'data:')):
             continue
@@ -119,7 +122,7 @@ def check_lib_deps(html, base_dir):
         if not has_local and not has_cdn:
             issues.append("ECharts usage found but no libs/echarts.min.js or CDN link")
         issues.extend(_check_local_script_paths(html, base_dir, "echarts"))
-    if re.search(r'bar3D|scatter3D|map3D|[\'\"]globe[\'\"]|\'surface\'', html) or 'echarts-gl' in html:
+    if re.search(r'bar3D|scatter3D|map3D|[\'\"]globe[\'\"]|[\'\"]surface[\'\"]', html) or 'echarts-gl' in html:
         has_gl = os.path.exists(os.path.join(base_dir, "libs", "echarts-gl.min.js"))
         if not has_gl:
             issues.append("ECharts GL usage found but no libs/echarts-gl.min.js")
@@ -156,7 +159,11 @@ def check_bilingual(html):
     has_zh = 'data-lang="zh"' in html
     has_en = 'data-lang="en"' in html
     has_toggle = 'data-lang-btn' in html
-    has_l_key = "key==='l'" in html or 'key==="l"' in html
+    # Accept: key==='l', key==="l", e.key==='l', e.key === 'l' (with optional spaces)
+    has_l_key = bool(re.search(
+        r"(?:e\.?key|e\.?key\s*===?\s*)['\"]l['\"]",
+        html, re.IGNORECASE
+    )) or "key==='l'" in html or 'key==="l"' in html
 
     if not has_zh and not has_en:
         return []
@@ -171,6 +178,29 @@ def check_bilingual(html):
         issues.append("Missing L key handler for language switching")
 
     return issues
+
+
+def check_cross_refs(html):
+    """Check that chapter cross-references use canonical #chN format."""
+    bad_refs = []
+    for ref in re.findall(r'href="#([^"#?]+)"', html):
+        if re.match(r'^(?:ch\d+\D|chapter[\d-])', ref, re.IGNORECASE):
+            bad_refs.append(ref)
+    if bad_refs:
+        return [f"Non-canonical chapter refs (expected #chN where N is a number): {', '.join(bad_refs)}"]
+    return []
+
+
+_VALID_DATA_ANIM = {'fade-up', 'fade', 'slide-left', 'blur'}
+
+
+def check_data_anim_syntax(html):
+    """Check that all data-anim values are valid CSS-recognized values."""
+    bad = [a for a in re.findall(r'data-anim="([^"]+)"', html)
+           if a not in _VALID_DATA_ANIM]
+    if bad:
+        return [f"Invalid data-anim values: {set(bad)} (valid: {', '.join(sorted(_VALID_DATA_ANIM))})"]
+    return []
 
 
 def check_gsap_modes(html):

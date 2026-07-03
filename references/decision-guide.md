@@ -204,7 +204,7 @@ ceil(总字数 / 500) = 报告最少组件数
 
 ## 交付前验证清单
 
-生成报告 HTML 后，必须通过 `python scripts/validate-report.py path/to/report.html` 验证。以下是验证器检查的 17 项：
+生成报告 HTML 后，必须通过 `python scripts/validate-report.py path/to/report.html` 验证。以下是验证器检查的 22 项硬性检查 + 3 项人类化建议（warning，不计入失败）：
 
 | # | 检查项 | 失败时处理 |
 |---|--------|-----------|
@@ -224,7 +224,14 @@ ceil(总字数 / 500) = 报告最少组件数
 | 14 | `theme/report-themes.css` 被引用且文件存在 | 在 `<head>` 中添加 `<link>` 引用，确认文件复制到目标位置 |
 | 15 | `.bar-fill` width 不超过 100% | 检查条形图数据值，修正超过 100% 的设置 |
 | 16 | `.cmp-table` 在 ≤700px 屏幕下有响应式规则 | 在 `<style>` 中添加 `@media (max-width: 700px)` 规则覆盖 `.cmp-table` |
-| 17 | 章节交叉引用使用 `#chN` 锚点 | 把 `href="#chapter-name"` 改为 `href="#chN"` |
+| 17 | 英文排版（overflow-wrap + table-layout:fixed） | 在 body 中加 `overflow-wrap: break-word`；`.cmp-table` 加 `table-layout: fixed` |
+| 18 | ECharts 不使用 `var()` 直接设色 | 用 `gv('--xxx')` 辅助函数替代 `var(--xxx)` |
+| 19 | 章节交叉引用使用 `#chN` 锚点 | 把 `href="#chapter-name"` 改为 `#chN` |
+| 20 | GSAP `data-gsap` 模式值有效 | 仅允许 fade/stagger/parallax/flip/zoom |
+| 21 | `data-anim` 语法有效 | 仅允许 fade-up/fade/slide-left/blur |
+| — | **D1 句长交替（warning）** | 每段混入 ≤10 字短句 1-2 + ≥35 字长句 1-2 |
+| — | **D4 连接词控制（warning）** | 段落开头禁用"首先/其次/值得注意的是"；≤6 个/千字 |
+| — | **D5 术语变体（warning）** | 每 800 字替换同义术语（"重要"→"关键/绕不开/真正"） |
 
 ## 视觉设计纪律
 
