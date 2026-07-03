@@ -69,9 +69,19 @@ class TestBilingual:
     def test_single_lang_with_toggle_fails(self):
         assert len(vr.check_bilingual(
             '<html><span data-lang="zh">中</span><button data-lang-btn></button>key==="l"</html>')) > 0
+    def test_unbalanced_pairs_fails(self):
+        assert len(vr.check_bilingual(
+            '<html><p data-lang="zh">A</p><p data-lang="zh">B</p>'
+            '<p data-lang="en">A</p>'
+            '<button data-lang-btn></button>key==="l"</html>')) > 0
+    def test_balanced_pairs_passes(self):
+        assert not vr.check_bilingual(
+            '<html><p data-lang="zh">A</p><p data-lang="zh">B</p>'
+            '<p data-lang="en">A</p><p data-lang="en">B</p>'
+            '<button data-lang-btn></button>key==="l"</html>')
 
 
-class TestThemeCSS:
+
     def test_link_present_passes(self):
         assert not vr.check_theme_css('<link href="theme/report-themes.css" rel="stylesheet">')
     def test_missing_link_fails(self):

@@ -183,6 +183,20 @@ def check_bilingual(html):
     if not has_l_key:
         issues.append("Missing L key handler for language switching")
 
+    # Count zh/en occurrences to detect unbalanced pairs
+    # Exclude data-lang on <html> tag (page language, not bilingual content)
+    zh_count = len(re.findall(r'data-lang="zh"', html))
+    en_count = len(re.findall(r'data-lang="en"', html))
+    if re.search(r'<html[^>]*data-lang="zh"', html):
+        zh_count -= 1
+    if re.search(r'<html[^>]*data-lang="en"', html):
+        en_count -= 1
+    if has_zh and has_en and zh_count != en_count:
+        issues.append(
+            f"Unbalanced bilingual pairs: {zh_count} zh vs {en_count} en "
+            "(each content block must have both language versions)"
+        )
+
     return issues
 
 
