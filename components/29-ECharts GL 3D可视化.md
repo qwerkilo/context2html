@@ -1,5 +1,7 @@
 ### 29. ECharts GL 3D 可视化
 
+> **🎯 效果**：WebGL 3D 图表——3D 柱状图、3D 散点图、3D 地球/地图、3D 曲面图。Canvas/JS 渲染，无需 CSS。需 `libs/echarts-gl.min.js`。
+
 > 本组件无 CSS 代码块 —— ECharts GL 全部通过 Canvas/JS 渲染，无需独立 CSS。
 
 基于 ECharts GL 扩展库，在标准 ECharts 基础上增加 WebGL 3D 渲染能力。支持 3D 柱状图、3D 散点图、3D 地球/地图和 3D 曲面图。

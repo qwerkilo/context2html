@@ -10,7 +10,8 @@
 body { font-family: "Noto Serif CJK SC", Georgia, serif; background: var(--bg); color: var(--text); line-height: 1.8; max-width: 720px; margin: 3rem auto; padding: 0 1.5rem; }
 h1 { font-size: 1.6rem; border-bottom: 1px solid #ddd; padding-bottom: 0.5em; }
 
-.quote-card { display: flex; gap: 1em; margin: 1.5rem 0; background: var(--bg); border-radius: var(--radius, 8px); padding: 1.2em; }
+.quote-card { display: flex; gap: 1em; margin: 1.5rem 0; background: var(--bg); border-radius: var(--radius, 8px); padding: 1.2em; transition: box-shadow 0.2s ease-out, transform 0.2s ease-out; }
+.quote-card:hover { box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.1)); transform: translateY(-1px); }
 .qc-bar { width: 4px; flex-shrink: 0; background: var(--accent); border-radius: 2px; }
 .qc-body { flex: 1; }
 .qc-text { font-size: 1rem; font-style: italic; line-height: 1.7; color: var(--text); margin: 0; }

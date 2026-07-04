@@ -1,6 +1,6 @@
 ### 25. 现代浏览器 API 组件（原生折叠 / 原生模态 / 幻灯片 / Popover）
 
-利用现代浏览器（Chrome/Edge/Safari/Firefox）原生支持的 HTML5 API，实现零 JS 依赖或极少 JS 的组件。
+> **🎯 效果**：零 JS 或极少 JS，利用 `<details>/<summary>`、`<dialog>`、CSS `scroll-snap`、Popover API 等原生 HTML5 能力。兼容 Chrome/Edge/Safari/Firefox 现代版本。
 
 #### 25a. 原生折叠（`<details><summary>`）
 

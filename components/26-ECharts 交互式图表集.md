@@ -1,6 +1,6 @@
 ### 26. ECharts 交互式图表集
 
-替代原 #24（纯 CSS/SVG 图表）。使用 Apache ECharts 渲染，支持交互式悬浮提示、自适应缩放。
+> **🎯 效果**：Apache ECharts 渲染的高质量交互式图表，支持悬浮提示（tooltip）、自适应缩放（resize）、4 种图表——柱状图 / 饼图 / 折线图 / 堆叠面积图。颜色通过 `gv('--accent')` 读取 CSS 变量跟随主题。需 `libs/echarts.min.js`。
 
 #### 前置依赖
 

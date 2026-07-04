@@ -1,6 +1,8 @@
 ### 7. PPT 质感增强（纵向滚读 + 动画 + 主题切换）
 
-在保持纵向滚读结构的基础上，添加 PPT 级的视觉品质。以下三个能力已内置在 report-starter.html 的模板中（CSS + JS）。
+> **🎯 效果**：20 主题切换（T 键循环 + 工具栏面板 + localStorage 持久化）、滚动入场动画（fade-up / fade / slide-left / blur 四种模式）、← → 键章节导航、浮动 TOC。所有能力内置在 `report-starter.html` 模板中。
+
+在保持纵向滚读结构的基础上，添加 PPT 级的视觉品质。以下能力已内置在模板中（CSS + JS）。
 
 #### 7.1 主题切换（T 键 + localStorage 持久化）
 

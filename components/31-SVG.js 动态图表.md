@@ -1,6 +1,6 @@
 ### 31. SVG.js 动态图表
 
-基于 [SVG.js v3](https://svgjs.dev/) 的轻量级 SVG 操作库（~78KB minified）。链式 API、内置动画、CSS 变量继承。
+> **🎯 效果**：基于 SVG.js v3（78KB minified）的链式 API 动态 SVG 图表——纵向柱状图、多系列折线图、流程图、进度环。内置 `element.animate()` 逐帧缓动动画，CSS 变量继承跟随主题。
 
 **何时用 SVG.js：**
 - 需要**自定义视觉风格**的 SVG 图（流程图、关系图、动画演示）

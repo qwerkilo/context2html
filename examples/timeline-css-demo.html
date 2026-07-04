@@ -13,8 +13,9 @@ h1 { font-size: 1.6rem; border-bottom: 1px solid #ddd; padding-bottom: 0.5em; }
 .timeline { position: relative; padding: 1em 0; margin: 1.5rem 0; }
 .timeline::before { content: ''; position: absolute; left: 18px; top: 0; bottom: 0; width: 2px; background: #d0d0d0; }
 .tl-item { position: relative; padding: 0.6em 0 0.6em 3em; }
-.tl-dot { position: absolute; left: 10px; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); border: 3px solid var(--bg); z-index: 1; }
+.tl-dot { position: absolute; left: 10px; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); border: 3px solid var(--bg); z-index: 1; transition: box-shadow 0.2s ease, transform 0.2s ease; }
 .tl-dot.major { width: 22px; height: 22px; left: 8px; }
+.tl-item:hover .tl-dot { box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent); transform: scale(1.15); }
 .tl-date { font-size: 0.8rem; font-weight: 700; color: var(--accent); }
 .tl-desc { font-size: 0.9rem; margin-top: 0.1em; }
 </style>

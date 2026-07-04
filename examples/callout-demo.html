@@ -10,7 +10,8 @@
 body { font-family: "Noto Serif CJK SC", Georgia, serif; background: var(--bg); color: var(--text); line-height: 1.8; max-width: 720px; margin: 3rem auto; padding: 0 1.5rem; }
 h1 { font-size: 1.6rem; border-bottom: 1px solid #ddd; padding-bottom: 0.5em; }
 
-.callout { display: flex; gap: 0.8em; padding: 0.8em 1em; border-radius: var(--radius, 8px); border-left: 4px solid; margin: 1.5rem 0; }
+.callout { display: flex; gap: 0.8em; padding: 0.8em 1em; border-radius: var(--radius, 8px); border-left: 4px solid; margin: 1.5rem 0; transition: box-shadow 0.2s ease; }
+.callout:hover { box-shadow: var(--shadow-sm, 0 1px 3px rgba(0,0,0,0.08)); }
 .callout-info { background: #eff6ff; border-left-color: #2563eb; }
 .callout-warning { background: #fff7ed; border-left-color: #d97706; }
 .callout-error { background: #fef2f2; border-left-color: #dc2626; }

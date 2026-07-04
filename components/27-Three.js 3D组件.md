@@ -1,6 +1,6 @@
 ### 27. Three.js 3D 组件
 
-使用 Three.js 在报告中渲染 3D 场景，适合展示地理/贸易网络、三维数据可视化、结构/架构图。
+> **🎯 效果**：Three.js r185 WebGPU/WebGL 双后端 3D 渲染，支持地理/贸易网络、三维数据可视化、结构/架构图。自动检测 `navigator.gpu` 决定使用 WebGPU 还是回退 WebGL。
 
 #### 渲染后端策略
 

@@ -1,6 +1,6 @@
 ### 30. GSAP 滚动动画集
 
-基于 GSAP + ScrollTrigger 的滚动触发动画合集，支持 5 种模式。
+> **🎯 效果**：基于 GSAP + ScrollTrigger 的 5 种滚动触发动画（fade / stagger / parallax / flip / zoom）。桌面端 `libs/` 离线加载，移动端 CDN 降级。每个模式独立触发，ease-out 缓动。
 
 桌面端优先加载 `libs/` 离线包（无网络依赖），移动端自动切换 CDN 以减少离线包大小。
 
