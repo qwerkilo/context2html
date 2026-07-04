@@ -75,19 +75,29 @@ def check_report_footer(html):
     return []
 
 
+_REPO_CDN = "cdn.jsdelivr.net/gh/qwerkilo/context2html"
+_RE_THEME_LOADLIB = re.compile(r"__loadLib\s*\(\s*['\"]([^'\"]*report-themes\.css[^'\"]*)['\"]")
+
 def check_theme_css(html, base_dir=None):
     issues = []
     refs = _RE_THEME_CSS.findall(html)
-    if not refs:
-        return ["Missing <link> to theme/report-themes.css"]
+    loadlib_refs = _RE_THEME_LOADLIB.findall(html)
+    if not refs and not loadlib_refs:
+        return ["Missing <link> or __loadLib to theme/report-themes.css"]
     for ref in refs:
         if ref.startswith("http"):
-            issues.append(f"Theme CSS from CDN/URL: {ref} (prefer local)")
+            if _REPO_CDN not in ref:
+                issues.append(f"Theme CSS from external CDN/URL: {ref} (prefer repo CDN or local)")
             continue
         if base_dir and not os.path.isabs(ref):
             resolved = os.path.normpath(os.path.join(base_dir, ref))
             if not os.path.exists(resolved):
                 issues.append(f"Theme CSS link points to missing file: {ref} -> {resolved}")
+    for ref in loadlib_refs:
+        if base_dir and not ref.startswith("http"):
+            resolved = os.path.normpath(os.path.join(base_dir, ref))
+            if not os.path.exists(resolved):
+                issues.append(f"Theme CSS __loadLib points to missing file: {ref} -> {resolved}")
     return issues
 
 

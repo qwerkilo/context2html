@@ -269,8 +269,15 @@ body, body * { transition: background-color 0.35s ease-out, color 0.35s ease-out
   h1 { font-size: 1.5rem; }
 }
 </style>
-<!-- 完整 20 主题 CSS（在 <style> 之后加载以确保优先级） -->
-<link rel="stylesheet" href="../theme/report-themes.css">
+<!-- CDN-first 加载器：CDN 加载失败时回退到本地。模板内所有动态库/样式通过它加载 -->
+<script>
+(function(){
+var C='https://cdn.jsdelivr.net/gh/qwerkilo/context2html@main/';
+window.__loadLib=function(n,f){var e=n.endsWith('.css'),t=e?document.createElement('link'):document.createElement('script');if(e){t.rel='stylesheet';t.href=C+n}else{t.src=C+n}t.onerror=function(){var r=e?document.createElement('link'):document.createElement('script');var p=f||'libs/'+n.replace(/^.*\//,'');if(e){r.rel='stylesheet';r.href=p}else{r.src=p}document.head.appendChild(r)};document.head.appendChild(t)};
+/* 主题 CSS（CDN 优先，回退本地） */
+__loadLib('theme/report-themes.css','../theme/report-themes.css');
+})();
+</script>
 </head>
 <body>
 

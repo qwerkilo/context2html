@@ -139,11 +139,16 @@ def _check_local_script_paths(html, base_dir, lib_name):
     return issues
 
 
+_REPO_CDN = "cdn.jsdelivr.net/gh/qwerkilo/context2html"
+_RE_LOADLIB = re.compile(r"__loadLib\s*\(\s*['\"]([^'\"]+)['\"]\s*\)")
+
+
 def check_lib_deps(html, base_dir):
     issues = []
+    has_repo_cdn = _REPO_CDN in html
     if _RE_ECHARTS_INIT.search(html):
         has_local = os.path.exists(os.path.join(base_dir, "libs", "echarts.min.js"))
-        has_cdn = "cdn.jsdelivr.net/npm/echarts" in html
+        has_cdn = "cdn.jsdelivr.net/npm/echarts" in html or has_repo_cdn
         if not has_local and not has_cdn:
             issues.append("ECharts usage found but no libs/echarts.min.js or CDN link")
         issues.extend(_check_local_script_paths(html, base_dir, "echarts"))
@@ -155,21 +160,21 @@ def check_lib_deps(html, base_dir):
     if _RE_THREE_USAGE.search(html) or _RE_THREE_BARE.search(html) or 'three@0.185.0' in html:
         has_local_umd = os.path.exists(os.path.join(base_dir, "libs", "three.min.js"))
         has_local_esm = os.path.exists(os.path.join(base_dir, "libs", "three.module.js"))
-        has_cdn = "cdnjs.cloudflare.com/ajax/libs/three.js" in html
+        has_cdn = "cdnjs.cloudflare.com/ajax/libs/three.js" in html or has_repo_cdn
         has_importmap = "cdn.jsdelivr.net/npm/three@0.185.0" in html
         if not has_local_umd and not has_local_esm and not has_cdn and not has_importmap:
             issues.append("Three.js usage found but no libs/three.min.js, three.module.js, or CDN link")
         issues.extend(_check_local_script_paths(html, base_dir, "three"))
     if _RE_D3_USAGE.search(html):
         has_local = os.path.exists(os.path.join(base_dir, "libs", "d3.min.js"))
-        has_cdn = "d3js.org/d3" in html
+        has_cdn = "d3js.org/d3" in html or has_repo_cdn
         if not has_local and not has_cdn:
             issues.append("D3.js usage found but no libs/d3.min.js or CDN link")
         issues.extend(_check_local_script_paths(html, base_dir, "d3"))
     if _RE_GSAP_USAGE.search(html):
         has_local_gsap = os.path.exists(os.path.join(base_dir, "libs", "gsap.min.js"))
         has_local_st = os.path.exists(os.path.join(base_dir, "libs", "ScrollTrigger.min.js"))
-        has_cdn = bool(re.search(r'cdnjs\.cloudflare\.com/ajax/libs/gsap/\d+\.\d+\.\d+/', html))
+        has_cdn = bool(re.search(r'cdnjs\.cloudflare\.com/ajax/libs/gsap/\d+\.\d+\.\d+/', html)) or has_repo_cdn
         if not has_local_gsap and not has_cdn:
             issues.append("GSAP usage found but no libs/gsap.min.js or CDN link")
         if not has_local_st and not has_cdn:
@@ -178,10 +183,19 @@ def check_lib_deps(html, base_dir):
         issues.extend(_check_local_script_paths(html, base_dir, "ScrollTrigger"))
     if _RE_SVGJS_USAGE.search(html):
         has_local = os.path.exists(os.path.join(base_dir, "libs", "svg.min.js"))
-        has_cdn = "cdn.jsdelivr.net/npm/@svgdotjs/svg.js" in html or "svgjs.in" in html
+        has_cdn = "cdn.jsdelivr.net/npm/@svgdotjs/svg.js" in html or "svgjs.in" in html or has_repo_cdn
         if not has_local and not has_cdn:
             issues.append("SVG.js usage found but no libs/svg.min.js or CDN link")
         issues.extend(_check_local_script_paths(html, base_dir, "svg.min.js"))
+    if has_repo_cdn:
+        for m in _RE_LOADLIB.finditer(html):
+            lib_name = m.group(1)
+            local_path = os.path.join(base_dir, "libs", lib_name)
+            if not os.path.exists(local_path):
+                issues.append(
+                    f"__loadLib references '{lib_name}' but local libs/{lib_name} not found"
+                    f" (required for fallback)"
+                )
     return issues
 
 

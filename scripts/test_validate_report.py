@@ -109,6 +109,20 @@ class TestBilingual:
     def test_cdn_with_base_dir_still_warns(self, tmp_path):
         assert len(vr.check_theme_css(
             '<link href="https://cdn.example.com/report-themes.css">', str(tmp_path))) > 0
+
+    def test_repo_cdn_theme_css_no_warning(self, tmp_path):
+        assert not vr.check_theme_css(
+            '<link href="https://cdn.jsdelivr.net/gh/qwerkilo/context2html@main/theme/report-themes.css" rel="stylesheet">', str(tmp_path))
+
+    def test_loadlib_theme_css_existing_file_passes(self, tmp_path):
+        (tmp_path / "theme").mkdir()
+        (tmp_path / "theme" / "report-themes.css").write_text("/* */")
+        assert not vr.check_theme_css(
+            '<script>__loadLib("theme/report-themes.css","../theme/report-themes.css")</script>', str(tmp_path))
+
+    def test_loadlib_theme_css_missing_file_fails(self, tmp_path):
+        assert len(vr.check_theme_css(
+            '<script>__loadLib("theme/report-themes.css","../theme/report-themes.css")</script>', str(tmp_path))) > 0
     def test_missing_file_error_includes_resolved_path(self, tmp_path):
         issues = vr.check_theme_css(
             '<link href="theme/report-themes.css">', str(tmp_path))
@@ -297,6 +311,25 @@ class TestLibDeps:
         assert not vr.check_lib_deps(
             '<html><script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js">'
             '</script>echarts.init()</html>', str(tmp_path))
+
+    def test_repo_cdn_passes_echarts(self, tmp_path):
+        assert not vr.check_lib_deps(
+            '<html><script src="https://cdn.jsdelivr.net/gh/qwerkilo/context2html@main/libs/'
+            'echarts.min.js"></script>echarts.init()</html>', str(tmp_path))
+
+    def test_loadlib_local_file_missing_fails(self, tmp_path):
+        assert len(vr.check_lib_deps(
+            '<html><script>__loadLib("echarts.min.js")</script>echarts.init()</html>'
+            '<div>cdn.jsdelivr.net/gh/qwerkilo/context2html</div>',
+            str(tmp_path))) > 0
+
+    def test_loadlib_local_file_exists_passes(self, tmp_path):
+        (tmp_path / "libs").mkdir()
+        (tmp_path / "libs" / "echarts.min.js").write_text("// stub")
+        assert not vr.check_lib_deps(
+            '<html><script>__loadLib("echarts.min.js")</script>echarts.init()</html>'
+            '<div>cdn.jsdelivr.net/gh/qwerkilo/context2html</div>',
+            str(tmp_path))
 
     def test_svg_js_CDN_passes(self):
         assert not vr.check_lib_deps(

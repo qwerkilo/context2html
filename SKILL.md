@@ -101,7 +101,8 @@ argument-hint: "调研内容描述或文件路径？"
    · 每章 2-4 个组件（数据密集型 5+）；同一章避免重复同类组件
    · 结构 HTML：复制文件中 ````html` 代码块
    · 组件 CSS：复制文件中 ````css` 代码块 → 合并到 `<style>` 中（按前缀分组）
-   · 组件 JS：复制文件中 `<script>` 所在代码块（````js` 块或含 `<script>` 的 ````html` 块均可）→ 合并到报告 JS 区
+    · 组件 JS：复制文件中 `<script>` 所在代码块（````js` 块或含 `<script>` 的 ````html` 块均可）→ 合并到报告 JS 区
+    · 库引用转换：组件 `<script src="libs/X.js">` → 改为 `<script>__loadLib('X.js')</script>`（CDN 优先，模板已内置 `__loadLib`）
 6. 生成自动编号目录
 7. 每章末尾追加标签组 #17
 
@@ -127,7 +128,7 @@ argument-hint: "调研内容描述或文件路径？"
 ### Step 5: 输出
 
 - 报告文件：`report-slug.html`
-- 首次使用时复制 `libs/` 目录到报告同级目录（echarts/three/d3 离线包）
+- 首次使用时复制 `libs/` 目录到报告同级目录（echarts/three/d3 离线包，作为 CDN 的 fallback）
 - 可选：运行 `bash templates/start-server.sh`（Linux/macOS）或 `powershell -ExecutionPolicy Bypass -File templates/start-server.ps1`（Windows）启动本地 HTTP 服务器预览
 
 ## 文件资源速查
