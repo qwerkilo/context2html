@@ -17,11 +17,11 @@ Pure HTML/CSS/JS. No package.json, no npm. Open directly in browser after genera
 ## Commands
 
 ```bash
-# All tests (274 tests across 3 files: validate_report 145, validate_lesson 107, theme_css 22)
+# All tests (276 tests: report 147 + lesson 107 + theme_css 22)
 python -m pytest scripts/test_validate_report.py scripts/test_validate_lesson.py scripts/test_generate_theme_css.py -v --tb=short
-
-# Or just `pytest` (works directly, no python -m needed when pytest is on PATH)
-pytest scripts/test_validate_report.py -v --tb=short
+```bash
+# Single test file
+python -m pytest scripts/test_validate_report.py -v --tb=short
 
 # Validate a report (21 hard checks + 3 humanization warnings). Paths resolved relative to report HTML directory.
 python scripts/validate-report.py path/to/report.html
@@ -29,9 +29,9 @@ python scripts/validate-report.py path/to/report.html
 # Regenerate theme CSS from theme/*/DESIGN.md
 python scripts/generate-theme-css.py
 
-# Preview server
-bash templates/start-server.sh          # Linux/macOS
+# Preview server (uses same cwd as root; access via localhost)
 powershell -ExecutionPolicy Bypass -File templates/start-server.ps1   # Windows
+bash templates/start-server.sh                                        # Linux/macOS
 ```
 
 ## Hard constraints
@@ -55,12 +55,14 @@ Rules in SKILL.md §2.5 + `references/humanize_matrix.md`. Failure modes agents 
 ## Gotchas
 
 - **Theme CSS is auto-generated** (`theme/report-themes.css`). Never hand-edit. Re-run `generate-theme-css.py` after teach_more_pic DESIGN.md changes.
+- **`generate-theme-css.py` speed** — uses `yaml.CSafeLoader` (C extension). Requires `pip install pyyaml` with compiled C extension. Pure-Python fallback is ~2× slower but works.
 - **Two manual themes** — `spotify` and `tesla` have NO YAML front matter in their DESIGN.md, so `generate-theme-css.py` falls back to the `MANUAL_THEMES` dict at the top of the script. **Editing their DESIGN.md will have no effect on the generated CSS** — edit `MANUAL_THEMES` instead. All other 18 themes are generated from `theme/*/DESIGN.md` YAML front matter.
 - **Template `<link>` path** — `report-starter.html` uses `<link href="../theme/report-themes.css">`. Adjust or inline when distributing standalone.
+- **`examples/*.html` paths** — files in `examples/` use `../libs/` not `libs/` for script/style paths. Demo HTMLs opened via `file://` protocol may need inlined external CSS (see `heatmap-demo.html` for the magicui-effects.css inlining pattern).
 - **Three.js WebGPU first** — component #27 uses `importmap` + `type="module"` for WebGPU, falls back to UMD `libs/three.min.js` for WebGL. Both patterns must be included.
-- **Copy `libs/` alongside report** — validator checks both `libs/<lib>.min.js` existence AND `<script src="libs/...">` path resolution.
+- **Copy `libs/` alongside report** — validator checks both `libs/<lib>.min.js` existence AND `<script src="libs/...">` path resolution (relative to the report HTML directory, not project root).
 - **Validator path resolution** — `validate-report.py` resolves SVG paths, `<script src>` paths relative to the report HTML's own directory, NOT project root.
-- **Test imports** — `test_validate_report.py` uses `importlib` to load `validate-report.py` (non-standard import pattern).
+- **Test imports** — `test_validate_report.py` uses `importlib` to load `validate-report.py` (non-standard import pattern). Tests are in `scripts/` next to the module under test.
 - **Components are .md files** — `components/NN-name.md` contain embedded ```html/css/js code blocks. Copy the blocks, not the whole file.
 - **ECharts color in Canvas** — `var(--accent)` in ECharts options does NOT resolve (Canvas2D ignores CSS var()). Always use `gv('--accent')` helper (`function gv(n){return getComputedStyle(docEl).getPropertyValue(n).trim()}`). Three.js #27 correctly already uses `getComputedStyle`.
 - **English text overflows on lang toggle** — English is wider than Chinese; template body has `overflow-wrap: break-word`, `.cmp-table` has `table-layout: fixed` + `word-break: break-word`. Do NOT remove these.
@@ -68,8 +70,10 @@ Rules in SKILL.md §2.5 + `references/humanize_matrix.md`. Failure modes agents 
 - **`examples/report-themes.html` is NOT a valid report** — it's a theme preview page and will fail `validate-report.py`. Use `examples/0001-demo-report.html` for smoke tests.
 - **`docs/` is gitignored** — `.gitignore` excludes `docs/`. Agent skill config files there won't be tracked.
 - **`CONTEXT.md`** exists at root with 5 resolved domain terms (可视化报告/人类化/视觉组件/双语/验证). Read before generating a report.
-- `results.tsv` and `test-prompts.json` — update after darwin-skill optimization runs.
+- **`results.tsv` and `test-prompts.json`** — update after darwin-skill optimization runs.
+- **Heatmap Canvas init** — when computing vmin/vmax from a data matrix, start with `vmin=Infinity, vmax=-Infinity` (not `-Infinity, Infinity`). The inverse produces NaN normalize values and black cells.
+- **`examples/gsap-demo.html`** uses `../libs/` for GSAP scripts (not `libs/`). CDN fallback creates fresh `<script>` elements rather than mutating the existing one's `src`, which is unreliable across browsers.
 
 ## Issue triage
 
-Issues are GitHub issues (create via `gh issue create`). PRs are not a triage surface. Standard labels: needs-triage / needs-info / ready-for-agent / ready-for-human / wontfix.
+Issues are GitHub issues (create via `gh issue create`). PRs are not a triage surface. Labels: needs-triage / needs-info / ready-for-agent / ready-for-human / wontfix.
