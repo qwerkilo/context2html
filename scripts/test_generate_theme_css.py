@@ -129,3 +129,67 @@ class TestManualThemeVars:
         blocks = self._get_theme_blocks()
         for var in self.REQUIRED:
             assert var in blocks.get('airbnb', ''), f"airbnb missing {var}"
+
+
+class TestIsDark:
+    def test_black_is_dark(self):
+        assert gc.is_dark('#000000') == True
+    def test_bright_yellow_is_not_dark(self):
+        assert gc.is_dark('#FFD700') == False
+    def test_white_is_not_dark(self):
+        assert gc.is_dark('#FFFFFF') == False
+
+class TestSplitYamlSections:
+    def test_simple_pairs(self):
+        result = gc.split_yaml_sections("a: 1\nb: 2")
+        assert result == [("a", "1"), ("b", "2")]
+    def test_double_dash_not_separator(self):
+        result = gc.split_yaml_sections("a: --\nb: 2")
+        assert len(result) == 2
+
+class TestParseChildDict:
+    def test_empty_list(self):
+        assert gc.parse_child_dict([]) == {}
+    def test_simple_kv(self):
+        result = gc.parse_child_dict(['  key: value', '  foo: bar'])
+        assert result == {'key': 'value', 'foo': 'bar'}
+    def test_quoted_values(self):
+        result = gc.parse_child_dict(['  key: "value"', "  foo: 'bar'"])
+        assert result == {'key': 'value', 'foo': 'bar'}
+
+class TestIsNewKey:
+    def test_simple_key(self):
+        assert gc.is_new_key('colors:')
+    def test_url_is_not_key(self):
+        assert not gc.is_new_key('https://example.com')
+    def test_key_with_value(self):
+        assert gc.is_new_key('description: A thing: nice')
+
+class TestGenerateThemeCss:
+    def test_generates_valid_css(self, tmp_path):
+        d = tmp_path / "DESIGN.md"
+        d.write_text("---\ncolors:\n  primary: '#c0392b'\n  bg: '#ffffff'\n  text: '#333333'\n---\n")
+        css, meta = gc.generate_theme_css('test-theme', str(d))
+        assert meta is not None
+        assert '--bg: #ffffff' in css
+        assert '--accent: #c0392b' in css
+    def test_generates_without_palette(self, tmp_path):
+        d = tmp_path / "DESIGN.md"
+        d.write_text("---\ncolors:\n  primary: '#c0392b'\n  bg: '#ffffff'\n---\n")
+        css, meta = gc.generate_theme_css('test-theme', str(d))
+        assert meta is not None
+        assert '--bg: #ffffff' in css
+        assert '--accent-text' in css
+    def test_no_front_matter_returns_none(self, tmp_path):
+        d = tmp_path / "DESIGN.md"
+        d.write_text("no front matter here\n")
+        css, meta = gc.generate_theme_css('test-theme', str(d))
+        assert css == ''
+        assert meta is None
+    def test_empty_colors_uses_defaults(self, tmp_path):
+        d = tmp_path / "DESIGN.md"
+        d.write_text("---\ncolors:\n  bg: '#111111'\n---\n")
+        css, meta = gc.generate_theme_css('test-theme', str(d))
+        assert meta is not None
+        assert '--accent: #3366cc' in css
+        assert '--bg: #111111' in css

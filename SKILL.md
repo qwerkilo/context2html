@@ -1,18 +1,19 @@
 ---
 name: context2html
 description: >
-  将调研内容/研究报告自动转化为可视化 HTML 报告。
-  从对话上下文提取已有调研结果，或读取外部文件路径。
+  将文本内容自动转化为可视化 HTML 页面。
+  支持报告、文章、文档、教程、笔记等多种内容类型。
   完整复用 teach_more_pic 的 29 个视觉组件 + 2 个自定义组件（GSAP 滚动动画 #30 + SVG.js 动态图表 #31）。
   Triggers: "报告", "调研", "research", "report", "生成报告", "把内容做成报告",
-  "调研报告", "visual report", "可视化报告", "research report", "出报告".
+  "调研报告", "visual report", "可视化报告", "research report", "出报告",
+  "文章", "笔记", "文档", "内容整理", "可视化页面", "content".
 disable-model-invocation: true
-argument-hint: "调研内容描述或文件路径？"
+argument-hint: "内容描述或文件路径？"
 ---
 
-# context2html — 调研内容可视化工具
+# context2html — 通用内容可视化引擎
 
-将调研内容/研究报告自动转化为可视化 HTML 报告。完整复用 `teach_more_pic` 的 29 个视觉组件 + 2 个自定义组件（GSAP + SVG.js）和离线库。
+将文本内容自动转化为可视化 HTML 页面。支持报告、文章、文档、教程、笔记等多种内容类型。完整复用 `teach_more_pic` 的 29 个视觉组件 + 2 个自定义组件（GSAP + SVG.js）和离线库。
 
 ## 前置条件
 
@@ -24,13 +25,24 @@ argument-hint: "调研内容描述或文件路径？"
 - **无构建系统**：纯 HTML/CSS/JS，无 package.json、无 npm 命令。修改后直接浏览器打开。
 - **中英双语**：所有文本必须同时包含中文和英文版本，通过 L 键或语言按钮切换。默认显示中文。
 - SVG 中文字体需显式指定 font-family（含中文字体名）。
-- **所有报告从 `templates/report-starter.html` 复制作为基础**。禁止从零生成 HTML 结构。
+- **报告类型从 `templates/report-starter.html` 复制作为基础；其他内容类型从 `templates/starter.html` 复制。禁止从零生成 HTML 结构。**
 - 保留模板的完整 CSS 变量系统（`:root` + 20 个 `[data-theme]`）、工具栏（主题/语言/目录）、键盘快捷键（T/L/←→）。
 - 视觉组件在模板预留的 `<!-- INSERT: 视觉组件 HTML -->` 注释处追加。
 
 ## 可视化工作流
 
-### Step 0: 输入获取
+### Step 0: 确定内容类型
+
+询问用户内容类型：
+- **report** — 调研报告/分析报告（默认，模板：report-starter.html）
+- **article** — 文章/博客/观点
+- **doc** — 文档/规范/说明
+- **tutorial** — 教程/指南
+- **note** — 笔记/备忘
+
+report 类型 → 复制 `report-starter.html`；其他类型 → 复制 `starter.html` 并设 `data-content-type="xxx"`
+
+### Step 0a: 输入获取
 
 - 从对话上下文中提取已有调研内容
 - 或读取用户提供的文件路径（Markdown/文本文件）
@@ -56,7 +68,7 @@ argument-hint: "调研内容描述或文件路径？"
 从 `references/decision-guide.md` 的决策树和选择矩阵按报告场景选组件（含失败模式）。数据密集型报告优先使用 Three.js #27 和 ECharts GL #29 提升视觉冲击力。
 
 - 打开对应的 `components/NN-name.md` 读取完整 HTML/CSS/JS
-- 每 500 字至少 1 个视觉元素，数据密集型章节可缩短至 300 字
+- 视觉密度根据内容类型调整：报告/教程类型每 500 字至少 1 个视觉元素（数据密集型章节可缩短至 300 字）；文章/笔记类型每 800 字至少 1 个视觉元素
 - 🔵 CHECKPOINT：展示组件选择清单给用户确认
 
 ### Step 2.5: 人类化写作（warning 级 — 生成内容前阅读）
@@ -85,10 +97,10 @@ argument-hint: "调研内容描述或文件路径？"
 - **禁止纯黑 `#000000`**，用 off-black（zinc-950、`#1a1a1a`）；**禁止纯白 `#ffffff`**，用 off-white
 - 渐变文本只用于极小标题，禁止大标题全渐变
 - 一页只用一个字体族
-- **到 `templates/report-starter.html` 中去取最新的 CSS 变量和组件 CSS**，不要从其他源复制。
+- **到对应模板中去取最新的 CSS 变量和组件 CSS**（report 类型→`templates/report-starter.html`，其他类型→`templates/starter.html`），不要从其他源复制。
 
-1. 复制 `templates/report-starter.html` 为 `report-slug.html`
-   · 模板路径不存在 → 检查 `templates/` 目录下文件名 → 从 teach_more_pic 重新复制
+1. 根据内容类型复制模板（report→`templates/report-starter.html`，其他→`templates/starter.html`）为 `output-slug.html`
+   · 模板路径不存在 → 检查 `templates/` 目录下对应文件名 → 从 teach_more_pic 重新复制
 2. 🎨 **选择并设置主题** — 按决策指南 `theme 选择参考表` 选适合报告类型的主题：
    · 设置 `<html data-theme="xxx">` 为推荐主题
    · 确保 `<link href="../theme/report-themes.css">` 路径正确
@@ -135,7 +147,8 @@ argument-hint: "调研内容描述或文件路径？"
 
 | 路径 | 用途 | 工作流中引用处 |
 |------|------|--------------|
-| `templates/report-starter.html` | 报告骨架模板（所有报告的起点） | Step 3 |
+| `templates/report-starter.html` | 报告骨架模板（report 类型起点） | Step 3 |
+| `templates/starter.html` | 通用内容模板（其他类型起点，设 data-content-type） | Step 0/3 |
 | `components/NN-name.md` | 组件代码（29 + 2 自定义） | Step 2/3 |
 | `references/decision-guide.md` | 组件选择矩阵 | Step 2 |
 | `references/page-types.md` | 9 种页面类型代码参考 | Step 3 |
@@ -155,9 +168,9 @@ argument-hint: "调研内容描述或文件路径？"
 | 2 | 硬编码颜色而非 CSS 变量 | 主题切换后颜色不变 | 全部用 `var(--accent)` 等 |
 | 3 | 只写中文不写英文 | 违反双语约定 | 成对 `data-lang` |
 | 4 | 编造数据/引文 | 损害可信度 | 模拟数据标注 `mock-data` 类 |
-| 5 | 缺少 PPT 质感（无主题切换/键盘导航） | 交互体验差 | report-starter.html 已内置 |
+| 5 | 缺少 PPT 质感（无主题切换/键盘导航） | 交互体验差 | report-starter.html / starter.html 均已内置 |
 | 6 | 图表库只加载部分依赖 | 一种图表空白 | 用到几个库就加载几个 libs 文件 |
-| 7 | 从零写 HTML 而非复制模板 | 丢失 CSS 变量/主题系统 | 始终从 report-starter.html 复制 |
+| 7 | 从零写 HTML 而非复制模板 | 丢失 CSS 变量/主题系统 | 始终从对应模板复制（report→report-starter.html，其他→starter.html） |
 
 ## 失败模式与异常处理
 

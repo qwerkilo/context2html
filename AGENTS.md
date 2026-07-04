@@ -17,7 +17,7 @@ Pure HTML/CSS/JS. No package.json, no npm. Open directly in browser after genera
 ## Commands
 
 ```bash
-# All tests (276 tests: report 147 + lesson 107 + theme_css 22)
+# All tests (376 tests: report 163 + lesson 131 + theme_css 28 + content_type 49 + sync_template 5)
 python -m pytest scripts/test_validate_report.py scripts/test_validate_lesson.py scripts/test_generate_theme_css.py -v --tb=short
 ```bash
 # Single test file

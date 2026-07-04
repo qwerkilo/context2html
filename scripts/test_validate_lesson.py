@@ -429,3 +429,24 @@ class TestLibDeps:
     def test_echarts_GL_no_lib_fails(self):
         assert len(vl.check_lib_deps(
             '<html>type: "bar3D"</html>', 'C:\\nonexistent')) > 0
+
+
+class TestContainerWidth:
+    def test_container_width_in_range(self):
+        assert not vl.check_container_width('<style>.container { max-width: 800px; }</style>')
+    def test_container_width_too_wide(self):
+        assert len(vl.check_container_width('<style>.container { max-width: 900px; }</style>')) > 0
+    def test_container_width_too_narrow(self):
+        assert len(vl.check_container_width('<style>.container { max-width: 600px; }</style>')) > 0
+
+class TestRunAllIntegration:
+    def test_run_all_missing_file(self):
+        import importlib.util, sys, os
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'scripts'))
+        spec = importlib.util.spec_from_file_location(
+            "validate_lesson",
+            os.path.join(os.path.dirname(__file__), "validate-lesson.py")
+        )
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        assert hasattr(mod, 'run_all')

@@ -568,3 +568,57 @@ class TestDataAnimSyntax:
         assert len(vr.check_data_anim_syntax('<div data-anim="zoom-in"></div>')) > 0
     def test_no_data_anim_skips(self):
         assert not vr.check_data_anim_syntax('<div>plain</div>')
+
+
+class TestD1EdgeCases:
+    def test_short_paragraph_skipped(self):
+        html = '<p data-lang="zh">短句。</p>'
+        assert not vr.check_d1_sentence_length(html)
+
+    def test_consecutive_short_sentences_fails(self):
+        html = '<p data-lang="zh">今天天气很好。我很快乐。他很高兴。大家都很开心。</p>'
+        assert len(vr.check_d1_sentence_length(html)) > 0
+
+    def test_consecutive_long_sentences_fails(self):
+        html = '<p data-lang="zh">这家公司凭借其在人工智能领域的深厚积累和持续创新，成功打造了一系列具有市场竞争力的产品。这些产品不仅覆盖了金融、医疗、教育等多个垂直行业，还通过开放的生态系统吸引了大量第三方开发者。与此同时，公司的全球化战略也在稳步推进，海外收入占比已经超过四成，并且还在持续增长。</p>'
+        assert len(vr.check_d1_sentence_length(html)) > 0
+
+    def test_english_only_skipped(self):
+        html = '<p data-lang="en">This is a test. Another sentence here. And a third one too.</p>'
+        assert not vr.check_d1_sentence_length(html)
+
+
+class TestD4EdgeCases:
+    def test_exactly_at_limit_passes(self):
+        """6 connectors per 1000 chars should pass (<=6)."""
+        text = '因此因此因此因此因此因此' + '的' * 987 + '。'
+        html = f'<p data-lang="zh">{text}</p>'
+        assert not vr.check_d4_connectors(html)
+
+    def test_banned_starter_fails(self):
+        html = '<p data-lang="zh">首先，我们要讨论这个问题。然后分析解决方案。</p>'
+        assert len(vr.check_d4_connectors(html)) > 0
+
+    def test_english_only_skipped(self):
+        html = '<p data-lang="en">First, we discuss the issue. Then we analyze solutions.</p>'
+        issues = vr.check_d4_connectors(html)
+        assert not any('首先' in i for i in issues)
+
+
+class TestD5EdgeCases:
+    def test_single_occurrence_under_limit_passes(self):
+        """One occurrence in >800 chars should pass."""
+        text = '重要' + '的' * 1000
+        html = f'<p data-lang="zh">{text}</p>'
+        assert not vr.check_d5_term_variety(html)
+
+    def test_two_occurrences_in_800_chars_fails(self):
+        """Two occurrences in <=800 chars should fail."""
+        text = '重要' + '重要' + '的' * 796
+        html = f'<p data-lang="zh">{text}</p>'
+        assert len(vr.check_d5_term_variety(html)) > 0
+
+    def test_english_only_skipped(self):
+        """D5 should skip English paragraphs (no Chinese overused terms match)."""
+        html = '<p data-lang="en">This important report shows significant growth. The important findings demonstrate crucial trends.</p>'
+        assert not vr.check_d5_term_variety(html)

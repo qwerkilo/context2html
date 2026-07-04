@@ -20,6 +20,10 @@ _Avoid_: Widget, element, module
 Every body-text block (`<p>`, `<h1>`, `<h2>`, `<td>`, etc.) must appear twice: once with `data-lang="zh"` and once with `data-lang="en"`. The L key toggles visibility between languages. SVG `<text>` elements and Canvas-rendered chart labels (ECharts `series.name`, Three.js sprite labels) are not covered by the automated bilingual check.
 _Avoid_: 中英双语, language switch, i18n
 
+**内容类型 (Content Type)**:
+One of five layout profiles: `report`, `article`, `doc`, `tutorial`, `note`. Set via `data-content-type` on `<html>`. Drives CSS layout variables (`--body-max-width`, `--sidebar-display`, `--cover-display`, component density). Default: `report` (backward compatible).
+_Avoid_: 页面类型, section type
+
 **验证 (Validation)**:
 Running `validate-report.py` performs 21 hard checks (blocking — any failure exits with code 1) and 3 D1/D4/D5 warnings (non-blocking). Hard checks cover SVG validity, HTML structure (h1 count, semantic elements, relative links), CSS rules (bar-fill overflow, English layout overflow-wrap, cmp-table responsive breakpoints), library dependency paths, GSAP `data-gsap` modes, `data-anim` syntax, chapter cross-references (`#chN`), and ECharts Canvas color usage (`gv()` helper).
 _Avoid_: 自动检查, quality gate
