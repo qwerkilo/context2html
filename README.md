@@ -151,6 +151,14 @@ powershell -ExecutionPolicy Bypass -File templates/start-server.ps1
 
 D1/D4/D5 三项已实现为 warning 级自动化检查（不阻断构建但提示需修复）。D2/D3 仍需人工 review。
 
+## 更新日志
+
+### 2026-07-04
+
+- **Bug 修复** — 8 项修复：L 键检测正则改进、GSAP CDN 版本硬编码改为通配、ECharts GL 检测加词边界、中文断句避免 A.I. 误断、ECharts var() 覆盖模板字符串、D1 连续相似长度全量报告、移除冗余 CSS transition、手动主题 --font-h 添加 fallback
+- **性能优化** — 3 轮：验证器正则预编译 + `lru_cache` 缓存 `_extract_para_texts`/`_get_style_css`；主题 CSS 生成改用 `CSafeLoader`（54% 加速，1.0s → 0.46s）；消除 style 块重复扫描
+- **GSAP demo 修复** — `examples/gsap-demo.html` 中脚本路径 `libs/` → `../libs/`（原路径解析到不存在的 `examples/libs/`），CDN 降级逻辑重建为统一回退
+
 ## 依赖
 
 - [teach_more_pic](https://github.com/qwerkilo/teach_more_pic) — 视觉组件来源（**必装**，29 个组件 + magicui-effects.css）

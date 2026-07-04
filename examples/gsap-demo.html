@@ -125,27 +125,36 @@ p { margin: 1.2em 0; color: var(--muted); }
 
   var baseURL = isMobile
     ? 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/'
-    : 'libs/';
+    : '../libs/';
 
   var loaded = 0;
   var total = 2;
+  var cdnFallback = false;
 
   function onLibLoad() {
     loaded++;
     if (loaded === total) initGSAP();
   }
 
-  ['gsap.min.js', 'ScrollTrigger.min.js'].forEach(function(file) {
+  function loadScript(url, onload) {
     var s = document.createElement('script');
-    s.src = baseURL + file;
-    s.onload = onLibLoad;
+    s.src = url;
+    s.onload = onload;
+    document.head.appendChild(s);
+    return s;
+  }
+
+  ['gsap.min.js', 'ScrollTrigger.min.js'].forEach(function(file) {
+    var s = loadScript(baseURL + file, onLibLoad);
     s.onerror = function() {
-      if (!isMobile) {
-        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/' + file;
-        s.onerror = null;
+      if (!cdnFallback) {
+        cdnFallback = true;
+        var cdns = [];
+        ['gsap.min.js', 'ScrollTrigger.min.js'].forEach(function(f) {
+          loadScript('https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/' + f, onLibLoad);
+        });
       }
     };
-    document.head.appendChild(s);
   });
 
   function initGSAP() {

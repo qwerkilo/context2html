@@ -52,10 +52,14 @@ def parse_front_matter(text):
     yaml_text = m.group(1)
     body = text[m.end():]
 
-    # Try PyYAML first
+    # Try PyYAML first (with C loader for speed)
     try:
         import yaml
-        result = yaml.safe_load(yaml_text)
+        try:
+            loader = yaml.CSafeLoader
+        except AttributeError:
+            loader = yaml.SafeLoader
+        result = yaml.load(yaml_text, Loader=loader)
         if isinstance(result, dict):
             return result, body
     except ImportError:
@@ -510,6 +514,8 @@ def main():
                 ('--toc-accent', c['accent']),
             ]
             for var, val in pairs:
+                if var == '--font-h' and not val:
+                    val = c.get('font', '')
                 if val:
                     css_parts.append(f'  {var}: {val};')
             css_parts.append('}\n')

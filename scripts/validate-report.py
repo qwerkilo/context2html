@@ -5,6 +5,7 @@ Usage: python validate-report.py <path-to-report.html>
 import re
 import sys
 import os
+from functools import lru_cache
 from collections import Counter
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -17,40 +18,66 @@ from _validate_common import (
 )
 
 
+# Pre-compiled patterns
+_RE_EXEC_SUMMARY = re.compile(r'class="[^"]*\bexec-summary\b[^"]*"')
+_RE_REPORT_CHAPTER = re.compile(r'class="[^"]*report-chapter[^"]*"')
+_RE_CONCLUSION = re.compile(r'class="[^"]*\bconclusion-page\b[^"]*"')
+_RE_FOOTER = re.compile(r'class="[^"]*\breport-footer\b[^"]*"')
+_RE_THEME_CSS = re.compile(r'href="([^"]*report-themes\.css)"')
+_RE_BAR_FILL = re.compile(r'class="[^"]*(?<![a-zA-Z0-9_-])bar-fill(?![-_])[^"]*"[^>]*style="([^"]*)"')
+_RE_BAR_FILL_REV = re.compile(r'style="([^"]*)"[^>]*class="[^"]*(?<![a-zA-Z0-9_-])bar-fill(?![-_])[^"]*"')
+_RE_STYLE_BLOCK = re.compile(r'<style[^>]*>(.*?)</style>', re.DOTALL)
+_RE_SCRIPT_BLOCK = re.compile(r'<script[^>]*>(.*?)</script>', re.DOTALL)
+_RE_PARA_ZH = re.compile(r'<p[^>]*data-lang="zh"[^>]*>(.*?)</p>', re.DOTALL)
+_RE_PARA_EN = re.compile(r'<p[^>]*data-lang="en"[^>]*>(.*?)</p>', re.DOTALL)
+_RE_PARA_ALL = re.compile(r'<p[^>]*data-lang="(?:zh|en)"[^>]*>(.*?)</p>', re.DOTALL)
+_RE_HTML_TAG = re.compile(r'<[^>]+>')
+_RE_CMP_TABLE_MEDIA = re.compile(
+    r'@media\s*\([^)]*max-width\s*:\s*(\d+)px[^)]*\)\s*\{',
+)
+_RE_CMP_TABLE_RULE = re.compile(r'\.cmp-table[^{]*\{([^}]*)\}')
+_RE_SENTENCE = re.compile(r'[^。！？.!?\n]+[。！？]|[^。！？.!?\n]+[.!?](?:\s|$)')
+_RE_BAR_CSS_WIDTH = re.compile(r'\.(?<![a-zA-Z0-9_-])bar-fill(?![-_])[^{]*\{[^}]*width\s*:\s*(\d+(?:\.\d+)?)\s*%\s*;')
+_RE_CMP_TABLE = re.compile(r'.cmp-table')
+
+# D1-D5 constants
+_BANNED_STARTERS_ZH = ['首先', '其次', '最后', '综上所述', '值得注意的是', '此外', '另外']
+_CONNECTORS_ZH = ['因此', '然而', '同时', '此外', '另外', '而且', '但是', '所以', '不过',
+                  '总之', '例如', '比如', '特别是', '尤其是', '一方面', '另一方面', '也就是说']
+_OVERUSED_TERMS_ZH = ['重要', '优势明显', '显著', '必不可少', '至关重要', '占据主导',
+                      '不可或缺', '十分关键', '日益突出', '值得关注']
+
 # ========== Report-specific checks ==========
 
 
 def check_exec_summary(html):
-    if not re.search(r'class="[^"]*\bexec-summary\b[^"]*"', html) and \
-       not re.search(r"class='[^']*\bexec-summary\b[^']*'", html):
+    if not _RE_EXEC_SUMMARY.search(html):
         return ["Missing .exec-summary section (required: key findings summary)"]
     return []
 
 
 def check_report_chapters(html):
-    chapters = re.findall(r'class="[^"]*report-chapter[^"]*"', html)
+    chapters = _RE_REPORT_CHAPTER.findall(html)
     if len(chapters) < 1:
         return [f"Found {len(chapters)} .report-chapter elements (expected at least 1)"]
     return []
 
 
 def check_conclusion_page(html):
-    if not re.search(r'class="[^"]*\bconclusion-page\b[^"]*"', html) and \
-       not re.search(r"class='[^']*\bconclusion-page\b[^']*'", html):
+    if not _RE_CONCLUSION.search(html):
         return ["Missing .conclusion-page section (required: conclusions & recommendations)"]
     return []
 
 
 def check_report_footer(html):
-    if not re.search(r'class="[^"]*\breport-footer\b[^"]*"', html) and \
-       not re.search(r"class='[^']*\breport-footer\b[^']*'", html):
+    if not _RE_FOOTER.search(html):
         return ["Missing .report-footer element (required: report footer)"]
     return []
 
 
 def check_theme_css(html, base_dir=None):
     issues = []
-    refs = re.findall(r'href="([^"]*report-themes\.css)"', html)
+    refs = _RE_THEME_CSS.findall(html)
     if not refs:
         return ["Missing <link> to theme/report-themes.css"]
     for ref in refs:
@@ -67,19 +94,15 @@ def check_theme_css(html, base_dir=None):
 def check_bar_fill_width(html):
     issues = []
     overflow = []
-    for pat in [
-        r'class="[^"]*(?<![a-zA-Z0-9_-])bar-fill(?![-_])[^"]*"[^>]*style="([^"]*)"',
-        r'style="([^"]*)"[^>]*class="[^"]*(?<![a-zA-Z0-9_-])bar-fill(?![-_])[^"]*"',
-    ]:
-        for m in re.finditer(pat, html):
+    for pat in [_RE_BAR_FILL, _RE_BAR_FILL_REV]:
+        for m in pat.finditer(html):
             style = m.group(1)
             wm = re.search(r'width\s*:\s*(\d+(?:\.\d+)?)\s*%', style)
             if wm and float(wm.group(1)) > 100:
                 overflow.append(f"{wm.group(1)}%")
-    style_block = re.search(r'<style[^>]*>(.*?)</style>', html, re.DOTALL)
-    if style_block:
-        css = style_block.group(1)
-        for m in re.finditer(r'\.(?<![a-zA-Z0-9_-])bar-fill(?![-_])[^{]*\{[^}]*width\s*:\s*(\d+(?:\.\d+)?)\s*%\s*;', css):
+    all_css = _get_style_css(html)
+    if all_css:
+        for m in _RE_BAR_CSS_WIDTH.finditer(all_css):
             if float(m.group(1)) > 100:
                 overflow.append(f"{m.group(1)}% (CSS rule)")
     if overflow:
@@ -88,16 +111,12 @@ def check_bar_fill_width(html):
 
 
 def check_cmp_table_responsive(html):
-    if '.cmp-table' not in html:
+    if not _RE_CMP_TABLE.search(html):
         return []
-    style_blocks = re.findall(r'<style[^>]*>(.*?)</style>', html, re.DOTALL)
-    if not style_blocks:
+    all_css = _get_style_css(html)
+    if not all_css:
         return [".cmp-table used but no <style> block found for responsive rules"]
-    all_css = '\n'.join(style_blocks)
-    narrow_breaks = list(re.finditer(
-        r'@media\s*\([^)]*max-width\s*:\s*(\d+)px[^)]*\)\s*\{',
-        all_css,
-    ))
+    narrow_breaks = list(_RE_CMP_TABLE_MEDIA.finditer(all_css))
     covers_table = False
     for mb in narrow_breaks:
         bp = int(mb.group(1))
@@ -125,13 +144,12 @@ def check_cmp_table_responsive(html):
 
 def check_english_layout(html):
     issues = []
-    style_blocks = re.findall(r'<style[^>]*>(.*?)</style>', html, re.DOTALL)
-    all_css = '\n'.join(style_blocks)
+    all_css = _get_style_css(html)
     if 'overflow-wrap: break-word' not in all_css and 'overflow-wrap:break-word' not in all_css:
         issues.append("Missing overflow-wrap: break-word on body (English text may overflow)")
-    if '.cmp-table' in html:
+    if _RE_CMP_TABLE.search(html):
         has_fixed = False
-        for m in re.finditer(r'\.cmp-table[^{]*\{([^}]*)\}', all_css):
+        for m in _RE_CMP_TABLE_RULE.finditer(all_css):
             if 'table-layout: fixed' in m.group(1) or 'table-layout:fixed' in m.group(1):
                 has_fixed = True
                 break
@@ -142,8 +160,8 @@ def check_english_layout(html):
 
 def check_echarts_color_usage(html):
     issues = []
-    for s in re.findall(r'<script[^>]*>(.*?)</script>', html, re.DOTALL):
-        if ("'var(--" in s or '"var(--' in s) and 'echarts' in s:
+    for s in _RE_SCRIPT_BLOCK.findall(html):
+        if ("'var(--" in s or '"var(--' in s or '`var(--' in s) and 'echarts' in s:
             issues.append(
                 "ECharts script uses 'var(--xxx)' directly (Canvas2D ignores CSS var())"
                 " — use gv('--xxx') helper instead"
@@ -154,19 +172,20 @@ def check_echarts_color_usage(html):
 
 # ========== D1-D5 humanization checks ==========
 
-_BANNED_STARTERS_ZH = ['首先', '其次', '最后', '综上所述', '值得注意的是', '此外', '另外']
-_CONNECTORS_ZH = ['因此', '然而', '同时', '此外', '另外', '而且', '但是', '所以', '不过',
-                  '总之', '例如', '比如', '特别是', '尤其是', '一方面', '另一方面', '也就是说']
-_OVERUSED_TERMS_ZH = ['重要', '优势明显', '显著', '必不可少', '至关重要', '占据主导',
-                      '不可或缺', '十分关键', '日益突出', '值得关注']
+
+@lru_cache(maxsize=4)
+def _get_style_css(html):
+    """Extract and join all <style> block contents (cached)."""
+    return '\n'.join(_RE_STYLE_BLOCK.findall(html))
 
 
+@lru_cache(maxsize=4)
 def _extract_para_texts(html, lang=None):
     """Extract plain text from <p data-lang="..."> blocks. If lang given, only that language."""
     texts = []
-    lang_pat = lang if lang else r'(?:zh|en)'
-    for m in re.finditer(rf'<p[^>]*data-lang="{lang_pat}"[^>]*>(.*?)</p>', html, re.DOTALL):
-        text = re.sub(r'<[^>]+>', '', m.group(1))
+    pat = _RE_PARA_ZH if lang == 'zh' else (_RE_PARA_EN if lang == 'en' else _RE_PARA_ALL)
+    for m in pat.finditer(html):
+        text = _RE_HTML_TAG.sub('', m.group(1))
         text = re.sub(r'&amp;', '&', text)
         text = re.sub(r'&lt;', '<', text)
         text = re.sub(r'&gt;', '>', text)
@@ -219,13 +238,8 @@ def check_d1_sentence_length(html):
     if not texts:
         return []
 
-    # Split on Chinese/English sentence boundaries
-    sent_pat = re.compile(
-        r'[^。！？.!?\n]+[。！？.!?\n]'
-    )
-
     for i, t in enumerate(texts):
-        sents = sent_pat.findall(t)
+        sents = _RE_SENTENCE.findall(t)
         sents = [s.strip() for s in sents if len(s.strip()) > 2]
         if len(sents) < 3:
             continue
@@ -251,7 +265,6 @@ def check_d1_sentence_length(html):
             if max(chunk) - min(chunk) < 10:
                 problems.append(f'句{j+1}-{j+4}长度过于接近'
                                 f'（{",".join(str(x) for x in chunk)}字）')
-                break
 
         if not has_short and not has_long:
             problems.append(
