@@ -27,3 +27,19 @@ _Avoid_: 页面类型, section type
 **验证 (Validation)**:
 Running `validate-report.py` performs 21 hard checks (blocking — any failure exits with code 1) and 3 D1/D4/D5 warnings (non-blocking). Hard checks cover SVG validity, HTML structure (h1 count, semantic elements, relative links), CSS rules (bar-fill overflow, English layout overflow-wrap, cmp-table responsive breakpoints), library dependency paths, GSAP `data-gsap` modes, `data-anim` syntax, chapter cross-references (`#chN`), and ECharts Canvas color usage (`gv()` helper).
 _Avoid_: 自动检查, quality gate
+
+**技能仓库 (Skill Repo)**:
+A project that exists primarily to augment another skill — `context2html` augments `teach_more_pic`, sharing its 29 visual components while adding a report-generation workflow, 20 brand themes, bilingual layout, and D1-D5 humanization. SKILL.md is the workflow document (Step 0-5). Loaded via `Skills:` in the agent's config, never invoked directly.
+_Avoid_: Plugin, extension, addon
+
+**CDN优先加载 (CDN-first Loading)**:
+All external libraries load from jsDelivr CDN first via `__loadLib()`, falling back to local `libs/` files on failure. The template's `__loadLib` function handles this transparently. Validator checks for both CDN presence and local fallback file existence. Second argument to `__loadLib` sets a custom fallback path (e.g. `'../theme/report-themes.css'` for generated reports).
+_Avoid_: 直接 `<script src>`
+
+**模板CSS同步 (Template CSS Sync)**:
+`templates/base-styles.css` is the single source of truth for all template CSS. Edit it, then run `python scripts/sync-template-styles.py` to push changes into both `starter.html` and `report-starter.html`. Never edit `<style>` blocks inside the HTML templates directly — they will be overwritten on next sync.
+_Avoid_: 直接改 HTML 模板的 style 块
+
+**手动主题 (Manual Themes)**:
+Two themes (`spotify`, `tesla`) have no YAML front matter in their `theme/*/DESIGN.md`. Their CSS comes from the `MANUAL_THEMES` dict in `scripts/generate-theme-css.py`. Editing their DESIGN.md has no effect. All other 18 themes are generated from `theme/*/DESIGN.md` YAML front matter.
+_Avoid_: 直接编辑 report-themes.css

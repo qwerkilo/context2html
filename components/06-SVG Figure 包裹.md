@@ -1,3 +1,15 @@
+---
+id: 6
+name: SVG Figure 包裹
+dependencies: []
+compat_types:
+- report
+- article
+- doc
+- tutorial
+requires_3d: false
+---
+
 ### 6. SVG Figure 包裹（标准容器）
 
 > **🎯 效果**：居中对齐的 SVG 容器，响应式缩放（`max-width: 100%`），8px 圆角。所有内联 SVG 均用此容器包裹。

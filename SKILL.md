@@ -15,9 +15,11 @@ argument-hint: "内容描述或文件路径？"
 
 将文本内容自动转化为可视化 HTML 页面。支持报告、文章、文档、教程、笔记等多种内容类型。完整复用 `teach_more_pic` 的 29 个视觉组件 + 2 个自定义组件（GSAP + SVG.js）和离线库。
 
+**Framework API** 在下文文档中 — 高级 agent 可用 API 组合自己的流程；新手可跟随下方的示例工作流。
+
 ## 前置条件
 
-- 本 skill 的 `components/`、`libs/`、`templates/report-starter.html` 已就位
+- 本 skill 的 `components/`、`libs/`、`templates/` 已就位
 - `teach_more_pic` 的组件体系已复制到本项目
 
 ## 核心约定
@@ -27,9 +29,54 @@ argument-hint: "内容描述或文件路径？"
 - SVG 中文字体需显式指定 font-family（含中文字体名）。
 - **报告类型从 `templates/report-starter.html` 复制作为基础；其他内容类型从 `templates/starter.html` 复制。禁止从零生成 HTML 结构。**
 - 保留模板的完整 CSS 变量系统（`:root` + 20 个 `[data-theme]`）、工具栏（主题/语言/目录）、键盘快捷键（T/L/←→）。
-- 视觉组件在模板预留的 `<!-- INSERT: 视觉组件 HTML -->` 注释处追加。
+- 视觉组件在模板预留的 `<!-- INSERT: 视觉组件 HTML -->` 注释处追加。亦可通过 `TemplateRenderer.assemble()` 自动完成。
 
-## 可视化工作流
+---
+
+## Framework API
+
+context2html 的核心 API，用于在 Python 中编程访问组件、主题和模板渲染。
+
+```python
+from context2html.registry import ComponentRegistry
+from context2html.theme import ThemeProvider
+from context2html.renderer import TemplateRenderer
+
+# 组件注册表
+reg = ComponentRegistry()
+all = reg.list_components()                          # all 31 components
+compat = reg.list_components(content_type='report')   # filter by type
+comp = reg.get_component(26)                          # single component by id
+deps = reg.resolve_dependencies([26, 28])             # lib deps for a set
+
+# comp.metadata  → .id, .name, .dependencies, .compat_types, .degrade_to, .requires_3d
+# comp.html / .css / .js  → extracted code blocks
+
+# 主题提供器
+tp = ThemeProvider()
+theme_list = tp.list_themes()                # all 20 themes
+theme = tp.get_theme('warm')                 # single theme by name
+best = tp.recommend_theme('report', '经济')   # recommended theme name
+
+# theme.accent, .bg, .text, .chart_colors, .recommend_for, .recommend_topics
+
+# 模板渲染器
+renderer = TemplateRenderer()
+html = renderer.assemble(
+    template_name='starter',           # 'starter' or 'report-starter'
+    components=[26, 17],               # component IDs
+    theme_name='warm'                  # theme for data-theme attribute
+)
+# Returns full HTML with components inserted, CSS merged, JS appended
+```
+
+**使用场景：** agent 可以从调用这些 API 构建自己的生成流程，而不需要严格遵循下方的示例工作流。
+
+---
+
+## Example flow (示例工作流)
+
+以下 5 步工作流是完整流程的一个示例。新 agent 可跟随此流程；熟练后可改用 Framework API 自由组合。
 
 ### Step 0: 确定内容类型
 
@@ -67,7 +114,8 @@ report 类型 → 复制 `report-starter.html`；其他类型 → 复制 `starte
 
 从 `references/decision-guide.md` 的决策树和选择矩阵按报告场景选组件（含失败模式）。数据密集型报告优先使用 Three.js #27 和 ECharts GL #29 提升视觉冲击力。
 
-- 打开对应的 `components/NN-name.md` 读取完整 HTML/CSS/JS
+- 用 `ComponentRegistry.list_components(content_type='...')` 过滤兼容组件
+- 用 `ComponentRegistry.get_component(id)` 读取组件的完整 HTML/CSS/JS
 - 视觉密度根据内容类型调整：报告/教程类型每 500 字至少 1 个视觉元素（数据密集型章节可缩短至 300 字）；文章/笔记类型每 800 字至少 1 个视觉元素
 - 🔵 CHECKPOINT：展示组件选择清单给用户确认
 
@@ -99,22 +147,31 @@ report 类型 → 复制 `report-starter.html`；其他类型 → 复制 `starte
 - 一页只用一个字体族
 - **到对应模板中去取最新的 CSS 变量和组件 CSS**（report 类型→`templates/report-starter.html`，其他类型→`templates/starter.html`），不要从其他源复制。
 
+**框架方式（推荐）：**
+
+```python
+from context2html.renderer import TemplateRenderer
+renderer = TemplateRenderer()
+html = renderer.assemble('report-starter', [26, 17], 'warm')
+# 然后在 html 中填充正文内容（中英双语）、封面元数据
+# 最后保存为文件、运行 validate-report.py
+```
+
+**手动方式（备选）：**
+
 1. 根据内容类型复制模板（report→`templates/report-starter.html`，其他→`templates/starter.html`）为 `output-slug.html`
    · 模板路径不存在 → 检查 `templates/` 目录下对应文件名 → 从 teach_more_pic 重新复制
-2. 🎨 **选择并设置主题** — 按决策指南 `theme 选择参考表` 选适合报告类型的主题：
+2. 🎨 **选择并设置主题** — 用 `ThemeProvider.recommend_theme(content_type, topic)` 获取推荐主题
    · 设置 `<html data-theme="xxx">` 为推荐主题
    · 确保 `<link href="../theme/report-themes.css">` 路径正确
    · 预览主题：打开 `examples/report-themes.html` 敲 T 键循环对比
 3. 填充封面元数据（标题、日期、作者、数据来源）
 4. 编写摘要 + 每章正文（中英双语 `data-lang="zh"` + `data-lang="en"`）— **写作时全程应用 Step 2.5 的 D1-D5 约束**
    🔵 CHECKPOINT：展示正文框架 + 逐段 D1-D5 自检结果给用户确认。用户确认后再合并组件。
-5. 从 `components/NN-name.md` 复制所选组件的 HTML + CSS + JS 合并到报告中：
+5. 用 `ComponentRegistry.get_component(id)` 获取组件 HTML/CSS/JS，合并到报告中：
    · 组件代码不兼容（缺 JS 依赖）→ 切换到简化版（纯 CSS 变体或文字替代）
    · 每章 2-4 个组件（数据密集型 5+）；同一章避免重复同类组件
-   · 结构 HTML：复制文件中 ````html` 代码块
-   · 组件 CSS：复制文件中 ````css` 代码块 → 合并到 `<style>` 中（按前缀分组）
-    · 组件 JS：复制文件中 `<script>` 所在代码块（````js` 块或含 `<script>` 的 ````html` 块均可）→ 合并到报告 JS 区
-    · 库引用转换：组件 `<script src="libs/X.js">` → 改为 `<script>__loadLib('X.js')</script>`（CDN 优先，模板已内置 `__loadLib`）
+   · 库引用转换：组件 `<script src="libs/X.js">` → 改为 `<script>__loadLib('X.js')</script>`（CDN 优先，模板已内置 `__loadLib`）
 6. 生成自动编号目录
 7. 每章末尾追加标签组 #17
 
@@ -125,7 +182,7 @@ report 类型 → 复制 `report-starter.html`；其他类型 → 复制 `starte
 4. `@media` 查询放各组件的 CSS 块末尾
 
 **组件 JS 合并规则：**
-- 组件 JS 放在 `<!-- ===== 组件 JS 从此处插入（可选） ===== -->` 注释之后
+- 组件 JS 追加在 `<!-- INSERT: 从 components/NN-name.md 复制 JS 到这里（可追加在下方） -->` 之后
 - PPT 增强 JS 始终最先加载
 
 ### Step 4: 验证
@@ -143,6 +200,8 @@ report 类型 → 复制 `report-starter.html`；其他类型 → 复制 `starte
 - 首次使用时复制 `libs/` 目录到报告同级目录（echarts/three/d3 离线包，作为 CDN 的 fallback）
 - 可选：运行 `bash templates/start-server.sh`（Linux/macOS）或 `powershell -ExecutionPolicy Bypass -File templates/start-server.ps1`（Windows）启动本地 HTTP 服务器预览
 
+---
+
 ## 文件资源速查
 
 | 路径 | 用途 | 工作流中引用处 |
@@ -153,13 +212,11 @@ report 类型 → 复制 `report-starter.html`；其他类型 → 复制 `starte
 | `references/decision-guide.md` | 组件选择矩阵 | Step 2 |
 | `references/page-types.md` | 9 种页面类型代码参考 | Step 3 |
 | `libs/` | 离线包（echarts/three/d3） | Step 5 |
-| `templates/start-server.ps1` | 本地 HTTP 服务器启动脚本 | Step 5 |
-| `templates/flowchart-vertical.svg` | 垂直流程图模板 | Step 2/3 |
 | `theme/report-themes.css` | 20 主题 CSS（自动生成，不可直接编辑） | Step 3 |
+| `theme/theme-index.json` | 主题元数据（含推荐规则） | Framework API |
 | `scripts/generate-theme-css.py` | 从 DESIGN.md 重新生成主题 CSS | 主题变更时 |
 | `examples/report-themes.html` | 20 主题预览页 | Step 2/3 |
-| `templates/cycle-diagram.svg` | 循环图模板 | Step 2/3 |
-| `templates/timeline-horizontal.svg` | 水平时间线 SVG 模板 | Step 2/3 |
+| `context2html/` | Python 框架包（registry/renderer/theme） | Framework API |
 
 ## 反模式黑名单
 | # | 反模式 | 为什么 | 替代做法 |

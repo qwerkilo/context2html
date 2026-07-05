@@ -1,79 +1,80 @@
 # context2html — Agent notes
 
-## What this is
+Pure HTML/CSS/JS. No frameworks, no build tools, no package.json. Open directly in browser after generation.
 
-Sub-skill augmenting **teach_more_pic**. Both loaded via `Skills:`. 31 visual components in `components/` are local copies from teach_more_pic (#1-29) + 2 custom (#30 GSAP, #31 SVG.js) — editable here. Differentiator: report workflow (not course), 20 brand themes, bilingual, D1-D5 humanization.
-
-**SKILL.md is the workflow document** (Step 0-5 + Step 2.5 humanize sub-step with STOP checkpoint before HTML generation).
-
-## Vanilla JS only
-
-**No JS frameworks.** No React/Vue/Svelte/jQuery/Alpine. Template uses ES5 IIFE + try/catch wrapping for maximum browser compatibility. All app logic is inline `<script>`, no external modules. Pre-downloaded libraries (ECharts, D3, Three.js, GSAP, SVG.js) go in `libs/` loaded via `<script src>` tags. Do NOT introduce build tools, bundlers, or framework runtimes.
-
-## No build system
-
-Pure HTML/CSS/JS. No package.json, no npm. Open directly in browser after generation.
+This is a **skill repo** — it augments `teach_more_pic` with a report-generation workflow. 31 visual components in `components/` (29 from teach_more_pic + 2 custom). **SKILL.md is the workflow** (Step 0-5 + Step 2.5 humanize checkpoint).
 
 ## Commands
 
 ```bash
-# All tests (376 tests: report 163 + lesson 131 + theme_css 28 + content_type 49 + sync_template 5)
+# All 376 tests
 python -m pytest scripts/test_validate_report.py scripts/test_validate_lesson.py scripts/test_generate_theme_css.py -v --tb=short
-```bash
+
 # Single test file
 python -m pytest scripts/test_validate_report.py -v --tb=short
 
-# Validate a report (21 hard checks + 3 humanization warnings). Paths resolved relative to report HTML directory.
+# Validate a report (21 hard checks + 3 humanization warnings)
 python scripts/validate-report.py path/to/report.html
 
 # Regenerate theme CSS from theme/*/DESIGN.md
 python scripts/generate-theme-css.py
 
-# Preview server (uses same cwd as root; access via localhost)
-powershell -ExecutionPolicy Bypass -File templates/start-server.ps1   # Windows
-bash templates/start-server.sh                                        # Linux/macOS
+# Preview server (root-relative paths need same cwd)
+bash templates/start-server.sh
 ```
 
 ## Hard constraints
 
-- **Vanilla JS** — no frameworks, no build tools, no bundlers
-- **Bilingual** — every content block needs `data-lang="zh"` + `data-lang="en"`. L key toggles.
-- **Template-based** — always copy `templates/report-starter.html`. Never start from scratch (loses CSS variable system, toolbar, keyboard nav).
+- **Vanilla JS** — ES5 IIFE + try/catch. No React/Vue/Svelte/jQuery/Alpine.
+- **Bilingual** — every text block needs `data-lang="zh"` + `data-lang="en"`. L key toggles.
+- **Template-based** — always copy `templates/report-starter.html` (report type) or `templates/starter.html` (other types). Never write HTML from scratch — lose CSS variable system, toolbar, keyboard nav.
 - **Visual density** — ≥1 component per 500 words. `references/decision-guide.md` for selection.
-- **ECharts priority** — for tabular/comparison data (3+ data points), prefer ECharts #26 over HTML tables #5/#22. The decision tree routes "对比分析 → ECharts #26 ⭐⭐⭐" first.
-- **Responsive tables** — components #5 and #22 now include `@media (max-width: 700px)` stacked layout + `data-label` attributes. No need to write responsive CSS from scratch.
+- **ECharts priority** — tabular/comparison data (3+ data points) → ECharts #26 before HTML tables #5/#22.
 - **Tag group #17** — required at end of every chapter.
-- **Theme** — pick from 20 themes via `<html data-theme="xxx">`.
+- **Theme** — 20 brand themes via `<html data-theme="xxx">`. Preview: open `examples/report-themes.html`, press T to cycle.
+- **5 content types** — `data-content-type` on `<html>`: `report`, `article`, `doc`, `tutorial`, `note`.
+- **D1-D5 humanization** — D4: no paragraph-initial "首先/其次/最后/综上所述/值得注意的是". D1: every paragraph must mix ≤10‑char and ≥35‑char sentences. D5: substitute terms every 800 chars. See `references/humanize_matrix.md`.
 
-## D1-D5 humanization (must read before writing)
+## MCP usage
 
-Rules in SKILL.md §2.5 + `references/humanize_matrix.md`. Failure modes agents miss:
-- D4: paragraph-initial "首先/其次/最后/综上所述/值得注意的是" = auto-fail
-- D1: every paragraph must mix ≤10‑char and ≥35‑char sentences
-- D5: substitute terms every 800 chars ("增长驱动"→"推力/支撑逻辑")
+### codebase-memory-mcp
+
+Indexed as `storage-emulated-0-Download-opencode` (~5.7K nodes / 19K edges). Skips `libs/`, `node_modules/`, `.git`.
+
+Use `search_graph` to find component names (e.g. `search_graph(query="GSAP 滚动动画")`) and `get_code_snippet` to read their source. The 31 components are indexed as Section nodes in `components/NN-name.md`. For architecture overview, `get_architecture(project="storage-emulated-0-Download-opencode")` shows clusters. `trace_path` works for cross-file JS patterns like `__loadLib` or `gv()` calls.
+
+**Limitation**: `libs/*` min.js files inflate the graph. Filter with `file_pattern` or `label` when searching — or use `rg`/`fd` directly for string patterns in `*.py` / `*.html` files.
+
+### sequential-thinking
+
+Use for: multi-step report structure planning (Step 1 → Step 2 → Step 2.5 ordering with human checkpoints), D1-D5 humanization analysis across paragraphs, or debugging complex validator failures where 21 checks interact.
 
 ## Gotchas
 
-- **Theme CSS is auto-generated** (`theme/report-themes.css`). Never hand-edit. Re-run `generate-theme-css.py` after teach_more_pic DESIGN.md changes.
-- **`generate-theme-css.py` speed** — uses `yaml.CSafeLoader` (C extension). Requires `pip install pyyaml` with compiled C extension. Pure-Python fallback is ~2× slower but works.
-- **Two manual themes** — `spotify` and `tesla` have NO YAML front matter in their DESIGN.md, so `generate-theme-css.py` falls back to the `MANUAL_THEMES` dict at the top of the script. **Editing their DESIGN.md will have no effect on the generated CSS** — edit `MANUAL_THEMES` instead. All other 18 themes are generated from `theme/*/DESIGN.md` YAML front matter.
-- **Template `<link>` path** — `report-starter.html` uses `<link href="../theme/report-themes.css">`. Adjust or inline when distributing standalone.
-- **`examples/*.html` paths** — files in `examples/` use `../libs/` not `libs/` for script/style paths. Demo HTMLs opened via `file://` protocol may need inlined external CSS (see `heatmap-demo.html` for the magicui-effects.css inlining pattern).
-- **Three.js WebGPU first** — component #27 uses `importmap` + `type="module"` for WebGPU, falls back to UMD `libs/three.min.js` for WebGL. Both patterns must be included.
-- **CDN-first + local fallback** — template has `__loadLib()` that tries `https://cdn.jsdelivr.net/gh/qwerkilo/context2html@main/` first, falls back to local. Use `<script>__loadLib('libs/echarts.min.js')</script>` instead of `<script src="libs/echarts.min.js">` in generated reports (second argument = custom local fallback path). Theme CSS loaded via `__loadLib('theme/report-themes.css','../theme/report-themes.css')`. Remove `<script src="libs/...">` tags from component code when inserting into reports. Keep `libs/` + `theme/` directories for fallback — validator checks both CDN URL presence AND local file existence.
-- **Validator path resolution** — `validate-report.py` resolves SVG paths, `<script src>` paths relative to the report HTML's own directory, NOT project root.
-- **Test imports** — `test_validate_report.py` uses `importlib` to load `validate-report.py` (non-standard import pattern). Tests are in `scripts/` next to the module under test.
-- **Components are .md files** — `components/NN-name.md` contain embedded ```html/css/js code blocks. Copy the blocks, not the whole file. Each component now has a standardized structure: `🎯 效果` preview header → HTML → CSS → JS → layout parameter table → usage rules → degradation notes. Simple components (#02-#20) include hover transitions (translateY + shadow) by default.
-- **ECharts color in Canvas** — `var(--accent)` in ECharts options does NOT resolve (Canvas2D ignores CSS var()). Always use `gv('--accent')` helper (`function gv(n){return getComputedStyle(docEl).getPropertyValue(n).trim()}`). Three.js #27 correctly already uses `getComputedStyle`.
-- **English text overflows on lang toggle** — English is wider than Chinese; template body has `overflow-wrap: break-word`, `.cmp-table` has `table-layout: fixed` + `word-break: break-word`. Do NOT remove these.
-- **Bilingual block-level elements** — `[data-lang].active` default is `display: inline`. Overrides exist for h1/h2/p/div/section/article/aside/td/th/cover-badge PLUS pre/blockquote/figure/ul/ol/li. If adding a new block-level element with `data-lang`, add it to the override chain.
-- **`examples/report-themes.html` is NOT a valid report** — it's a theme preview page and will fail `validate-report.py`. Use `examples/0001-demo-report.html` for smoke tests.
-- **`docs/` is gitignored** — `.gitignore` excludes `docs/`. Agent skill config files there won't be tracked.
-- **`CONTEXT.md`** exists at root with 5 resolved domain terms (可视化报告/人类化/视觉组件/双语/验证). Read before generating a report.
-- **`results.tsv` and `test-prompts.json`** — update after darwin-skill optimization runs.
-- **Heatmap Canvas init** — when computing vmin/vmax from a data matrix, start with `vmin=Infinity, vmax=-Infinity` (not `-Infinity, Infinity`). The inverse produces NaN normalize values and black cells.
-- **`examples/gsap-demo.html`** uses `../libs/` for GSAP scripts (not `libs/`). CDN fallback creates fresh `<script>` elements rather than mutating the existing one's `src`, which is unreliable across browsers.
+- **Theme CSS is auto-generated** (`theme/report-themes.css`). Never hand-edit. Re-run `generate-theme-css.py` after DESIGN.md changes.
+- **Two manual themes** — `spotify` and `tesla` have NO YAML front matter in their DESIGN.md. Edit `MANUAL_THEMES` dict in `generate-theme-css.py` instead. All other 18 themes come from `theme/*/DESIGN.md`.
+- **CDN-first + local fallback** — template has `__loadLib()` that tries jsDelivr CDN first, falls back to local `libs/`. Use `<script>__loadLib('libs/echarts.min.js')</script>` instead of raw `<script src>`. Validator checks both CDN presence AND local file existence.
+- **`__loadLib` for theme CSS** — use `__loadLib('theme/report-themes.css','../theme/report-themes.css')` in generated reports.
+- **Validator path resolution** — paths resolved relative to the report HTML's own directory, NOT project root.
+- **Test imports use `importlib`** — tests load modules via `importlib.util.spec_from_file_location`. Tests live in `scripts/` next to modules under test.
+- **Components are .md files** — copy the ```html/css/js code blocks, not the whole file.
+- **ECharts color in Canvas** — `var(--accent)` does NOT resolve inside ECharts options (Canvas2D ignores CSS var()). Always use the `gv('--accent')` helper (`function gv(n){return getComputedStyle(docEl).getPropertyValue(n).trim()}`).
+- **English text overflows on lang toggle** — English is wider than Chinese. Template has `overflow-wrap: break-word`, `.cmp-table` has `table-layout: fixed` + `word-break: break-word`. Do NOT remove.
+- **Heatmap Canvas vmin/vmax** — initialize with `vmin=Infinity, vmax=-Infinity` (not the inverse), or get NaN black cells.
+- **CSS source of truth** — edit `templates/base-styles.css`, then run `python scripts/sync-template-styles.py` to push changes to both `starter.html` and `report-starter.html`.
+- **`docs/` gitignore** — `docs/*` is gitignored except `docs/agents/`. Agent skill configs there are tracked; other docs are not.
+- **`examples/report-themes.html` is NOT a valid report** — will fail `validate-report.py`. Use `examples/0001-demo-report.html` for smoke tests.
 
-## Issue triage
+## Agent skills
 
-Issues are GitHub issues (create via `gh issue create`). PRs are not a triage surface. Labels: needs-triage / needs-info / ready-for-agent / ready-for-human / wontfix.
+### Issue tracker
+
+GitHub issues via `gh` CLI. External PRs not a triage surface. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default strings: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context — `CONTEXT.md` at root + `docs/adr/`. See `docs/agents/domain.md`.

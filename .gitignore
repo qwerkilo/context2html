@@ -5,7 +5,9 @@ __pycache__/
 .idea/
 node_modules/
 *.log
-docs/
+# docs/agents/ is tracked (agent skill configs). Other docs/ is ignored.
+docs/*
+!docs/agents/
 .cortexkit/
 .codegraph/
 # Windows file-sync conflict copies (OneDrive/Dropbox/Synology Drive)

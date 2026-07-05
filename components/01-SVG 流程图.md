@@ -1,3 +1,15 @@
+---
+id: 1
+name: SVG 流程图
+dependencies: []
+compat_types:
+- report
+- article
+- doc
+- tutorial
+requires_3d: false
+---
+
 ### 1. SVG 流程图（替换 ASCII 图）
 
 > **🎯 效果**：彩色 SVG 流程图，节点带圆角矩形 + 阴影 + 箭头连线，颜色语义统一（蓝=资金流、橙=触发、红=崩溃、绿=恢复），节点内包含图标+标题+副标题，适配主题色。

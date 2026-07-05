@@ -1,3 +1,16 @@
+---
+id: 25
+name: 现代浏览器API组件
+dependencies: []
+compat_types:
+- report
+- article
+- doc
+- tutorial
+- note
+requires_3d: false
+---
+
 ### 25. 现代浏览器 API 组件（原生折叠 / 原生模态 / 幻灯片 / Popover）
 
 > **🎯 效果**：零 JS 或极少 JS，利用 `<details>/<summary>`、`<dialog>`、CSS `scroll-snap`、Popover API 等原生 HTML5 能力。兼容 Chrome/Edge/Safari/Firefox 现代版本。

@@ -1,3 +1,17 @@
+---
+id: 29
+name: ECharts GL 3D可视化
+dependencies:
+- echarts.min.js
+- echarts-gl.min.js
+compat_types:
+- report
+- article
+- doc
+degrade_to: '26'
+requires_3d: true
+---
+
 ### 29. ECharts GL 3D 可视化
 
 > **🎯 效果**：WebGL 3D 图表——3D 柱状图、3D 散点图、3D 地球/地图、3D 曲面图。Canvas/JS 渲染，无需 CSS。需 `libs/echarts-gl.min.js`。

@@ -1,3 +1,12 @@
+---
+id: 26
+name: ECharts 交互式图表集
+dependencies: [echarts.min.js]
+compat_types: [report, article, doc, tutorial, note]
+degrade_to: "05"
+requires_3d: false
+---
+
 ### 26. ECharts 交互式图表集
 
 > **🎯 效果**：Apache ECharts 渲染的高质量交互式图表，支持悬浮提示（tooltip）、自适应缩放（resize）、4 种图表——柱状图 / 饼图 / 折线图 / 堆叠面积图。颜色通过 `gv('--accent')` 读取 CSS 变量跟随主题。需 `libs/echarts.min.js`。

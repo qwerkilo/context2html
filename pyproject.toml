@@ -1,0 +1,16 @@
+[project]
+name = "context2html"
+version = "0.1.0"
+description = "通用内容可视化引擎 — General-purpose content visualization engine"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+include = ["context2html*"]
+
+[tool.pytest.ini_options]
+testpaths = ["scripts"]
+python_files = ["test_*.py"]

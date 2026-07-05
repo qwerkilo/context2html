@@ -14,7 +14,18 @@
       "#27ae60"
     ],
     "radius": "8px",
-    "has_dark_bg": false
+    "has_dark_bg": false,
+    "recommend_for": [
+      "report",
+      "article"
+    ],
+    "recommend_topics": [
+      "经济",
+      "社会",
+      "教育",
+      "文化",
+      "历史"
+    ]
   },
   {
     "name": "airbnb",
@@ -31,7 +42,17 @@
       "rgb(225,6,72)"
     ],
     "radius": "14px",
-    "has_dark_bg": false
+    "has_dark_bg": false,
+    "recommend_for": [
+      "report",
+      "article"
+    ],
+    "recommend_topics": [
+      "旅游",
+      "住宿",
+      "设计",
+      "生活"
+    ]
   },
   {
     "name": "airtable",
@@ -48,7 +69,16 @@
       "rgb(0,0,18)"
     ],
     "radius": "10px",
-    "has_dark_bg": false
+    "has_dark_bg": false,
+    "recommend_for": [
+      "doc",
+      "report"
+    ],
+    "recommend_topics": [
+      "产品",
+      "管理",
+      "数据"
+    ]
   },
   {
     "name": "apple",
@@ -65,7 +95,16 @@
       "rgb(0,52,184)"
     ],
     "radius": "11px",
-    "has_dark_bg": false
+    "has_dark_bg": false,
+    "recommend_for": [
+      "report",
+      "article"
+    ],
+    "recommend_topics": [
+      "科技",
+      "设计",
+      "产品"
+    ]
   },
   {
     "name": "binance",
@@ -82,7 +121,16 @@
       "rgb(222,163,33)"
     ],
     "radius": "6px",
-    "has_dark_bg": false
+    "has_dark_bg": false,
+    "recommend_for": [
+      "report"
+    ],
+    "recommend_topics": [
+      "金融",
+      "投资",
+      "区块链",
+      "加密货币"
+    ]
   },
   {
     "name": "bmw-m",
@@ -99,7 +147,17 @@
       "rgb(225,205,235)"
     ],
     "radius": "6px",
-    "has_dark_bg": true
+    "has_dark_bg": true,
+    "recommend_for": [
+      "report",
+      "article"
+    ],
+    "recommend_topics": [
+      "汽车",
+      "机械",
+      "运动",
+      "性能"
+    ]
   },
   {
     "name": "claude",
@@ -116,7 +174,17 @@
       "rgb(174,70,72)"
     ],
     "radius": "8px",
-    "has_dark_bg": false
+    "has_dark_bg": false,
+    "recommend_for": [
+      "article",
+      "tutorial"
+    ],
+    "recommend_topics": [
+      "AI",
+      "人工智能",
+      "写作",
+      "创意"
+    ]
   },
   {
     "name": "cursor",
@@ -133,7 +201,18 @@
       "rgb(215,28,0)"
     ],
     "radius": "8px",
-    "has_dark_bg": false
+    "has_dark_bg": false,
+    "recommend_for": [
+      "doc",
+      "tutorial",
+      "note"
+    ],
+    "recommend_topics": [
+      "编程",
+      "开发",
+      "技术",
+      "工具"
+    ]
   },
   {
     "name": "dell-1996",
@@ -150,7 +229,16 @@
       "rgb(203,0,22)"
     ],
     "radius": "8px",
-    "has_dark_bg": false
+    "has_dark_bg": false,
+    "recommend_for": [
+      "report",
+      "article"
+    ],
+    "recommend_topics": [
+      "历史",
+      "科技",
+      "企业"
+    ]
   },
   {
     "name": "figma",
@@ -167,7 +255,17 @@
       "#f4ecd6"
     ],
     "radius": "8px",
-    "has_dark_bg": false
+    "has_dark_bg": false,
+    "recommend_for": [
+      "article",
+      "tutorial"
+    ],
+    "recommend_topics": [
+      "设计",
+      "工具",
+      "协作",
+      "创意"
+    ]
   },
   {
     "name": "hp",
@@ -184,7 +282,16 @@
       "rgb(0,24,196)"
     ],
     "radius": "4px",
-    "has_dark_bg": false
+    "has_dark_bg": false,
+    "recommend_for": [
+      "report",
+      "doc"
+    ],
+    "recommend_topics": [
+      "企业",
+      "科技",
+      "教育"
+    ]
   },
   {
     "name": "ibm",
@@ -201,7 +308,17 @@
       "rgb(0,48,234)"
     ],
     "radius": "6px",
-    "has_dark_bg": false
+    "has_dark_bg": false,
+    "recommend_for": [
+      "report",
+      "doc"
+    ],
+    "recommend_topics": [
+      "企业",
+      "科技",
+      "咨询",
+      "数据"
+    ]
   },
   {
     "name": "minimax",
@@ -218,7 +335,17 @@
       "rgb(0,0,0)"
     ],
     "radius": "8px",
-    "has_dark_bg": false
+    "has_dark_bg": false,
+    "recommend_for": [
+      "report",
+      "article"
+    ],
+    "recommend_topics": [
+      "AI",
+      "人工智能",
+      "科技",
+      "极致"
+    ]
   },
   {
     "name": "nike",
@@ -235,7 +362,17 @@
       "rgb(0,0,0)"
     ],
     "radius": "24px",
-    "has_dark_bg": false
+    "has_dark_bg": false,
+    "recommend_for": [
+      "article",
+      "report"
+    ],
+    "recommend_topics": [
+      "运动",
+      "体育",
+      "品牌",
+      "潮流"
+    ]
   },
   {
     "name": "notion",
@@ -252,7 +389,18 @@
       "rgb(56,19,192)"
     ],
     "radius": "8px",
-    "has_dark_bg": false
+    "has_dark_bg": false,
+    "recommend_for": [
+      "doc",
+      "note",
+      "tutorial"
+    ],
+    "recommend_topics": [
+      "产品",
+      "管理",
+      "笔记",
+      "效率"
+    ]
   },
   {
     "name": "nvidia",
@@ -269,7 +417,18 @@
       "#f9d4ff"
     ],
     "radius": "2px",
-    "has_dark_bg": false
+    "has_dark_bg": false,
+    "recommend_for": [
+      "report",
+      "article"
+    ],
+    "recommend_topics": [
+      "AI",
+      "GPU",
+      "芯片",
+      "科技",
+      "游戏"
+    ]
   },
   {
     "name": "spotify",
@@ -286,7 +445,17 @@
       "#b3b3b3"
     ],
     "radius": "8px",
-    "has_dark_bg": true
+    "has_dark_bg": true,
+    "recommend_for": [
+      "article",
+      "note"
+    ],
+    "recommend_topics": [
+      "音乐",
+      "娱乐",
+      "文化",
+      "创意"
+    ]
   },
   {
     "name": "tesla",
@@ -303,7 +472,17 @@
       "#f4f4f4"
     ],
     "radius": "4px",
-    "has_dark_bg": false
+    "has_dark_bg": false,
+    "recommend_for": [
+      "report",
+      "article"
+    ],
+    "recommend_topics": [
+      "汽车",
+      "能源",
+      "科技",
+      "创新"
+    ]
   },
   {
     "name": "x.ai",
@@ -320,7 +499,17 @@
       "#c4b5fd"
     ],
     "radius": "8px",
-    "has_dark_bg": true
+    "has_dark_bg": true,
+    "recommend_for": [
+      "report",
+      "article"
+    ],
+    "recommend_topics": [
+      "AI",
+      "人工智能",
+      "科技",
+      "前沿"
+    ]
   },
   {
     "name": "zapier",
@@ -337,6 +526,17 @@
       "rgb(225,29,0)"
     ],
     "radius": "12px",
-    "has_dark_bg": false
+    "has_dark_bg": false,
+    "recommend_for": [
+      "doc",
+      "tutorial",
+      "note"
+    ],
+    "recommend_topics": [
+      "自动化",
+      "效率",
+      "工具",
+      "工作流"
+    ]
   }
 ]

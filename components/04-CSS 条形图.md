@@ -1,3 +1,14 @@
+---
+id: 4
+name: CSS 条形图
+dependencies: []
+compat_types:
+- report
+- article
+- doc
+requires_3d: false
+---
+
 ### 4. CSS 条形图（替换纯文本统计）
 
 > **🎯 效果**：水平条形图，左侧标签 + 彩色填充条 + 右侧数值。条带圆角（3px），填充色语义化（蓝=正常、橙=触发、红=负面、绿=正面）。条宽动画 `transition: width 1s ease`。

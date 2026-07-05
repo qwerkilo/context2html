@@ -1,3 +1,16 @@
+---
+id: 30
+name: GSAP 滚动动画集
+dependencies:
+- gsap.min.js
+- ScrollTrigger.min.js
+compat_types:
+- report
+- article
+- tutorial
+requires_3d: false
+---
+
 ### 30. GSAP 滚动动画集
 
 > **🎯 效果**：基于 GSAP + ScrollTrigger 的 5 种滚动触发动画（fade / stagger / parallax / flip / zoom）。桌面端 `libs/` 离线加载，移动端 CDN 降级。每个模式独立触发，ease-out 缓动。

@@ -1,3 +1,16 @@
+---
+id: 31
+name: SVG.js 动态图表
+dependencies:
+- svg.min.js
+compat_types:
+- report
+- article
+- doc
+- tutorial
+requires_3d: false
+---
+
 ### 31. SVG.js 动态图表
 
 > **🎯 效果**：基于 SVG.js v3（78KB minified）的链式 API 动态 SVG 图表——纵向柱状图、多系列折线图、流程图、进度环。内置 `element.animate()` 逐帧缓动动画，CSS 变量继承跟随主题。

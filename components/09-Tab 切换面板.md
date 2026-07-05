@@ -1,3 +1,15 @@
+---
+id: 9
+name: Tab 切换面板
+dependencies: []
+compat_types:
+- report
+- article
+- doc
+- tutorial
+requires_3d: false
+---
+
 ### 9. Tab 切换面板（替换平铺的多视角罗列）
 
 > **🎯 效果**：左侧纵向药丸 Tab + 右侧内容区。选中 Tab 主题色填充 + 白色文字，未选中灰色描边。内容切换带 `fadeIn` 动画（0.3s）。窄屏自动折叠为顶部横向 Tab 栏。

@@ -1,3 +1,16 @@
+---
+id: 7
+name: PPT 质感增强
+dependencies: []
+compat_types:
+- report
+- article
+- doc
+- tutorial
+- note
+requires_3d: false
+---
+
 ### 7. PPT 质感增强（纵向滚读 + 动画 + 主题切换）
 
 > **🎯 效果**：20 主题切换（T 键循环 + 工具栏面板 + localStorage 持久化）、滚动入场动画（fade-up / fade / slide-left / blur 四种模式）、← → 键章节导航、浮动 TOC。所有能力内置在 `report-starter.html` 模板中。

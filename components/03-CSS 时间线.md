@@ -1,3 +1,14 @@
+---
+id: 3
+name: CSS 时间线
+dependencies: []
+compat_types:
+- report
+- article
+- tutorial
+requires_3d: false
+---
+
 ### 3. CSS 时间线（替换事件表格）
 
 > **🎯 效果**：左侧竖线 + 圆点里程碑 + 日期 + 描述。关键事件放大圆点（22px），悬停时圆点发光放大。纯 CSS，无 JS。
