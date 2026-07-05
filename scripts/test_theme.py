@@ -44,3 +44,21 @@ class TestThemeProvider:
     def test_theme_has_recommend_for(self):
         t = self.tp.get_theme('warm')
         assert 'report' in t.recommend_for
+
+    def test_all_20_themes_have_valid_accent(self):
+        for t in self.tp.list_themes():
+            assert t.accent, f"Theme {t.name} has no accent color"
+            assert t.bg, f"Theme {t.name} has no bg color"
+
+    def test_recommend_exact_topic_wins(self):
+        name = self.tp.recommend_theme('tutorial', '编程')
+        assert name == 'cursor'
+
+    def test_recommend_fallback_on_no_topic_match(self):
+        name = self.tp.recommend_theme('report', 'nonexistent_topic_xyz')
+        assert name is not None
+        assert isinstance(name, str)
+
+    def test_get_theme_case_sensitive(self):
+        assert self.tp.get_theme('Warm') is None
+        assert self.tp.get_theme('warm') is not None
