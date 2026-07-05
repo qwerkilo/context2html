@@ -4,6 +4,7 @@ Usage: python validate-report.py <path-to-report.html>
 
 import sys
 import os
+from dataclasses import dataclass, field
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _validate_common import (
@@ -24,20 +25,20 @@ from checks.report import (
 )
 
 
-def run_all(path):
-    if not os.path.exists(path):
-        print(f"{FAIL} File not found: {path}")
-        sys.exit(1)
+@dataclass
+class ValidationResult:
+    content_type: str = ''
+    checks: list = field(default_factory=list)
+    warnings: list = field(default_factory=list)
+    all_pass: bool = True
 
-    with open(path, "r", encoding="utf-8") as f:
-        html = f.read()
 
-    base_dir = os.path.dirname(path)
-
+def build_checks(html, base_dir):
+    """Return (checks, warnings) lists of (label, issues) tuples
+    based on content type.
+    """
     ct = detect_content_type(html)
-    print(f"  Content type: {ct}")
 
-    # 通用检查（所有类型）
     checks = [
         ("SVG files exist & valid", check_svg_links(html, base_dir)),
         ("Exactly one <h1>", check_h1_count(html)),
@@ -52,24 +53,17 @@ def run_all(path):
         ("theme/report-themes.css referenced", check_theme_css(html, base_dir)),
     ]
 
-    # report 类型专有检查
     if ct == 'report':
         checks += [
             (".exec-summary section", check_exec_summary(html)),
             (".report-chapter sections (>=1)", check_report_chapters(html)),
             (".conclusion-page section", check_conclusion_page(html)),
             (".report-footer element", check_report_footer(html)),
-        ]
-
-    # 数据可视化相关检查（report 强制）
-    if ct == 'report':
-        checks += [
             ("Bar-fill width <= 100%", check_bar_fill_width(html)),
             ("Comparison table responsive (max-width 600-700px)", check_cmp_table_responsive(html)),
             ("English layout (overflow-wrap + table-layout:fixed)", check_english_layout(html)),
         ]
 
-    # 内容类型专有结构检查
     if ct == 'article':
         checks += [("Article structure (<article> elements)", check_article_structure(html))]
     elif ct == 'doc':
@@ -79,7 +73,6 @@ def run_all(path):
     elif ct == 'note':
         checks += [("Note structure", check_note_structure(html))]
 
-    # 跨内容类型通用（技术正确性）
     checks += [
         ("ECharts var() not used directly in script", check_echarts_color_usage(html)),
         ("Chapter cross-refs use #chN anchors", check_cross_refs(html)),
@@ -93,29 +86,61 @@ def run_all(path):
         ("D5 — 术语变体 (同术语 ≤1次/800字)", check_d5_term_variety(html)),
     ]
 
-    all_pass = True
+    return ct, checks, warnings
+
+
+def run_checks(html, base_dir):
+    """Run all checks and return a structured ValidationResult."""
+    ct, checks, warnings = build_checks(html, base_dir)
+    result = ValidationResult(content_type=ct)
     for label, issues in checks:
+        result.checks.append((label, issues))
         if issues:
-            all_pass = False
-            print(f"  {FAIL} {label}")
-            for i in issues:
-                print(f"      {i}")
-        else:
-            print(f"  {PASS} {label}")
-
+            result.all_pass = False
     for label, issues in warnings:
-        if issues:
-            print(f"  [!WRN] {label}")
-            for i in issues:
-                print(f"      {i}")
-        else:
-            print(f"  [PASS] {label}")
+        result.warnings.append((label, issues))
+    return result
 
-    print()
-    if all_pass:
-        print(f" {PASS} All checks passed for {os.path.basename(path)}")
+
+def format_result(result):
+    """Format a ValidationResult as a printable string."""
+    lines = [f"  Content type: {result.content_type}"]
+    for label, issues in result.checks:
+        if issues:
+            lines.append(f"  {FAIL} {label}")
+            for i in issues:
+                lines.append(f"      {i}")
+        else:
+            lines.append(f"  {PASS} {label}")
+    for label, issues in result.warnings:
+        if issues:
+            lines.append(f"  [!WRN] {label}")
+            for i in issues:
+                lines.append(f"      {i}")
+        else:
+            lines.append(f"  [PASS] {label}")
+    lines.append("")
+    if result.all_pass:
+        lines.append(f" {PASS} All checks passed")
     else:
-        print(f" {FAIL} Some checks failed")
+        lines.append(f" {FAIL} Some checks failed")
+    return "\n".join(lines)
+
+
+def run_all(path):
+    """Legacy entry point: read file, run checks, print, sys.exit."""
+    if not os.path.exists(path):
+        print(f"{FAIL} File not found: {path}")
+        sys.exit(1)
+
+    with open(path, "r", encoding="utf-8") as f:
+        html = f.read()
+
+    base_dir = os.path.dirname(path)
+    result = run_checks(html, base_dir)
+    print(format_result(result))
+
+    if not result.all_pass:
         sys.exit(1)
 
 
