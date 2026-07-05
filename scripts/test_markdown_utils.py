@@ -61,6 +61,33 @@ class TestExtractCodeBlock:
         assert extract_code_block(md, "css") == ".foo { color: red; }"
 
 
+class TestExtractCodeBlockMulti:
+    def test_multi_all_blocks(self):
+        md = "```html\n<div>1</div>\n```\n```html\n<div>2</div>\n```"
+        result = extract_code_block(md, "html", multi=True)
+        assert result == ["<div>1</div>", "<div>2</div>"]
+
+    def test_multi_empty(self):
+        md = "plain text"
+        assert extract_code_block(md, "html", multi=True) == []
+
+    def test_multi_single_block(self):
+        md = "```html\n<div>x</div>\n```"
+        result = extract_code_block(md, "html", multi=True)
+        assert result == ["<div>x</div>"]
+
+    def test_multi_different_langs_filtered(self):
+        md = "```html\n<template>\n```\n```css\na {}\n```"
+        result = extract_code_block(md, "html", multi=True)
+        assert len(result) == 1
+        assert "<template>" in result[0]
+
+    def test_multi_three_blocks(self):
+        md = "```js\na\n```\n```js\nb\n```\n```js\nc\n```"
+        result = extract_code_block(md, "js", multi=True)
+        assert result == ["a", "b", "c"]
+
+
 class TestExtractJsFromMd:
     def test_explicit_js_block(self):
         md = "```js\nvar x = 1;\n```"
@@ -77,3 +104,14 @@ class TestExtractJsFromMd:
     def test_js_block_preferred_over_html(self):
         md = "```js\nvar y = 2;\n```\n```html\n<script>var x = 1;</script>\n```"
         assert extract_js_from_md(md) == "var y = 2;"
+
+
+class TestExtractJsFromMdMulti:
+    def test_multi_js_blocks(self):
+        md = "```js\na\n```\n```js\nb\n```"
+        result = extract_js_from_md(md, multi=True)
+        assert "a" in result
+        assert "b" in result
+
+    def test_multi_empty(self):
+        assert extract_js_from_md("plain text", multi=True) == ""
