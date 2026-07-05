@@ -59,9 +59,11 @@ class ComponentRegistry:
             meta, body = parse_front_matter(content)
             if not meta:
                 continue
-            html = extract_code_block(body, 'html') or ''
-            css = extract_code_block(body, 'css') or ''
-            js = extract_js_from_md(body)
+            html_blocks = extract_code_block(body, 'html', multi=True)
+            css_blocks = extract_code_block(body, 'css', multi=True)
+            html = '\n'.join(html_blocks) if html_blocks else ''
+            css = '\n'.join(css_blocks) if css_blocks else ''
+            js = extract_js_from_md(body, multi=True)
             metadata = ComponentMeta.from_dict(meta)
             self._cache.append(Component(metadata, html, css, js))
         return self._cache

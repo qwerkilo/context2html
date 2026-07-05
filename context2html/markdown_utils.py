@@ -22,31 +22,44 @@ def parse_front_matter(text):
     return {}, body
 
 
-def extract_code_block(content, lang):
-    """Find the first ```lang fenced code block, return its content."""
+def extract_code_block(content, lang, multi=False):
+    """Find fenced code blocks for a given language.
+    Returns first block content (str) when multi=False.
+    Returns list of all block contents (list[str]) when multi=True.
+    """
     pattern = re.compile(
         r'^`{3}' + re.escape(lang) + r'\s*\n(.*?)\n^`{3}',
         re.MULTILINE | re.DOTALL
     )
+    if multi:
+        return [m.group(1).strip() for m in pattern.finditer(content)]
     m = pattern.search(content)
     if m:
         return m.group(1).strip()
     return None
 
 
-def extract_js_from_md(content):
+def extract_js_from_md(content, multi=False):
     """Extract JS from markdown. Prefers ```js block, falls back to
     ```html block containing <script>.
+    Returns first result (str) when multi=False.
+    Returns concatenated string when multi=True.
     """
-    js = extract_code_block(content, 'js')
-    if js:
-        return js
+    js_blocks = extract_code_block(content, 'js', multi=True)
+    if js_blocks:
+        result = '\n'.join(js_blocks)
+        return result if not multi else result
+
     pattern = re.compile(
         r'^`{3}html\s*\n(.*?)\n^`{3}',
         re.MULTILINE | re.DOTALL
     )
+    script_blocks = []
     for m in pattern.finditer(content):
         block = m.group(1)
         if '<script' in block:
-            return block.strip()
-    return ''
+            script_blocks.append(block.strip())
+
+    if multi:
+        return '\n'.join(script_blocks)
+    return script_blocks[0] if script_blocks else ''
