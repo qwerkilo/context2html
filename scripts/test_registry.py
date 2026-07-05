@@ -1,14 +1,7 @@
 """Tests for context2html.registry."""
-import os, sys, importlib.util
+import os
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-spec = importlib.util.spec_from_file_location(
-    "context2html.registry",
-    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                 "context2html", "registry.py")
-)
-reg = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(reg)
+from context2html.registry import ComponentRegistry
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 COMPONENTS_DIR = os.path.join(BASE_DIR, 'components')
@@ -16,7 +9,7 @@ COMPONENTS_DIR = os.path.join(BASE_DIR, 'components')
 
 class TestComponentRegistry:
     def setup_method(self):
-        self.r = reg.ComponentRegistry(COMPONENTS_DIR)
+        self.r = ComponentRegistry(COMPONENTS_DIR)
 
     def test_list_components_returns_all(self):
         all_c = self.r.list_components()

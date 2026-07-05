@@ -1,5 +1,4 @@
 import sys, os, re, importlib.util
-sys.path.insert(0, os.path.dirname(__file__))
 spec = importlib.util.spec_from_file_location(
     "gc", os.path.join(os.path.dirname(__file__), "generate-theme-css.py"))
 gc = importlib.util.module_from_spec(spec)

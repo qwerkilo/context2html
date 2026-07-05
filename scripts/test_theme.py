@@ -1,14 +1,7 @@
 """Tests for context2html.theme."""
-import os, sys, importlib.util
+import os
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-spec = importlib.util.spec_from_file_location(
-    "context2html.theme",
-    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                 "context2html", "theme.py")
-)
-th = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(th)
+from context2html.theme import ThemeProvider
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 INDEX_PATH = os.path.join(BASE_DIR, 'theme', 'theme-index.json')
@@ -16,7 +9,7 @@ INDEX_PATH = os.path.join(BASE_DIR, 'theme', 'theme-index.json')
 
 class TestThemeProvider:
     def setup_method(self):
-        self.tp = th.ThemeProvider(INDEX_PATH)
+        self.tp = ThemeProvider(INDEX_PATH)
 
     def test_list_themes_returns_20(self):
         themes = self.tp.list_themes()

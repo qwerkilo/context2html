@@ -1,14 +1,7 @@
 """Tests for context2html.renderer."""
-import os, sys, importlib.util
+import os
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-spec = importlib.util.spec_from_file_location(
-    "context2html.renderer",
-    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                 "context2html", "renderer.py")
-)
-rd = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(rd)
+from context2html.renderer import TemplateRenderer
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
@@ -16,7 +9,7 @@ TEMPLATES_DIR = os.path.join(BASE_DIR, 'templates')
 
 class TestTemplateRenderer:
     def setup_method(self):
-        self.r = rd.TemplateRenderer(templates_dir=TEMPLATES_DIR)
+        self.r = TemplateRenderer(templates_dir=TEMPLATES_DIR)
 
     def test_assemble_starter_no_components(self):
         result = self.r.assemble('starter', [], 'warm')

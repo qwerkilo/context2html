@@ -1,8 +1,6 @@
 """Tests for content_type.py and report.py check functions."""
 import sys, os, re, importlib.util
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-
 # Load checks.report to get _get_style_css, _extract_para_texts
 spec = importlib.util.spec_from_file_location(
     "checks.report",

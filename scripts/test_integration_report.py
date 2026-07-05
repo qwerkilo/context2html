@@ -1,7 +1,6 @@
 """Integration tests for validate-report.py entry point."""
 import sys, os, importlib.util
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 spec = importlib.util.spec_from_file_location(
     "vr_main", os.path.join(os.path.dirname(__file__), "validate-report.py")
 )

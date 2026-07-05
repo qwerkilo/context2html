@@ -1,5 +1,4 @@
 import sys, os, importlib.util
-sys.path.insert(0, os.path.dirname(__file__))
 spec = importlib.util.spec_from_file_location("vr", os.path.join(os.path.dirname(__file__), "validate-report.py"))
 vr = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(vr)
