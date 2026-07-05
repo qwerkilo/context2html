@@ -15,6 +15,8 @@ argument-hint: "内容描述或文件路径？"
 
 将文本内容自动转化为可视化 HTML 页面。支持报告、文章、文档、教程、笔记等多种内容类型。完整复用 `teach_more_pic` 的 29 个视觉组件 + 2 个自定义组件（GSAP + SVG.js）和离线库。
 
+**Docs hierarchy:** `SKILL.md` (this file, workflow + API) → `AGENTS.md` (agent quick ref) → `README.md` (human-facing overview).
+
 **Framework API** 在下文文档中 — 高级 agent 可用 API 组合自己的流程；新手可跟随下方的示例工作流。
 
 ## 前置条件

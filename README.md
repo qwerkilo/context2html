@@ -1,5 +1,7 @@
 # context2html — 通用内容可视化引擎
 
+**Docs hierarchy:** `SKILL.md` (workflow + API) → `AGENTS.md` (agent quick ref) → `README.md` (this file, overview).
+
 把文本内容自动转化为可视化 HTML 页面。支持报告、文章、文档、教程、笔记等多种内容类型。完整复用 [teach_more_pic](../teach_more_pic/) 的 29 个视觉组件体系 + 2 个自定义组件（GSAP #30、SVG.js #31）：SVG 流程图、ECharts、Three.js 3D、D3.js、CSS 条形图、时间线、对比表、GSAP 动画集等，新增报告专用模板和人类化写作约束。生成的报告支持 20 种品牌主题切换、中英双语、键盘导航。
 
 > 本 skill 是 [teach_more_pic](../teach_more_pic/) 的兄弟技能——共用同一套视觉组件体系，差异化在报告场景（而非课程）。通用化改造后，已扩展到文章、文档、教程、笔记等多种内容类型。

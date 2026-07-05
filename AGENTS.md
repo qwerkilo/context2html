@@ -2,6 +2,8 @@
 
 Pure HTML/CSS/JS. No frameworks, no build tools, no package.json. Open directly in browser after generation.
 
+**Docs hierarchy:** `SKILL.md` (workflow + API) → `AGENTS.md` (this file, quick ref) → `README.md` (human-facing overview).
+
 This is a **skill repo** — it augments `teach_more_pic` with a report-generation workflow. 31 visual components in `components/` (29 from teach_more_pic + 2 custom). **SKILL.md is the workflow** (Step 0-5 + Step 2.5 humanize checkpoint) and the **Framework API reference**.
 
 ## Commands
