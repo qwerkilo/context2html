@@ -1,9 +1,10 @@
 """Component Registry — parse and query visual components by metadata."""
 
 import os
-import re
-import glob
 import yaml
+import glob
+
+from context2html.markdown_utils import parse_front_matter, extract_code_block, extract_js_from_md
 
 
 COMPONENTS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'components')
@@ -55,56 +56,15 @@ class ComponentRegistry:
         for f in files:
             with open(f, 'r', encoding='utf-8') as fh:
                 content = fh.read()
-            meta, body = self._parse_front_matter(content)
+            meta, body = parse_front_matter(content)
             if not meta:
                 continue
-            html = self._find_md_block(body, 'html') or ''
-            css = self._find_md_block(body, 'css') or ''
-            js = self._extract_js(body)
+            html = extract_code_block(body, 'html') or ''
+            css = extract_code_block(body, 'css') or ''
+            js = extract_js_from_md(body)
             metadata = ComponentMeta.from_dict(meta)
             self._cache.append(Component(metadata, html, css, js))
         return self._cache
-
-    @staticmethod
-    def _parse_front_matter(text):
-        m = re.match(r'^---\s*\n(.*?)\n(?:---|\.\.\.)', text, re.DOTALL)
-        if not m:
-            return {}, text
-        yaml_text = m.group(1)
-        body = text[m.end():]
-        try:
-            result = yaml.safe_load(yaml_text)
-            if isinstance(result, dict):
-                return result, body
-        except yaml.YAMLError:
-            pass
-        return {}, body
-
-    @staticmethod
-    def _find_md_block(content, lang):
-        pattern = re.compile(
-            r'^`{3}' + re.escape(lang) + r'\s*\n(.*?)\n^`{3}',
-            re.MULTILINE | re.DOTALL
-        )
-        m = pattern.search(content)
-        if m:
-            return m.group(1).strip()
-        return None
-
-    @staticmethod
-    def _extract_js(content):
-        js = ComponentRegistry._find_md_block(content, 'js')
-        if js:
-            return js
-        pattern = re.compile(
-            r'^`{3}html\s*\n(.*?)\n^`{3}',
-            re.MULTILINE | re.DOTALL
-        )
-        for m in pattern.finditer(content):
-            block = m.group(1)
-            if '<script' in block:
-                return block.strip()
-        return ''
 
     def list_components(self, content_type=None):
         all_components = self._load_all()

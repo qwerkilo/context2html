@@ -5,52 +5,30 @@ Usage:
   python extract-component.py JS <component.md>     # Extract JS
   python extract-component.py LIST                  # List all components
 """
-import re
 import os
 import sys
 import glob
+import re
 
-
-def find_md_block(content, lang):
-    """Find the first ```lang code block, return its content."""
-    pattern = re.compile(
-        r'^`{3}' + re.escape(lang) + r'\s*\n(.*?)\n^`{3}',
-        re.MULTILINE | re.DOTALL
-    )
-    m = pattern.search(content)
-    if m:
-        return m.group(1).strip()
-    return None
+from context2html.markdown_utils import extract_code_block, extract_js_from_md
 
 
 def extract_html(filepath):
     with open(filepath, 'r', encoding='utf-8') as f:
         content = f.read()
-    return find_md_block(content, 'html') or ''
+    return extract_code_block(content, 'html') or ''
 
 
 def extract_css(filepath):
     with open(filepath, 'r', encoding='utf-8') as f:
         content = f.read()
-    return find_md_block(content, 'css') or ''
+    return extract_code_block(content, 'css') or ''
 
 
 def extract_js(filepath):
     with open(filepath, 'r', encoding='utf-8') as f:
         content = f.read()
-    js = find_md_block(content, 'js')
-    if js:
-        return js
-    # Fallback: find ```html block that contains <script>
-    pattern = re.compile(
-        r'^`{3}html\s*\n(.*?)\n^`{3}',
-        re.MULTILINE | re.DOTALL
-    )
-    for m in pattern.finditer(content):
-        block = m.group(1)
-        if '<script' in block:
-            return block.strip()
-    return ''
+    return extract_js_from_md(content)
 
 
 def list_components():

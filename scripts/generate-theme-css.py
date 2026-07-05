@@ -14,6 +14,8 @@ import re
 import json
 import sys
 
+from context2html.markdown_utils import parse_front_matter
+
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # 先找本地 theme/ 目录（已从 teach_more_pic 复制），再找同级 teach_more_pic 项目
@@ -42,147 +44,6 @@ OUTPUT_DIR = os.path.join(PROJECT_DIR, "theme")
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 OUTPUT_CSS = os.path.join(OUTPUT_DIR, "report-themes.css")
 OUTPUT_JSON = os.path.join(OUTPUT_DIR, "theme-index.json")
-
-# YAML front matter 解析（使用 pyyaml 或内置回退）
-def parse_front_matter(text):
-    """解析 --- 包围的 YAML 头，返回 dict 和正文。"""
-    m = re.match(r'^---\s*\n(.*?)\n(?:---|\.\.\.)', text, re.DOTALL)
-    if not m:
-        return {}, text
-    yaml_text = m.group(1)
-    body = text[m.end():]
-
-    # Try PyYAML first (with C loader for speed)
-    try:
-        import yaml
-        try:
-            loader = yaml.CSafeLoader
-        except AttributeError:
-            loader = yaml.SafeLoader
-        result = yaml.load(yaml_text, Loader=loader)
-        if isinstance(result, dict):
-            return result, body
-    except ImportError:
-        pass
-
-    # Fallback: section-based regex parser
-    result = {}
-    sections = split_yaml_sections(yaml_text)
-
-    for key, val in sections:
-        if isinstance(val, dict):
-            result[key] = val
-        elif isinstance(val, str):
-            result[key] = val
-        else:
-            result[key] = val
-
-    return result, body
-
-
-def is_new_key(line):
-    """Check if line looks like a new YAML key (not a URL or value with colons)."""
-    stripped = line.strip()
-    if '://' in stripped:
-        return False
-    # Must have ':' followed by space or end-of-string (YAML key pattern)
-    return re.match(r'^[\w\-]+:', stripped)
-
-
-def split_yaml_sections(text):
-    """Split YAML by top-level keys. Returns list of (key, value_or_dict_or_string)."""
-    lines = text.split('\n')
-    result = []
-    i = 0
-    while i < len(lines):
-        line = lines[i].rstrip()
-        if not line or line.strip().startswith('#'):
-            i += 1
-            continue
-        stripped = line.strip()
-        if ':' not in stripped:
-            i += 1
-            continue
-        key, _, val = stripped.partition(':')
-        key = key.rstrip()
-        val = val.strip()
-
-        # Empty value → child block follows
-        if not val:
-            child_lines = []
-            i += 1
-            while i < len(lines):
-                next_line = lines[i]
-                if next_line.strip() and not next_line.startswith(' ') and not next_line.startswith('\t') and is_new_key(next_line):
-                    break
-                if next_line.strip() and not next_line.strip().startswith('#'):
-                    child_lines.append(next_line)
-                i += 1
-            children = parse_child_dict(child_lines)
-            result.append((key, children))
-
-        # | block → multi-line string
-        elif val == '|':
-            desc_lines = []
-            i += 1
-            while i < len(lines):
-                next_line = lines[i]
-                if next_line.strip() and not next_line.startswith(' ') and not next_line.startswith('\t') and (is_new_key(next_line) or next_line.strip().startswith('#') or next_line.startswith('---')):
-                    break
-                desc_lines.append(next_line.strip())
-                i += 1
-            result.append((key, ' '.join(desc_lines)))
-
-        # > block → folded multi-line string
-        elif val == '>':
-            desc_lines = []
-            i += 1
-            while i < len(lines):
-                next_line = lines[i]
-                if next_line.strip() and not next_line.startswith(' ') and not next_line.startswith('\t') and (is_new_key(next_line) or next_line.strip().startswith('#')):
-                    break
-                desc_lines.append(next_line.strip())
-                i += 1
-            result.append((key, ' '.join(desc_lines)))
-
-        # Regular scalar value
-        else:
-            val = val.strip()
-            if val.startswith('"') and val.endswith('"'):
-                val = val[1:-1]
-            elif val.startswith("'") and val.endswith("'"):
-                val = val[1:-1]
-            # Handle list values like [a, b, c]
-            if val.startswith('[') and val.endswith(']'):
-                try:
-                    val = json.loads(val)
-                except:
-                    pass
-            result.append((key, val))
-            i += 1
-
-    return result
-
-
-def parse_child_dict(lines):
-    """Parse indented child key-value pairs into a dict."""
-    d = {}
-    for line in lines:
-        stripped = line.strip()
-        if not stripped or stripped.startswith('#'):
-            continue
-        if ':' not in stripped:
-            continue
-        key, _, val = stripped.partition(':')
-        key = key.rstrip()
-        val = val.strip()
-        if val.startswith('"') and val.endswith('"'):
-            val = val[1:-1]
-        elif val.startswith("'") and val.endswith("'"):
-            val = val[1:-1]
-        d[key] = val
-    return d
-
 
 def get_color(colors, *keys, default=None):
     for k in keys:

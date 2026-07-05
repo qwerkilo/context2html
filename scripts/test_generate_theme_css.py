@@ -139,32 +139,6 @@ class TestIsDark:
     def test_white_is_not_dark(self):
         assert gc.is_dark('#FFFFFF') == False
 
-class TestSplitYamlSections:
-    def test_simple_pairs(self):
-        result = gc.split_yaml_sections("a: 1\nb: 2")
-        assert result == [("a", "1"), ("b", "2")]
-    def test_double_dash_not_separator(self):
-        result = gc.split_yaml_sections("a: --\nb: 2")
-        assert len(result) == 2
-
-class TestParseChildDict:
-    def test_empty_list(self):
-        assert gc.parse_child_dict([]) == {}
-    def test_simple_kv(self):
-        result = gc.parse_child_dict(['  key: value', '  foo: bar'])
-        assert result == {'key': 'value', 'foo': 'bar'}
-    def test_quoted_values(self):
-        result = gc.parse_child_dict(['  key: "value"', "  foo: 'bar'"])
-        assert result == {'key': 'value', 'foo': 'bar'}
-
-class TestIsNewKey:
-    def test_simple_key(self):
-        assert gc.is_new_key('colors:')
-    def test_url_is_not_key(self):
-        assert not gc.is_new_key('https://example.com')
-    def test_key_with_value(self):
-        assert gc.is_new_key('description: A thing: nice')
-
 class TestGenerateThemeCss:
     def test_generates_valid_css(self, tmp_path):
         d = tmp_path / "DESIGN.md"
