@@ -49,9 +49,10 @@ class TemplateRenderer:
         component_js_parts = []
 
         for cid in components:
-            comp = self._reg.get_component(cid)
-            if comp is None:
+            comps = self._reg.list_components(id=cid)
+            if not comps:
                 continue
+            comp = comps[0]
             if comp.html:
                 component_html_parts.append(comp.html)
             if comp.css:

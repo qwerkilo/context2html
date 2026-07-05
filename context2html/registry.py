@@ -1,11 +1,9 @@
 """Component Registry — parse and query visual components by metadata."""
 
 import os
-import yaml
 import glob
 
 from context2html.markdown_utils import parse_front_matter, extract_code_block, extract_js_from_md
-
 
 COMPONENTS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'components')
 
@@ -68,26 +66,22 @@ class ComponentRegistry:
             self._cache.append(Component(metadata, html, css, js))
         return self._cache
 
-    def list_components(self, content_type=None):
+    def list_components(self, content_type=None, id=None):
         all_components = self._load_all()
-        if content_type is None:
-            return all_components
-        return [c for c in all_components if content_type in c.metadata.compat_types]
-
-    def get_component(self, id):
-        all_components = self._load_all()
-        for c in all_components:
-            if c.metadata.id == id:
-                return c
-        return None
+        result = all_components
+        if content_type is not None:
+            result = [c for c in result if content_type in c.metadata.compat_types]
+        if id is not None:
+            result = [c for c in result if c.metadata.id == id]
+        return result
 
     def resolve_dependencies(self, component_ids):
         result = []
         seen = set()
         for cid in component_ids:
-            comp = self.get_component(cid)
-            if comp:
-                for dep in comp.metadata.dependencies:
+            comps = self.list_components(id=cid)
+            if comps:
+                for dep in comps[0].metadata.dependencies:
                     if dep not in seen:
                         seen.add(dep)
                         result.append(dep)

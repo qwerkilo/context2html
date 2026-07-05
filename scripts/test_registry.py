@@ -24,27 +24,28 @@ class TestComponentRegistry:
         assert result == []
 
     def test_get_component_26_has_correct_metadata(self):
-        c = self.r.get_component(26)
-        assert c is not None
+        comps = self.r.list_components(id=26)
+        assert len(comps) == 1
+        c = comps[0]
         assert c.metadata.id == 26
         assert c.metadata.name == 'ECharts 交互式图表集'
         assert 'echarts.min.js' in c.metadata.dependencies
         assert 'report' in c.metadata.compat_types
 
-    def test_get_component_unknown_returns_none(self):
-        assert self.r.get_component(999) is None
+    def test_get_component_unknown_returns_empty(self):
+        assert self.r.list_components(id=999) == []
 
     def test_get_component_26_has_html(self):
-        c = self.r.get_component(26)
-        assert len(c.html) > 0
+        comps = self.r.list_components(id=26)
+        assert len(comps[0].html) > 0
 
     def test_get_component_26_has_css(self):
-        c = self.r.get_component(26)
-        assert len(c.css) > 0
+        comps = self.r.list_components(id=26)
+        assert len(comps[0].css) > 0
 
     def test_get_component_26_has_js(self):
-        c = self.r.get_component(26)
-        assert len(c.js) > 0
+        comps = self.r.list_components(id=26)
+        assert len(comps[0].js) > 0
 
     def test_resolve_dependencies_single(self):
         deps = self.r.resolve_dependencies([26])

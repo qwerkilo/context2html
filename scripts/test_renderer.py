@@ -46,9 +46,9 @@ class TestTemplateRenderer:
     def test_all_31_components_resolve(self):
         all_ids = list(range(1, 32))
         for cid in all_ids:
-            c = self.r._reg.get_component(cid)
-            assert c is not None, f"Component {cid} not found"
-            assert c.metadata.name, f"Component {cid} has no name"
+            comps = self.r._reg.list_components(id=cid)
+            assert len(comps) == 1, f"Component {cid} not found"
+            assert comps[0].metadata.name, f"Component {cid} has no name"
 
     def test_resolve_dependencies_all(self):
         deps = self.r._reg.resolve_dependencies(list(range(1, 32)))
