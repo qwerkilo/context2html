@@ -6,10 +6,12 @@ Pure HTML/CSS/JS. No frameworks, no build tools, no package.json. Open directly 
 
 This is a **skill repo** — it augments `teach_more_pic` with a report-generation workflow. 31 visual components in `components/` (29 from teach_more_pic + 2 custom). **SKILL.md is the workflow** (Step 0-5 + Step 2.5 humanize checkpoint) and the **Framework API reference**.
 
+A Python framework package (`context2html/`) provides programmatic access: `ComponentRegistry`, `TemplateRenderer`, `ThemeProvider`, `markdown_utils`, and `validator`.
+
 ## Commands
 
 ```bash
-# All 393 tests
+# All 443 tests
 python -m pytest scripts/ -v --tb=short
 
 # Single test file
@@ -46,7 +48,6 @@ Use for: multi-step report structure planning (Step 1 → Step 2 → Step 2.5 or
 - **CDN-first + local fallback** — template has `__loadLib()` that tries jsDelivr CDN first, falls back to local `libs/`. Use `<script>__loadLib('libs/echarts.min.js')</script>` instead of raw `<script src>`. Validator checks both CDN presence AND local file existence.
 - **`__loadLib` for theme CSS** — use `__loadLib('theme/report-themes.css','../theme/report-themes.css')` in generated reports.
 - **Validator path resolution** — paths resolved relative to the report HTML's own directory, NOT project root.
-- **Test imports use `importlib`** — tests load modules via `importlib.util.spec_from_file_location`. Tests live in `scripts/` next to modules under test.
 - **Components are .md files** — copy the ```html/css/js code blocks, not the whole file.
 - **ECharts color in Canvas** — `var(--accent)` does NOT resolve inside ECharts options (Canvas2D ignores CSS var()). Always use the `gv('--accent')` helper (`function gv(n){return getComputedStyle(docEl).getPropertyValue(n).trim()}`).
 - **English text overflows on lang toggle** — English is wider than Chinese. Template has `overflow-wrap: break-word`, `.cmp-table` has `table-layout: fixed` + `word-break: break-word`. Do NOT remove.
@@ -54,6 +55,9 @@ Use for: multi-step report structure planning (Step 1 → Step 2 → Step 2.5 or
 - **CSS source of truth** — edit `templates/base-styles.css`, then run `python scripts/sync-template-styles.py` to push changes to both `starter.html` and `report-starter.html`.
 - **`docs/` gitignore** — `docs/*` is gitignored except `docs/agents/`. Agent skill configs there are tracked; other docs are not.
 - **`examples/report-themes.html` is NOT a valid report** — will fail `validate-report.py`. Use `examples/0001-demo-report.html` for smoke tests.
+- **`ComponentRegistry.get_component()` removed** — use `list_components(id=26)` which returns a list (empty if not found).
+- **Validator in framework package** — `from context2html.validator import check_h1_count, check_bilingual, ...` works directly.
+- **Framework package tests** — `test_registry.py`, `test_renderer.py`, `test_theme.py` use direct imports (`from context2html.xxx import ...`). Other tests still use `importlib`.
 
 ## Agent skills
 
