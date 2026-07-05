@@ -170,92 +170,84 @@ def generate_theme_css(theme_name, design_md_path):
     # === Chart colors ===
     chart_colors = make_chart_colors(accent, colors)
 
-    # === Shadow ===
-    shadow_sm = f'0 1px 3px {hex_to_rgba(text_color, 0.1)}'
-    shadow_md = f'0 4px 12px {hex_to_rgba(text_color, 0.1)}'
-    shadow_lg = f'0 8px 30px {hex_to_rgba(text_color, 0.12)}'
-
-    # === Derived colors ===
-    accent_soft = hex_to_rgba(accent, 0.12)
-    accent_muted = hex_to_rgba(accent, 0.4)
-    tag_bg = hex_to_rgba(accent, 0.1)
-    tag_text = accent  # keep the accent for tags
-    table_stripe = hex_to_rgba(text_color, 0.04)
-    table_header_bg = hex_to_rgba(accent, 0.08)
-    blockquote_border = f'4px solid {accent}'
-    blockquote_bg = hex_to_rgba(accent, 0.06)
-    code_bg = surface
-    code_text = accent
-    section_gap = '4rem'
-    h2_border = f'2px solid {border}'
-    toc_accent = accent
-
     # Build CSS
-    css_lines = [f'/* ===== Theme: {theme_name} ===== */', f'[data-theme="{theme_name}"] {{']
+    tokens = {
+        'bg': bg, 'text': text_color, 'accent': accent, 'accent_text': accent_text,
+        'surface': surface, 'surface_raised': surface_raised, 'border': border,
+        'muted': muted, 'link': link, 'success': success, 'warning': warning, 'error': error,
+        'font': body_font, 'font_h': heading_font, 'lh': line_height, 'radius': radius,
+        'chart_colors': chart_colors,
+    }
+    css = build_theme_css(theme_name, tokens)
+    metadata = build_theme_metadata(theme_name, tokens)
+    return css, metadata
 
+
+def build_theme_css(theme_name, tokens):
+    """Build CSS string from a flat token dict.
+    tokens: {bg, text, accent, accent_text, surface, surface_raised, border,
+             muted, link, success, warning, error, font, font_h, lh, radius, chart_colors}
+    """
+    c = tokens
     pairs = [
-        ('--bg', bg),
-        ('--text', text_color),
-        ('--accent', accent),
-        ('--accent-text', accent_text),
-        ('--accent-soft', accent_soft),
-        ('--accent-muted', accent_muted),
-        ('--surface', surface),
-        ('--surface-raised', surface_raised),
-        ('--border', border),
-        ('--muted', muted),
-        ('--link', link),
-        ('--success', success),
-        ('--warning', warning),
-        ('--error', error),
-        ('--font', body_font),
-        ('--font-h', heading_font),
-        ('--lh', line_height),
-        ('--body-size', '1rem'),
-        ('--small-size', '0.85rem'),
-        ('--radius', radius),
-        ('--shadow-sm', shadow_sm),
-        ('--shadow-md', shadow_md),
-        ('--shadow-lg', shadow_lg),
-        ('--chart-1', chart_colors[0]),
-        ('--chart-2', chart_colors[1]),
-        ('--chart-3', chart_colors[2]),
-        ('--chart-4', chart_colors[3]),
-        ('--tag-bg', tag_bg),
-        ('--tag-text', tag_text),
-        ('--table-stripe', table_stripe),
-        ('--table-header-bg', table_header_bg),
-        ('--blockquote-border', blockquote_border),
-        ('--blockquote-bg', blockquote_bg),
-        ('--code-bg', code_bg),
-        ('--code-text', code_text),
-        ('--section-gap', section_gap),
-        ('--h2-border', h2_border),
-        ('--toc-accent', toc_accent),
+        ('--bg', c['bg']), ('--text', c['text']),
+        ('--accent', c['accent']), ('--accent-text', c['accent_text']),
+        ('--accent-soft', hex_to_rgba(c['accent'], 0.12)),
+        ('--accent-muted', hex_to_rgba(c['accent'], 0.4)),
+        ('--surface', c['surface']), ('--surface-raised', c['surface_raised']),
+        ('--border', c['border']), ('--muted', c['muted']),
+        ('--link', c['link']), ('--success', c['success']),
+        ('--warning', c['warning']), ('--error', c['error']),
+        ('--font', c['font']), ('--font-h', c['font_h']), ('--lh', c['lh']),
+        ('--body-size', '1rem'), ('--small-size', '0.85rem'),
+        ('--radius', c['radius']),
+        ('--shadow-sm', f'0 1px 3px {hex_to_rgba(c["text"], 0.1)}'),
+        ('--shadow-md', f'0 4px 12px {hex_to_rgba(c["text"], 0.1)}'),
+        ('--shadow-lg', f'0 8px 30px {hex_to_rgba(c["text"], 0.12)}'),
+        ('--chart-1', c['chart_colors'][0]), ('--chart-2', c['chart_colors'][1]),
+        ('--chart-3', c['chart_colors'][2]), ('--chart-4', c['chart_colors'][3]),
+        ('--tag-bg', hex_to_rgba(c['accent'], 0.1)),
+        ('--tag-text', c['accent']),
+        ('--table-stripe', hex_to_rgba(c['text'], 0.04)),
+        ('--table-header-bg', hex_to_rgba(c['accent'], 0.08)),
+        ('--blockquote-border', f'4px solid {c["accent"]}'),
+        ('--blockquote-bg', hex_to_rgba(c['accent'], 0.06)),
+        ('--code-bg', c['surface']),
+        ('--code-text', c['accent']),
+        ('--section-gap', '4rem'),
+        ('--h2-border', f'2px solid {c["border"]}'),
+        ('--toc-accent', c['accent']),
     ]
-
+    css_lines = [f'/* ===== Theme: {theme_name} ===== */', f'[data-theme="{theme_name}"] {{']
     for var, val in pairs:
         if var == '--font-h' and not val:
-            val = body_font  # fallback to body font when heading font undefined
+            val = c.get('font', '')
         if val:
             css_lines.append(f'  {var}: {val};')
-
     css_lines.append('}\n')
+    return '\n'.join(css_lines)
 
-    metadata = {
+
+def build_theme_metadata(theme_name, tokens, recommend_for=None, recommend_topics=None):
+    """Build metadata dict from token dict."""
+    c = tokens
+    meta = {
         'name': theme_name,
-        'accent': accent,
-        'accent_text': accent_text,
-        'bg': bg,
-        'text': text_color,
-        'font': body_font,
-        'font_h': heading_font,
-        'chart_colors': chart_colors,
-        'radius': radius,
-        'has_dark_bg': is_dark(bg),
+        'accent': c['accent'],
+        'accent_text': c['accent_text'],
+        'bg': c['bg'],
+        'text': c['text'],
+        'font': c['font'],
+        'font_h': c['font_h'],
+        'chart_colors': c['chart_colors'],
+        'radius': c['radius'],
+        'has_dark_bg': is_dark(c['bg']),
     }
-
-    return '\n'.join(css_lines), metadata
+    if recommend_for is not None:
+        meta['recommend_for'] = recommend_for
+    if recommend_topics is not None:
+        meta['recommend_topics'] = recommend_topics
+    return meta
 
 
 def is_dark(color):
@@ -272,6 +264,38 @@ def is_dark(color):
 def main():
     themes = []
     all_css_parts = []
+
+    # 主题推荐规则（用于 theme-index.json）
+    THEME_RECOMMENDATIONS = {
+        'warm':       (['report', 'article'],      ['经济', '社会', '教育', '文化', '历史']),
+        'airbnb':     (['report', 'article'],      ['旅游', '住宿', '设计', '生活']),
+        'airtable':   (['doc', 'report'],          ['产品', '管理', '数据']),
+        'apple':      (['report', 'article'],      ['科技', '设计', '产品']),
+        'binance':    (['report'],                 ['金融', '投资', '区块链', '加密货币']),
+        'bmw-m':      (['report', 'article'],      ['汽车', '机械', '运动', '性能']),
+        'claude':     (['article', 'tutorial'],    ['AI', '人工智能', '写作', '创意']),
+        'cursor':     (['doc', 'tutorial', 'note'],['编程', '开发', '技术', '工具']),
+        'dell-1996':  (['report', 'article'],      ['历史', '科技', '企业']),
+        'figma':      (['article', 'tutorial'],    ['设计', '工具', '协作', '创意']),
+        'hp':         (['report', 'doc'],          ['企业', '科技', '教育']),
+        'ibm':        (['report', 'doc'],          ['企业', '科技', '咨询', '数据']),
+        'minimax':    (['report', 'article'],      ['AI', '人工智能', '科技', '极致']),
+        'nike':       (['article', 'report'],      ['运动', '体育', '品牌', '潮流']),
+        'notion':     (['doc', 'note', 'tutorial'],['产品', '管理', '笔记', '效率']),
+        'nvidia':     (['report', 'article'],      ['AI', 'GPU', '芯片', '科技', '游戏']),
+        'spotify':    (['article', 'note'],        ['音乐', '娱乐', '文化', '创意']),
+        'tesla':      (['report', 'article'],      ['汽车', '能源', '科技', '创新']),
+        'x.ai':       (['report', 'article'],      ['AI', '人工智能', '科技', '前沿']),
+        'zapier':     (['doc', 'tutorial', 'note'],['自动化', '效率', '工具', '工作流']),
+    }
+
+    def add_recommendations(meta):
+        name = meta['name']
+        if name in THEME_RECOMMENDATIONS:
+            rec_for, rec_topics = THEME_RECOMMENDATIONS[name]
+            meta['recommend_for'] = rec_for
+            meta['recommend_topics'] = rec_topics
+        return meta
 
     # 默认 warm 主题
     warm_css = '''/* ===== Theme: warm (default) ===== */
@@ -293,7 +317,7 @@ def main():
   --section-gap: 4rem; --h2-border: 2px solid #ddd8d0; --toc-accent: #c0392b;
 }'''
     all_css_parts.append(warm_css)
-    themes.append({
+    themes.append(add_recommendations({
         'name': 'warm',
         'accent': '#c0392b',
         'accent_text': '#ffffff',
@@ -304,7 +328,7 @@ def main():
         'chart_colors': ['#c0392b', '#e67e22', '#2980b9', '#27ae60'],
         'radius': '8px',
         'has_dark_bg': False,
-    })
+    }))
 
     # 硬编码特殊主题（无 YAML front matter 的 DESIGN.md）
     MANUAL_THEMES = {
@@ -341,55 +365,14 @@ def main():
         css, meta = generate_theme_css(td, design_md)
         if css:
             all_css_parts.append(css)
-            themes.append(meta)
+            themes.append(add_recommendations(meta))
             print(f'  [OK]   {td}/ — {meta["accent"]}')
         elif td in MANUAL_THEMES:
-            m = MANUAL_THEMES[td]
-            css_parts = [f'/* ===== Theme: {td} (manual) ===== */', f'[data-theme="{td}"] {{']
-            c = m
-            pairs = [
-                ('--bg', c['bg']), ('--text', c['text']), ('--accent', c['accent']),
-                ('--accent-text', c['accent_text']),
-                ('--accent-soft', hex_to_rgba(c['accent'], 0.12)),
-                ('--accent-muted', hex_to_rgba(c['accent'], 0.4)),
-                ('--surface', c['surface']), ('--surface-raised', c['surface_raised']),
-                ('--border', c['border']), ('--muted', c['muted']), ('--link', c['link']),
-                ('--success', c['success']), ('--warning', c['warning']), ('--error', c['error']),
-                ('--font', c['font']), ('--font-h', c['font_h']), ('--lh', c['lh']),
-                ('--radius', c['radius']),
-                ('--chart-1', c['chart_colors'][0]), ('--chart-2', c['chart_colors'][1]),
-                ('--chart-3', c['chart_colors'][2]), ('--chart-4', c['chart_colors'][3]),
-                ('--shadow-sm', f'0 1px 3px {hex_to_rgba(c["text"], 0.1)}'),
-                ('--shadow-md', f'0 4px 12px {hex_to_rgba(c["text"], 0.1)}'),
-                ('--shadow-lg', f'0 8px 30px {hex_to_rgba(c["text"], 0.12)}'),
-                ('--tag-bg', hex_to_rgba(c['accent'], 0.1)),
-                ('--tag-text', c['accent']),
-                ('--table-stripe', hex_to_rgba(c['text'], 0.04)),
-                ('--table-header-bg', hex_to_rgba(c['accent'], 0.08)),
-                ('--blockquote-border', f'4px solid {c["accent"]}'),
-                ('--blockquote-bg', hex_to_rgba(c['accent'], 0.06)),
-                ('--code-bg', c['surface']),
-                ('--code-text', c['accent']),
-                ('--section-gap', '4rem'),
-                ('--h2-border', f'2px solid {c["border"]}'),
-                ('--toc-accent', c['accent']),
-            ]
-            for var, val in pairs:
-                if var == '--font-h' and not val:
-                    val = c.get('font', '')
-                if val:
-                    css_parts.append(f'  {var}: {val};')
-            css_parts.append('}\n')
-            gen_css = '\n'.join(css_parts)
+            c = MANUAL_THEMES[td]
+            gen_css = build_theme_css(td, c)
             all_css_parts.append(gen_css)
-
-            meta = {
-                'name': td, 'accent': c['accent'], 'accent_text': c['accent_text'],
-                'bg': c['bg'], 'text': c['text'], 'font': c['font'], 'font_h': c['font_h'],
-                'chart_colors': c['chart_colors'],
-                'radius': c['radius'], 'has_dark_bg': is_dark(c['bg']),
-            }
-            themes.append(meta)
+            meta = build_theme_metadata(td, c)
+            themes.append(add_recommendations(meta))
             print(f'  [MANUAL] {td}/ — {c["accent"]}')
         else:
             print(f'  [WARN] {td}/ — DESIGN.md has no YAML front matter AND no MANUAL_THEMES entry — theme SKIPPED. Add YAML or extend MANUAL_THEMES dict.')
