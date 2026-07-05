@@ -1,32 +1,19 @@
-"""Shared validation functions for report and lesson HTML files."""
+"""Shared validation helpers — barrel re-export module."""
 
 import os
 import re
 import xml.etree.ElementTree as ET
 
+from checks.svg import check_svg_links, check_svg_contrast
+
 PASS = "[PASS]"
 FAIL = "[FAIL]"
 
-_LIGHT_FILLS = re.compile(
-    r'fill="(?:#)?(?:fef2f2|f0fdf4|eff6ff|fff7ed|ffffff|f8fafc)"', re.IGNORECASE
-)
-_WHITE_TEXT = re.compile(r'fill="(?:#)?(?:f{3}|f{6})"', re.IGNORECASE)
-
 _VALID_GSAP_MODES = {"fade", "stagger", "parallax", "flip", "zoom"}
 
-# Pre-compiled regex patterns
 _RE_H1_TAG = re.compile(r"<h1[^>]*>")
 _RE_H1_LANG = re.compile(r'<h1[^>]*data-lang=["\']([^"\']+)["\']')
 _RE_A_HREF = re.compile(r'<a[^>]*href="([^"]+)"')
-_RE_IMG_SVG = re.compile(r'<img[^>]*src="([^"]+\.svg(?:[?#][^"]*)?)"')
-_RE_IMG_SVG_S = re.compile(r"<img[^>]*src='([^']+\.svg(?:[?#][^']*)?)'")
-_RE_OBJ_SVG = re.compile(r'<object[^>]*data="([^"]+\.svg(?:[?#][^"]*)?)"')
-_RE_OBJ_SVG_S = re.compile(r"<object[^>]*data='([^']+\.svg(?:[?#][^']*)?)'")
-_RE_IFRAME_SVG = re.compile(r'<iframe[^>]*src="([^"]+\.svg(?:[?#][^"]*)?)"')
-_RE_IFRAME_SVG_S = re.compile(r"<iframe[^>]*src='([^']+\.svg(?:[?#][^']*)?)'")
-_RE_SOURCE_SVG = re.compile(r'<source[^>]*src="([^"]+\.svg(?:[?#][^"]*)?)"')
-_RE_SOURCE_SVG_S = re.compile(r"<source[^>]*src='([^']+\.svg(?:[?#][^']*)?)'")
-_RE_SCRIPT_SRC = re.compile(r'<script\b[^>]*\bsrc="([^"]*)"[^>]*>', re.IGNORECASE)
 _RE_FOCUS_VISIBLE = re.compile(r":focus-visible")
 _RE_TABULAR_NUMS = re.compile(r"tabular-nums")
 _RE_ECHARTS_INIT = re.compile(r'echarts\.init\(')
@@ -38,30 +25,12 @@ _RE_GSAP_DATA = re.compile(r'data-gsap="([^"]*)"')
 _RE_DATA_ANIM = re.compile(r'data-anim="([^"]+)"')
 _RE_THREE_USAGE = re.compile(r'new THREE\.')
 _RE_THREE_BARE = re.compile(r'\bTHREE\b')
+_RE_SCRIPT_SRC = re.compile(r'<script\b[^>]*\bsrc="([^"]*)"[^>]*>', re.IGNORECASE)
 
+_REPO_CDN = "cdn.jsdelivr.net/gh/qwerkilo/context2html"
+_RE_LOADLIB = re.compile(r"__loadLib\s*\(\s*['\"]([^'\"]+)['\"]\s*\)")
 
-def check_svg_links(html, base_dir):
-    issues = []
-    svgs = set(_RE_IMG_SVG.findall(html))
-    svgs.update(_RE_IMG_SVG_S.findall(html))
-    svgs.update(_RE_OBJ_SVG.findall(html))
-    svgs.update(_RE_OBJ_SVG_S.findall(html))
-    svgs.update(_RE_IFRAME_SVG.findall(html))
-    svgs.update(_RE_IFRAME_SVG_S.findall(html))
-    svgs.update(_RE_SOURCE_SVG.findall(html))
-    svgs.update(_RE_SOURCE_SVG_S.findall(html))
-    for src in svgs:
-        if src.startswith(('http://', 'https://', 'data:')):
-            continue
-        path = os.path.join(base_dir, src)
-        if not os.path.exists(path):
-            issues.append(f"SVG not found: {src}")
-        else:
-            try:
-                ET.parse(path)
-            except Exception as e:
-                issues.append(f"SVG invalid XML: {src} -- {e}")
-    return issues
+_VALID_DATA_ANIM = {'fade-up', 'fade', 'slide-left', 'blur'}
 
 
 def check_h1_count(html):
@@ -80,29 +49,6 @@ def check_relative_links(html):
     for href in _RE_A_HREF.findall(html):
         if href.startswith("/") or href.startswith("http"):
             issues.append(f"Absolute link found: {href} (use relative path)")
-    return issues
-
-
-def _check_svg_content(content, issues, label):
-    if bool(_LIGHT_FILLS.search(content)) and bool(_WHITE_TEXT.search(content)):
-        issues.append(
-            f"{label}: possible white text on light background -- verify manually"
-        )
-
-
-def check_svg_contrast(html, base_dir):
-    issues = []
-    for src in re.findall(r'<img[^>]*src="([^"]+\.svg)"', html):
-        path = os.path.join(base_dir, src)
-        if not os.path.exists(path):
-            continue
-        try:
-            with open(path, "r", encoding="utf-8") as f:
-                _check_svg_content(f.read(), issues, src)
-        except Exception:
-            pass
-    for svg_content in re.findall(r'<svg[^>]*>(.*?)</svg>', html, re.DOTALL):
-        _check_svg_content(svg_content, issues, "Inline <svg>")
     return issues
 
 
@@ -137,10 +83,6 @@ def _check_local_script_paths(html, base_dir, lib_name):
         if not os.path.exists(resolved):
             issues.append(f"{lib_name} <script src=\"{src}\"> points to missing file -> {resolved}")
     return issues
-
-
-_REPO_CDN = "cdn.jsdelivr.net/gh/qwerkilo/context2html"
-_RE_LOADLIB = re.compile(r"__loadLib\s*\(\s*['\"]([^'\"]+)['\"]\s*\)")
 
 
 def check_lib_deps(html, base_dir):
@@ -204,7 +146,6 @@ def check_bilingual(html):
     has_zh = 'data-lang="zh"' in html
     has_en = 'data-lang="en"' in html
     has_toggle = 'data-lang-btn' in html
-    # Accept: e.key==='l', e.key === 'l', key==='l', key==="l"
     has_l_key = bool(re.search(
         r"e\.key\s*===\s*['\"]l['\"]",
         html, re.IGNORECASE
@@ -222,8 +163,6 @@ def check_bilingual(html):
     if not has_l_key:
         issues.append("Missing L key handler for language switching")
 
-    # Count zh/en occurrences to detect unbalanced pairs
-    # Exclude data-lang on <html> tag (page language, not bilingual content)
     zh_count = len(re.findall(r'data-lang="zh"', html))
     en_count = len(re.findall(r'data-lang="en"', html))
     if re.search(r'<html[^>]*data-lang="zh"', html):
@@ -240,7 +179,6 @@ def check_bilingual(html):
 
 
 def check_cross_refs(html):
-    """Check that chapter cross-references use canonical #chN format."""
     bad_refs = []
     for ref in re.findall(r'href="#([^"#?]+)"', html):
         if re.match(r'^(?:ch\d+\D|chapter[\d-])', ref, re.IGNORECASE):
@@ -250,11 +188,7 @@ def check_cross_refs(html):
     return []
 
 
-_VALID_DATA_ANIM = {'fade-up', 'fade', 'slide-left', 'blur'}
-
-
 def check_data_anim_syntax(html):
-    """Check that all data-anim values are valid CSS-recognized values."""
     bad = [a for a in _RE_DATA_ANIM.findall(html)
            if a not in _VALID_DATA_ANIM]
     if bad:
