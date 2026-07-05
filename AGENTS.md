@@ -2,13 +2,13 @@
 
 Pure HTML/CSS/JS. No frameworks, no build tools, no package.json. Open directly in browser after generation.
 
-This is a **skill repo** — it augments `teach_more_pic` with a report-generation workflow. 31 visual components in `components/` (29 from teach_more_pic + 2 custom). **SKILL.md is the workflow** (Step 0-5 + Step 2.5 humanize checkpoint).
+This is a **skill repo** — it augments `teach_more_pic` with a report-generation workflow. 31 visual components in `components/` (29 from teach_more_pic + 2 custom). **SKILL.md is the workflow** (Step 0-5 + Step 2.5 humanize checkpoint) and the **Framework API reference**.
 
 ## Commands
 
 ```bash
-# All 376 tests
-python -m pytest scripts/test_validate_report.py scripts/test_validate_lesson.py scripts/test_generate_theme_css.py -v --tb=short
+# All 393 tests
+python -m pytest scripts/ -v --tb=short
 
 # Single test file
 python -m pytest scripts/test_validate_report.py -v --tb=short
@@ -22,18 +22,6 @@ python scripts/generate-theme-css.py
 # Preview server (root-relative paths need same cwd)
 bash templates/start-server.sh
 ```
-
-## Hard constraints
-
-- **Vanilla JS** — ES5 IIFE + try/catch. No React/Vue/Svelte/jQuery/Alpine.
-- **Bilingual** — every text block needs `data-lang="zh"` + `data-lang="en"`. L key toggles.
-- **Template-based** — always copy `templates/report-starter.html` (report type) or `templates/starter.html` (other types). Never write HTML from scratch — lose CSS variable system, toolbar, keyboard nav.
-- **Visual density** — ≥1 component per 500 words. `references/decision-guide.md` for selection.
-- **ECharts priority** — tabular/comparison data (3+ data points) → ECharts #26 before HTML tables #5/#22.
-- **Tag group #17** — required at end of every chapter.
-- **Theme** — 20 brand themes via `<html data-theme="xxx">`. Preview: open `examples/report-themes.html`, press T to cycle.
-- **5 content types** — `data-content-type` on `<html>`: `report`, `article`, `doc`, `tutorial`, `note`.
-- **D1-D5 humanization** — D4: no paragraph-initial "首先/其次/最后/综上所述/值得注意的是". D1: every paragraph must mix ≤10‑char and ≥35‑char sentences. D5: substitute terms every 800 chars. See `references/humanize_matrix.md`.
 
 ## MCP usage
 

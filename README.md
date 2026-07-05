@@ -90,49 +90,30 @@ print(f'#26 deps: {reg.resolve_dependencies([26])}')
 "
 ```
 
-## Framework API (Python)
+## 快速开始（框架 API）
 
-context2html 提供三个可编程模块，其他技能和 agent 可以直接导入使用。
+context2html 提供三个可编程模块，安装后可直接导入：
 
 ```python
 from context2html.registry import ComponentRegistry
 from context2html.theme import ThemeProvider
 from context2html.renderer import TemplateRenderer
-
-# 组件注册表
-reg = ComponentRegistry()
-all_c = reg.list_components()                    # 全部 31 组件
-compat = reg.list_components(content_type='doc') # 按内容类型过滤
-comp = reg.get_component(26)                     # 按 ID 获取单个组件
-deps = reg.resolve_dependencies([26, 28])        # 解析库依赖
-
-# comp.metadata.id, .name, .dependencies, .compat_types, .degrade_to, .requires_3d
-# comp.html, .css, .js  — 已提取的代码块
-
-# 主题提供器
-tp = ThemeProvider()
-theme_list = tp.list_themes()                    # 所有 20 主题
-theme = tp.get_theme('warm')                     # 按名称查询
-best = tp.recommend_theme('report', '经济')       # 按场景推荐
-
-# 模板渲染器（一键组装）
-renderer = TemplateRenderer()
-html = renderer.assemble(
-    template_name='starter',    # 'starter' 或 'report-starter'
-    components=[26, 17],        # 组件 ID 列表
-    theme_name='warm'           # 主题名称
-)
-# 返回完整 HTML，组件已插入、CSS 已合并、JS 已追加
 ```
 
-## 报告生成流程（示例工作流）
+```bash
+# 安装框架包
+uv pip install -e .
 
-0. **人类化写作约束** — 同上（通用中英双语内容均适用）
-1. **输入获取** — 从对话上下文或文件路径读取调研内容
-2. **结构规划** — 设计章节大纲（推荐 3-6 章）、关键发现摘要（3-5 条）、标记可视化数据点
-3. **组件选择** — 按 `references/decision-guide.md` 矩阵选型，对比分析优先 ECharts #26 交互式图表，次选 HTML 对比表 #5/#22，每 500 字 ≥1 视觉元素。也可用 `ComponentRegistry.list_components(content_type='...')` 编程筛选
-4. **HTML 生成** — 从 `templates/report-starter.html` 复制骨架，填充中英双语正文，合并组件 CSS/JS。或调用 `TemplateRenderer.assemble()` 一键生成
-5. **验证输出** — run `scripts/validate-report.py`，**21 项硬性检查 + 3 项人类化建议（warning）** 全通过后交付。对比表响应式堆叠、内联 SVG 对比、ECharts 依赖路径、英文布局（overflow-wrap + table-layout:fixed）、ECharts Canvas 颜色用法、GSAP data-gsap 模式验证、章节交叉引用 `#chN`、data-anim 语法、D1 句长交替、D4 连接词控制、D5 术语变体均已覆盖
+# 查看组件
+python -c "
+from context2html.registry import ComponentRegistry
+reg = ComponentRegistry()
+print(f'{len(reg.list_components())} components loaded')
+print(f'#26 deps: {reg.resolve_dependencies([26])}')
+"
+```
+
+完整工作流请参考 `SKILL.md`（示例工作流 + Framework API 参考）。
 
 ## 项目结构
 
@@ -223,19 +204,9 @@ CDN:    https://cdn.jsdelivr.net/gh/qwerkilo/context2html@main/libs/echarts.min.
 
 所有效果适配 CSS 变量（`var(--accent)`、`var(--surface)` 等），自动跟随主题切换。
 
-## 人类化维度（D1-D5，自动化检查）
+## 人类化维度（D1-D5）
 
-报告正文默认执行人类化写作约束（SKILL.md 中完整定义）：
-
-| 维度 | 约束 | 自动化检查位置 |
-|------|------|---------|
-| D1-句长分布 | 每段 ≤10 字短句 + ≥35 字长句各 ≥1 | `validate-report.py:check_d1_sentence_length`（warning） |
-| D2-段落结构 | 相邻段落使用不同结构模板（5 种轮换） | 人工检查（参考 `references/humanize_matrix.md`） |
-| D3-信息密度 | 连续两段密度差 ≥ 15%，高-低-高交替 | 人工检查 |
-| D4-连接词 | ≤6 个/千字，禁止段首 AI 高频词 | `validate-report.py:check_d4_connectors`（warning） |
-| D5-术语变体 | 每 800 字 ≥ 1 处同义学术替代 | `validate-report.py:check_d5_term_variety`（warning） |
-
-D1/D4/D5 三项已实现为 warning 级自动化检查（不阻断构建但提示需修复）。D2/D3 仍需人工 review。
+参见 `SKILL.md` Step 2.5。三项自动化检查（D1/D4/D5）通过 `validate-report.py` 输出 warning，两项（D2/D3）需人工 review。
 
 ## 更新日志
 
