@@ -1,4 +1,7 @@
-"""Smoke tests for context2html.validator package — verify all functions importable."""
+"""Smoke and integration tests for context2html.validator package."""
+
+import os
+
 from context2html.validator import (
     PASS, FAIL,
     check_svg_links, check_svg_contrast,
@@ -16,8 +19,11 @@ from context2html.validator import (
     check_d4_connectors, check_d1_sentence_length, check_d5_term_variety,
 )
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+TEMPLATE_PATH = os.path.join(BASE_DIR, 'templates', 'starter.html')
 
-class TestValidatorImports:
+
+class TestValidatorSmoke:
     def test_pass_fail_constants(self):
         assert PASS == "[PASS]"
         assert FAIL == "[FAIL]"
@@ -62,3 +68,47 @@ class TestValidatorImports:
     def test_check_relative_links(self):
         assert check_relative_links('<a href="local.html">x</a>') == []
         assert len(check_relative_links('<a href="/abs.html">x</a>')) > 0
+
+
+class TestValidatorIntegration:
+    """Run the full check suite on a real template HTML."""
+
+    def _load_template(self):
+        with open(TEMPLATE_PATH, 'r', encoding='utf-8') as f:
+            return f.read()
+
+    def test_starter_html_passes_common_checks(self):
+        html = self._load_template()
+        base_dir = os.path.dirname(TEMPLATE_PATH)
+
+        assert check_h1_count(html) == [], "starter should have exactly one h1 or bilingual pair"
+        assert check_focus_visible(html) == [], "starter should have :focus-visible"
+        assert check_bilingual(html) == [], "starter should have bilingual markup"
+        assert check_semantic_html(html) == [], "starter should have semantic elements"
+        assert check_tabular_nums(html) == [], "starter should have tabular-nums"
+        assert check_data_anim_syntax(html) == [], "starter should have valid data-anim"
+        assert check_content_type_valid(html) == [], "starter should have valid content type"
+        assert check_relative_links(html) == [], "starter should have only relative links"
+
+    def test_starter_html_lib_deps(self):
+        html = self._load_template()
+        base_dir = os.path.dirname(TEMPLATE_PATH)
+        # starter.html doesn't use echarts/three/d3 — should pass
+        assert check_lib_deps(html, base_dir) == []
+
+    def test_starter_html_detected_as_report(self):
+        html = self._load_template()
+        assert detect_content_type(html) == "report"
+
+    def test_missing_h1_flagged(self):
+        assert len(check_h1_count("<html><h2>No h1</h2></html>")) > 0
+
+    def test_no_semantic_html_flagged(self):
+        assert len(check_semantic_html("<html><div>only divs</div></html>")) > 0
+
+    def test_no_bilingual_flagged(self):
+        html = '<html data-lang-btn><p data-lang="zh">only cn</p></html>'
+        assert len(check_bilingual(html)) > 0
+
+    def test_missing_focus_visible_flagged(self):
+        assert len(check_focus_visible("<html><body></body></html>")) > 0
