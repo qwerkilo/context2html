@@ -6,16 +6,13 @@ import sys
 import os
 from dataclasses import dataclass, field
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _validate_common import (
+from context2html.validator import (
     PASS, FAIL,
     check_svg_links, check_h1_count, check_relative_links,
     check_svg_contrast, check_focus_visible, check_tabular_nums,
     check_semantic_html, check_lib_deps, check_bilingual,
     check_gsap_modes, check_cross_refs, check_data_anim_syntax,
-)
-from checks.content_type import detect_content_type, check_content_type_valid
-from checks.report import (
+    detect_content_type, check_content_type_valid,
     check_exec_summary, check_report_chapters, check_conclusion_page,
     check_report_footer, check_theme_css, check_bar_fill_width,
     check_cmp_table_responsive, check_english_layout, check_echarts_color_usage,
@@ -34,9 +31,6 @@ class ValidationResult:
 
 
 def build_checks(html, base_dir):
-    """Return (checks, warnings) lists of (label, issues) tuples
-    based on content type.
-    """
     ct = detect_content_type(html)
 
     checks = [
@@ -90,7 +84,6 @@ def build_checks(html, base_dir):
 
 
 def run_checks(html, base_dir):
-    """Run all checks and return a structured ValidationResult."""
     ct, checks, warnings = build_checks(html, base_dir)
     result = ValidationResult(content_type=ct)
     for label, issues in checks:
@@ -103,7 +96,6 @@ def run_checks(html, base_dir):
 
 
 def format_result(result):
-    """Format a ValidationResult as a printable string."""
     lines = [f"  Content type: {result.content_type}"]
     for label, issues in result.checks:
         if issues:
@@ -128,7 +120,6 @@ def format_result(result):
 
 
 def run_all(path):
-    """Legacy entry point: read file, run checks, print, sys.exit."""
     if not os.path.exists(path):
         print(f"{FAIL} File not found: {path}")
         sys.exit(1)
