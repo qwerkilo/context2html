@@ -58,3 +58,18 @@ class TestComponentRegistry:
     def test_resolve_dependencies_deduplicates(self):
         deps = self.r.resolve_dependencies([26, 26])
         assert len(deps) == 1
+
+    def test_list_combined_filters_content_type_and_id(self):
+        result = self.r.list_components(content_type='doc', id=26)
+        assert len(result) == 1
+        assert result[0].metadata.id == 26
+
+    def test_list_combined_filters_no_match(self):
+        result = self.r.list_components(content_type='doc', id=999)
+        assert result == []
+
+    def test_list_combined_content_type_and_id_both_apply(self):
+        # #27 (Three.js) is compatible with doc, #26 (ECharts) is not
+        # Make sure content_type filter is not bypassed by id filter
+        result = self.r.list_components(content_type='not_a_real_type', id=26)
+        assert result == []
