@@ -36,6 +36,17 @@ git clone https://github.com/qwerkilo/context2html
 Skills: teach_more_pic, context2html
 ```
 
+### Python 包安装（可选 — 框架 API 需要）
+
+```bash
+cd context2html
+uv pip install -e .
+# 然后可在 Python 中导入框架 API：
+#   from context2html.registry import ComponentRegistry
+#   from context2html.renderer import TemplateRenderer
+#   from context2html.theme import ThemeProvider
+```
+
 ## 能力
 
 **31 个通用视觉组件**（29 来自 teach_more_pic + 2 自定义，完整索引见 SKILL.md + `references/decision-guide.md`），覆盖报告、文章、文档、教程、笔记等场景。优先选择 ECharts 交互式图表 #26 而非静态 HTML 表格：
@@ -69,25 +80,74 @@ python -c "import xml.etree.ElementTree as ET; ET.parse('path.svg')"
 
 # 启动本地预览服务器
 powershell -ExecutionPolicy Bypass -File templates/start-server.ps1
+
+# 框架 API 快速使用
+python -c "
+from context2html.registry import ComponentRegistry
+reg = ComponentRegistry()
+print(f'{len(reg.list_components())} components loaded')
+print(f'#26 deps: {reg.resolve_dependencies([26])}')
+"
 ```
 
-## 报告生成流程
+## Framework API (Python)
+
+context2html 提供三个可编程模块，其他技能和 agent 可以直接导入使用。
+
+```python
+from context2html.registry import ComponentRegistry
+from context2html.theme import ThemeProvider
+from context2html.renderer import TemplateRenderer
+
+# 组件注册表
+reg = ComponentRegistry()
+all_c = reg.list_components()                    # 全部 31 组件
+compat = reg.list_components(content_type='doc') # 按内容类型过滤
+comp = reg.get_component(26)                     # 按 ID 获取单个组件
+deps = reg.resolve_dependencies([26, 28])        # 解析库依赖
+
+# comp.metadata.id, .name, .dependencies, .compat_types, .degrade_to, .requires_3d
+# comp.html, .css, .js  — 已提取的代码块
+
+# 主题提供器
+tp = ThemeProvider()
+theme_list = tp.list_themes()                    # 所有 20 主题
+theme = tp.get_theme('warm')                     # 按名称查询
+best = tp.recommend_theme('report', '经济')       # 按场景推荐
+
+# 模板渲染器（一键组装）
+renderer = TemplateRenderer()
+html = renderer.assemble(
+    template_name='starter',    # 'starter' 或 'report-starter'
+    components=[26, 17],        # 组件 ID 列表
+    theme_name='warm'           # 主题名称
+)
+# 返回完整 HTML，组件已插入、CSS 已合并、JS 已追加
+```
+
+## 报告生成流程（示例工作流）
 
 0. **人类化写作约束** — 同上（通用中英双语内容均适用）
 1. **输入获取** — 从对话上下文或文件路径读取调研内容
 2. **结构规划** — 设计章节大纲（推荐 3-6 章）、关键发现摘要（3-5 条）、标记可视化数据点
-3. **组件选择** — 按 `references/decision-guide.md` 矩阵选型，对比分析优先 ECharts #26 交互式图表，次选 HTML 对比表 #5/#22，每 500 字 ≥1 视觉元素
-4. **HTML 生成** — 从 `templates/report-starter.html` 复制骨架，填充中英双语正文，合并组件 CSS/JS
+3. **组件选择** — 按 `references/decision-guide.md` 矩阵选型，对比分析优先 ECharts #26 交互式图表，次选 HTML 对比表 #5/#22，每 500 字 ≥1 视觉元素。也可用 `ComponentRegistry.list_components(content_type='...')` 编程筛选
+4. **HTML 生成** — 从 `templates/report-starter.html` 复制骨架，填充中英双语正文，合并组件 CSS/JS。或调用 `TemplateRenderer.assemble()` 一键生成
 5. **验证输出** — run `scripts/validate-report.py`，**21 项硬性检查 + 3 项人类化建议（warning）** 全通过后交付。对比表响应式堆叠、内联 SVG 对比、ECharts 依赖路径、英文布局（overflow-wrap + table-layout:fixed）、ECharts Canvas 颜色用法、GSAP data-gsap 模式验证、章节交叉引用 `#chN`、data-anim 语法、D1 句长交替、D4 连接词控制、D5 术语变体均已覆盖
 
 ## 项目结构
 
 ```
-├── SKILL.md                     ← 唯一入口，含 5 步工作流 + D1-D5 人类化写作指令
-├── components/                  31 个视觉组件 .md（29来自 teach_more_pic + 2自定义 GSAP #30 + SVG.js #31）
+├── SKILL.md                     ← 入口文档（示例工作流 + Framework API 参考）
+├── context2html/                ← Python 框架包
+│   ├── __init__.py
+│   ├── registry.py              组件注册表（按内容类型/依赖查询组件）
+│   ├── renderer.py              模板渲染器（一键组装组件到模板）
+│   └── theme.py                 主题提供器（程序化查询和推荐主题）
+├── components/                  31 视觉组件 .md（所有组件含 YAML front matter 元数据）
 ├── templates/
 │   ├── starter.html             通用骨架模板（report/article/doc/tutorial/note）
-│   ├── report-starter.html      报告骨架模板（report-starter.html 的特化别名）
+│   ├── report-starter.html      报告骨架模板
+│   ├── base-styles.css          CSS 唯一源（用 sync-template-styles.py 同步）
 │   ├── flowchart-vertical.svg   SVG 模板——垂直流程图
 │   ├── cycle-diagram.svg        SVG 模板——循环图
 │   ├── comparison-side-by-side.svg   SVG 模板——并排对比
@@ -96,25 +156,36 @@ powershell -ExecutionPolicy Bypass -File templates/start-server.ps1
 ├── scripts/
 │   ├── _validate_common.py      共享验证核心（12 个共享 check_* 函数）
 │   ├── validate-report.py       报告验证脚本（21 硬性 + 3 warning）
-│   ├── validate-lesson.py       课程验证脚本（继承共享核心 + 课程专有检查）
-│   ├── test_validate_report.py  报告验证测试（145 tests）
-│   ├── test_validate_lesson.py  课程验证测试（107 tests）
-│   ├── test_generate_theme_css.py  主题 CSS 测试（22 tests）
-│   └── generate-theme-css.py    从 teach_more_pic DESIGN.md 自动生成主题 CSS（20 主题）
+│   ├── validate-lesson.py       课程验证脚本
+│   ├── test_validate_report.py  报告验证测试（624 lines）
+│   ├── test_validate_lesson.py  课程验证测试（452 lines）
+│   ├── test_generate_theme_css.py  主题 CSS 测试（195 lines）
+│   ├── test_checks_content_type.py 内容类型检查测试（256 lines）
+│   ├── test_integration_report.py  集成测试（102 lines）
+│   ├── test_registry.py         组件注册表测试（11 tests）
+│   ├── test_renderer.py         模板渲染器测试（6 tests）
+│   ├── test_theme.py            主题提供器测试（8 tests）
+│   ├── extract-component.py     组件代码提取工具
+│   ├── generate-theme-css.py    从 DESIGN.md 自动生成主题 CSS（20 主题）
+│   └── sync-template-styles.py  同步 base-styles.css 到 HTML 模板
 ├── theme/
-│   ├── report-themes.css        20 主题 CSS（自动生成，含 --chart-* / --shadow-* / --table-* 等 25+ CSS 变量）
-│   └── theme-index.json         主题元数据索引
-├── libs/                        外部库离线包（CDN 优先，jsDelivr 回退本地 — 见 README CDN 策略）
+│   ├── report-themes.css        20 主题 CSS（自动生成）
+│   ├── theme-index.json         主题元数据索引（含 recommend_for/recommend_topics）
+│   └── <brand>/DESIGN.md        各品牌主题设计文件
+├── libs/                        外部库离线包（CDN 优先，本地回退）
 ├── references/
-│   ├── decision-guide.md        报告场景组件选择矩阵 + 主题推荐表
-│   └── page-types.md            9 种页面类型 HTML/CSS 代码参考
+│   ├── decision-guide.md        组件选择矩阵 + 主题推荐表
+│   ├── humanize_matrix.md       D1-D5 人类化写作案例
+│   └── page-types.md            9 种页面类型代码参考
 ├── examples/
-│   ├── 0001-demo-report.html    全球 AI 芯片市场调研报告（示例 + humanize 参考）
-│   ├── gsap-demo.html           GSAP 滚动动画集——5 种模式演示
+│   ├── 0001-demo-report.html    全球 AI 芯片市场调研报告
+│   ├── gsap-demo.html           GSAP 滚动动画集演示
+│   ├── heatmap-demo.html        热力图演示（Canvas）
 │   └── report-themes.html       20 主题预览页（敲 T 键循环切换）
-└── docs/
-    ├── agents/                  工程技能配置（issue tracker / triage labels / domain docs）
-    └── theme-index.md           主题元数据文档
+├── docs/
+│   └── agents/                  工程技能配置（issue tracker / triage labels / domain docs）
+├── pyproject.toml               uv 包管理配置
+└── uv.lock
 
 ## CDN + 本地回退策略
 
@@ -167,6 +238,16 @@ CDN:    https://cdn.jsdelivr.net/gh/qwerkilo/context2html@main/libs/echarts.min.
 D1/D4/D5 三项已实现为 warning 级自动化检查（不阻断构建但提示需修复）。D2/D3 仍需人工 review。
 
 ## 更新日志
+
+### 2026-07-05 — Framework v0.1.0
+
+- **Python 框架包** — 新增 `context2html/` 包（`registry.py` / `renderer.py` / `theme.py`），通过 `uv pip install -e .` 安装。其他技能可编程调用组件和主题
+- **组件元数据** — 全部 31 个组件 .md 增加 YAML front matter，含 `id/name/dependencies/compat_types/degrade_to/requires_3d`。`ComponentRegistry` 可按内容类型过滤、解析依赖
+- **模板渲染器** — `TemplateRenderer.assemble()` 一键将组件组装到模板，替代手动 copy-paste。支持两个模板（starter/report-starter）
+- **主题推荐** — `theme/theme-index.json` 扩展 `recommend_for` / `recommend_topics` 字段。`ThemeProvider.recommend_theme()` 按内容类型和主题词推荐
+- **SKILL.md 双层重构** — 拆分为 Framework API 参考 + 示例工作流。Agent 可跟随示例流或直接用 API 组合自己的流程
+- **新测试 25 个** — registry（11）、renderer（6）、theme（8），覆盖框架模块公共 API
+- **包管理** — 新增 `pyproject.toml`，零运行时依赖，仅 dev 依赖 pytest
 
 ### 2026-07-04
 
