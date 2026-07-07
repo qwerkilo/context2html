@@ -145,11 +145,11 @@ from context2html.markdown_utils import (
 │   ├── sync-template-styles.py  base-styles.css 同步
 │   ├── extract-component.py     组件代码提取 CLI
 │   ├── conftest.py              测试路径配置
-│   └── test_*.py                443 个测试
+│   └── test_*.py                453 个测试
 ├── theme/                       20 主题（report-themes.css + theme-index.json）
 ├── libs/                        外部库离线包（CDN 优先，本地回退）
 ├── references/                  组件选择矩阵 / 人类化案例 / 页面类型参考
-├── examples/                    15+ 演示 HTML
+├── examples/                    2 演示 HTML（0001-demo-report + report-themes）
 ├── docs/agents/                 工程技能配置
 ├── pyproject.toml               uv 包管理
 └── uv.lock
@@ -170,9 +170,16 @@ CDN:    https://cdn.jsdelivr.net/gh/qwerkilo/context2html@main/libs/echarts.min.
 
 ## 人类化维度（D1-D5）
 
-参见 `SKILL.md` Step 2.5。三项自动化检查（D1/D4/D5）通过 `validate-report.py` 输出 warning，两项（D2/D3）需人工 review。D1-D5 词汇库（段首禁用词、连接词、高频 AI 黑话）在 `context2html/validator/report.py`。
+参见 `SKILL.md` Step 2.5。五项自动化检查通过 `validate-report.py` 输出 warning（D1 句长/D2 段落结构/D3 信息密度/D4 连接词/D5 术语变体）。D1-D5 词汇库（段首禁用词、连接词、高频 AI 黑话）在 `context2html/validator/report.py`。
 
 ## 更新日志
+
+### 2026-07-07 — D2/D3 自动化 + 测试扩展
+
+- **D2（段落结构）自动化** — 新增 `check_d2_paragraph_structure()`：检测 5 种段落模板轮换、相邻段落结构重复、段落密度差 ≥ 15%
+- **D3（信息密度）自动化** — 新增 `check_d3_information_density()`：检测核心段密度 70%-85%、过渡段密度 40%-50%、连续两段密度差 ≥ 15%
+- **验证器扩展** — `validate-report.py` 现在输出全部 5 项 D1-D5 warning
+- **测试覆盖** — +10 D2/D3 单元测试，总数 453
 
 ### 2026-07-05 — 架构深化 + 框架完善
 

@@ -48,7 +48,7 @@ from context2html.renderer import TemplateRenderer
 reg = ComponentRegistry()
 all = reg.list_components()                          # all 31 components
 compat = reg.list_components(content_type='report')   # filter by type
-comp = reg.get_component(26)                          # single component by id
+comp = reg.list_components(id=26)[0]                   # single component by id
 deps = reg.resolve_dependencies([26, 28])             # lib deps for a set
 
 # comp.metadata  → .id, .name, .dependencies, .compat_types, .degrade_to, .requires_3d
@@ -117,13 +117,13 @@ report 类型 → 复制 `report-starter.html`；其他类型 → 复制 `starte
 从 `references/decision-guide.md` 的决策树和选择矩阵按报告场景选组件（含失败模式）。数据密集型报告优先使用 Three.js #27 和 ECharts GL #29 提升视觉冲击力。
 
 - 用 `ComponentRegistry.list_components(content_type='...')` 过滤兼容组件
-- 用 `ComponentRegistry.get_component(id)` 读取组件的完整 HTML/CSS/JS
+- 用 `ComponentRegistry.list_components(id=N)` 读取组件的完整 HTML/CSS/JS
 - 视觉密度根据内容类型调整：报告/教程类型每 500 字至少 1 个视觉元素（数据密集型章节可缩短至 300 字）；文章/笔记类型每 800 字至少 1 个视觉元素
 - 🔵 CHECKPOINT：展示组件选择清单给用户确认
 
 ### Step 2.5: 人类化写作（warning 级 — 生成内容前阅读）
 
-**所有报告正文应去 AI 味。** 以下规则基于 AIGC 检测系统的 5 个判定维度。D1/D4/D5 由 `validate-report.py` 输出 warning（不阻断构建但建议修复），D2/D3 需人工 review。
+**所有报告正文应去 AI 味。** 以下规则基于 AIGC 检测系统的 5 个判定维度。全部 5 项由 `validate-report.py` 输出 warning（不阻断构建但建议修复）。
 
 | 维度 | 规则 | 执行检查 |
 |------|------|---------|
@@ -170,7 +170,7 @@ html = renderer.assemble('report-starter', [26, 17], 'warm')
 3. 填充封面元数据（标题、日期、作者、数据来源）
 4. 编写摘要 + 每章正文（中英双语 `data-lang="zh"` + `data-lang="en"`）— **写作时全程应用 Step 2.5 的 D1-D5 约束**
    🔵 CHECKPOINT：展示正文框架 + 逐段 D1-D5 自检结果给用户确认。用户确认后再合并组件。
-5. 用 `ComponentRegistry.get_component(id)` 获取组件 HTML/CSS/JS，合并到报告中：
+5. 用 `ComponentRegistry.list_components(id=N)` 获取组件 HTML/CSS/JS，合并到报告中：
    · 组件代码不兼容（缺 JS 依赖）→ 切换到简化版（纯 CSS 变体或文字替代）
    · 每章 2-4 个组件（数据密集型 5+）；同一章避免重复同类组件
    · 库引用转换：组件 `<script src="libs/X.js">` → 改为 `<script>__loadLib('X.js')</script>`（CDN 优先，模板已内置 `__loadLib`）
@@ -189,7 +189,7 @@ html = renderer.assemble('report-starter', [26, 17], 'warm')
 
 ### Step 4: 验证
 
-运行 `python scripts/validate-report.py report-slug.html` — 自动检查 21 项硬性约束 + 3 项人类化 warning（D1 句长/D4 连接词/D5 术语变体）。
+运行 `python scripts/validate-report.py report-slug.html` — 自动检查 21 项硬性约束 + 5 项人类化 warning（D1-D5）。
 
 · 验证失败 → 对照"失败模式与异常处理"表锁定具体问题 → 修复 → 重新验证
 · 连续 3 轮验证仍不通过 → 降级为纯文字报告输出（不附加视觉组件）

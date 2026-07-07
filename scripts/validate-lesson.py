@@ -3,17 +3,17 @@ Usage: python validate-lesson.py <path-to-lesson.html>
 """
 
 import re
-import sys
 import os
+import sys
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from _validate_common import (
+from context2html.validator.common import (
     PASS, FAIL,
-    check_svg_links, check_h1_count, check_relative_links,
-    check_svg_contrast, check_focus_visible, check_tabular_nums,
+    check_h1_count, check_relative_links,
+    check_focus_visible, check_tabular_nums,
     check_semantic_html, check_lib_deps, check_bilingual,
     check_cross_refs, check_data_anim_syntax,
 )
+from context2html.validator.svg import check_svg_links, check_svg_contrast
 
 
 def _extract_tag_blocks(html, tag, class_name):

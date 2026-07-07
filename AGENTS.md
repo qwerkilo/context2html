@@ -12,7 +12,7 @@ A Python framework package (`context2html/`) provides programmatic access: `Comp
 ## Commands
 
 ```bash
-# All 443 tests
+# All 453 tests
 python -m pytest scripts/ -v --tb=short
 
 # Single test file
