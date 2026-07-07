@@ -1,51 +1,57 @@
 # Error Handling
 
-> How errors are handled in this project.
+> How Python code handles errors in context2html.
 
----
+## Patterns
 
-## Overview
+### 1. Validation checks return issue lists
 
-<!--
-Document your project's error handling conventions here.
+All `check_*` functions return `list[str]` — empty list means pass, non-empty means issues found.
 
-Questions to answer:
-- What error types do you define?
-- How are errors propagated?
-- How are errors logged?
-- How are errors returned to clients?
--->
+```python
+def check_exec_summary(html):
+    if not re.search(r'class="[^"]*\bexec-summary\b[^"]*"', html):
+        return ["Missing .exec-summary section"]
+    return []
+```
 
-(To be filled by the team)
+### 2. Aggregation via dataclass
 
----
+`validate-report.py` collects all check results into a `ValidationResult` dataclass:
 
-## Error Types
+```python
+@dataclass
+class ValidationResult:
+    content_type: str = ''
+    checks: list = field(default_factory=list)   # Hard checks
+    warnings: list = field(default_factory=list)  # D1-D5 humanization warnings
+    all_pass: bool = True                          # False if any hard check fails
+```
 
-<!-- Custom error classes/types -->
+### 3. ValueError for invalid arguments
 
-(To be filled by the team)
+Used in the framework package for bad input:
 
----
+```python
+def assemble(self, template_name, components, theme_name='warm'):
+    if template_name not in _TEMPLATE_MAP:
+        raise ValueError(f"Unknown template: {template_name}")
+    if not os.path.exists(tpl_path):
+        raise FileNotFoundError(f"Template not found: {tpl_path}")
+```
 
-## Error Handling Patterns
+### 4. sys.exit(1) for CLI failures
 
-<!-- Try-catch patterns, error propagation -->
+CLI scripts exit with code 1 on failure, with a human-readable message:
 
-(To be filled by the team)
+```python
+if not os.path.exists(path):
+    print(f"{FAIL} File not found: {path}")
+    sys.exit(1)
+```
 
----
+## Anti-patterns
 
-## API Error Responses
-
-<!-- Standard error response format -->
-
-(To be filled by the team)
-
----
-
-## Common Mistakes
-
-<!-- Error handling mistakes your team has made -->
-
-(To be filled by the team)
+- No custom exception classes (ValueError/FileNotFoundError suffice).
+- No try/except wrapping for validation — checks return lists instead of raising.
+- No logging library — CLI scripts use `print()` to stdout/stderr.
