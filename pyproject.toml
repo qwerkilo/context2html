@@ -14,3 +14,4 @@ include = ["context2html*"]
 [tool.pytest.ini_options]
 testpaths = ["scripts"]
 python_files = ["test_*.py"]
+addopts = "-v --tb=short --no-header"
