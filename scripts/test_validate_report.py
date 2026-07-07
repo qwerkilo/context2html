@@ -621,3 +621,50 @@ class TestD5EdgeCases:
         """D5 should skip English paragraphs (no Chinese overused terms match)."""
         html = '<p data-lang="en">This important report shows significant growth. The important findings demonstrate crucial trends.</p>'
         assert not vr.check_d5_term_variety(html)
+
+
+class TestD2ParagraphStructure:
+    def test_empty_html_skips(self):
+        assert not vr.check_d2_paragraph_structure('<html></html>')
+
+    def test_single_paragraph_passes(self):
+        html = '<p data-lang="zh">市场在增长。技术迭代不断。</p>'
+        assert not vr.check_d2_paragraph_structure(html)
+
+    def test_adjacent_data_structure_fails(self):
+        html = ('<p data-lang="zh">2024年AI芯片市场规模达1200亿美元。同比增长35%。GPU占比65%。</p>'
+                '<p data-lang="zh">2025年预计突破1500亿美元。增长来自AI PC。行业前景乐观。</p>')
+        assert len(vr.check_d2_paragraph_structure(html)) > 0
+
+    def test_summary_ending_fails(self):
+        html = '<p data-lang="zh">技术正在快速发展。企业纷纷布局AI领域。这显示了市场的快速增长。</p>'
+        assert len(vr.check_d2_paragraph_structure(html)) > 0
+
+    def test_zongshangsu_fails(self):
+        html = '<p data-lang="zh">综上所述，数据驱动决策已成为行业共识。</p>'
+        assert len(vr.check_d2_paragraph_structure(html)) > 0
+
+    def test_clean_text_passes(self):
+        html = ('<p data-lang="zh">出货量涨了40%——这数字不需要太多注脚。</p>'
+                '<p data-lang="zh">竞争方面倒是另一幅画面。头部厂商的份额差距在收窄。</p>')
+        assert not vr.check_d2_paragraph_structure(html)
+
+
+class TestD3InfoDensity:
+    def test_empty_html_skips(self):
+        assert not vr.check_d3_info_density('<html></html>')
+
+    def test_clean_alternation_passes(self):
+        html = ('<p data-lang="zh">市场格局正在重塑。A厂以绝对优势领跑。</p>'
+                '<p data-lang="zh">2024年A厂营收520亿，同比增长23%。这是其三连增。</p>')
+        assert not vr.check_d3_info_density(html)
+
+    def test_high_density_consecutive_fails(self):
+        html = ('<p data-lang="zh">A厂营收520亿增长23%。B厂营收480亿增长18%。C厂营收310亿增长42%。</p>'
+                '<p data-lang="zh">B厂从28%升至30%。C厂从18%升至22%。增长率普遍在15%以上。</p>')
+        assert len(vr.check_d3_info_density(html)) > 0
+
+    def test_low_density_consecutive_fails(self):
+        html = ('<p data-lang="zh">数字化转型非常重要。企业需要重视这方面的工作。</p>'
+                '<p data-lang="zh">行业整体呈现向好趋势。各方面都在稳步推进。</p>')
+        assert len(vr.check_d3_info_density(html)) > 0
