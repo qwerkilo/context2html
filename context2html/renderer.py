@@ -67,7 +67,7 @@ class TemplateRenderer:
 
         if component_html_parts:
             html = _RE_HTML_ZONE.sub(
-                _make_inserter('\n'.join(component_html_parts) + '\n'), html
+                _make_inserter('\n'.join(component_html_parts) + '\n'), html, count=1
             )
 
         if component_js_parts:

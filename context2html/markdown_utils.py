@@ -42,13 +42,14 @@ def extract_code_block(content, lang, multi=False):
 def extract_js_from_md(content, multi=False):
     """Extract JS from markdown. Prefers ```js block, falls back to
     ```html block containing <script>.
-    Returns first result (str) when multi=False.
-    Returns concatenated string when multi=True.
+    Returns str when multi=False.
+    Returns list[str] when multi=True (consistent with extract_code_block).
     """
     js_blocks = extract_code_block(content, 'js', multi=True)
     if js_blocks:
-        result = '\n'.join(js_blocks)
-        return result if not multi else result
+        if multi:
+            return js_blocks
+        return '\n'.join(js_blocks)
 
     pattern = re.compile(
         r'^`{3}html\s*\n(.*?)\n^`{3}',
@@ -61,5 +62,5 @@ def extract_js_from_md(content, multi=False):
             script_blocks.append(block.strip())
 
     if multi:
-        return '\n'.join(script_blocks)
+        return script_blocks
     return script_blocks[0] if script_blocks else ''

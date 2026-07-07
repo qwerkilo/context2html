@@ -61,7 +61,8 @@ class ComponentRegistry:
             css_blocks = extract_code_block(body, 'css', multi=True)
             html = '\n'.join(html_blocks) if html_blocks else ''
             css = '\n'.join(css_blocks) if css_blocks else ''
-            js = extract_js_from_md(body, multi=True)
+            js_blocks = extract_js_from_md(body, multi=True)
+            js = '\n'.join(js_blocks) if js_blocks else ''
             metadata = ComponentMeta.from_dict(meta)
             self._cache.append(Component(metadata, html, css, js))
         return self._cache

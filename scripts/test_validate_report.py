@@ -617,10 +617,10 @@ class TestD5EdgeCases:
         html = f'<p data-lang="zh">{text}</p>'
         assert len(vr.check_d5_term_variety(html)) > 0
 
-    def test_english_only_skipped(self):
-        """D5 should skip English paragraphs (no Chinese overused terms match)."""
+    def test_english_overused_terms_caught(self):
+        """D5 now catches English overused terms."""
         html = '<p data-lang="en">This important report shows significant growth. The important findings demonstrate crucial trends.</p>'
-        assert not vr.check_d5_term_variety(html)
+        assert len(vr.check_d5_term_variety(html)) > 0
 
 
 class TestD2ParagraphStructure:

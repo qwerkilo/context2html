@@ -311,8 +311,8 @@ __loadLib('theme/report-themes.css','../theme/report-themes.css');
     </svg>
   </div>
   <div class="meteors-container"></div>
-  <div class="cover-badge shiny-text" data-lang="zh">内容概览</div>
-  <div class="cover-badge shiny-text" data-lang="en">Content Overview</div>
+  <div class="cover-badge" data-lang="zh">内容概览</div>
+  <div class="cover-badge" data-lang="en">Content Overview</div>
   <h1 data-lang="zh">页面标题</h1>
   <h1 data-lang="en">Page Title</h1>
   <p class="cover-subtitle" data-lang="zh">副标题 / 范围说明</p>
@@ -492,17 +492,17 @@ var n=e.key==='ArrowRight'?Math.min(c+1,h2s.length-1):Math.max(c-1,0);if(n>=0&&h
   var io = new IntersectionObserver(function(es) {
     es.forEach(function(e) {
       if (e.isIntersecting) {
-        var target = parseFloat(e.dataset.countup);
+        var target = parseFloat(e.target.dataset.countup);
         var start = performance.now();
         var dur = 1500;
         function step(now) {
           var t = Math.min((now - start) / dur, 1);
           var val = t < 1 ? target * (1 - Math.pow(1 - t, 3)) : target;
-          e.textContent = target % 1 === 0 ? Math.round(val).toLocaleString() : val.toFixed(1);
+          e.target.textContent = target % 1 === 0 ? Math.round(val).toLocaleString() : val.toFixed(1);
           if (t < 1) requestAnimationFrame(step);
         }
         requestAnimationFrame(step);
-        io.unobserve(e);
+        io.unobserve(e.target);
       }
     });
   }, { threshold: 0.3 });

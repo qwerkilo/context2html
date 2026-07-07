@@ -74,7 +74,8 @@ class ThemeProvider:
         if topic:
             topic_lower = topic.lower()
             for t in candidates:
-                if any(topic_lower in rt.lower() for rt in t.recommend_topics):
+                if any(topic_lower in rt.lower() or rt.lower() in topic_lower
+                       for rt in t.recommend_topics):
                     return t.name
         if candidates:
             return candidates[0].name

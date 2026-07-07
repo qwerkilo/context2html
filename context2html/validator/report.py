@@ -21,7 +21,7 @@ _RE_PARA_ALL = re.compile(r'<p[^>]*data-lang="(?:zh|en)"[^>]*>(.*?)</p>', re.DOT
 _RE_HTML_TAG = re.compile(r'<[^>]+>')
 _RE_CMP_TABLE_MEDIA = re.compile(r'@media\s*\([^)]*max-width\s*:\s*(\d+)px[^)]*\)\s*\{')
 _RE_CMP_TABLE_RULE = re.compile(r'\.cmp-table[^{]*\{([^}]*)\}')
-_RE_SENTENCE = re.compile(r'[^。！？.!?\n]+[。！？]|[^。！？.!?\n]+[.!?](?:\s|$)')
+_RE_SENTENCE = re.compile(r'[^。！？.!?\n]+[。！？]|[^。！？.!?\n]+[.!?](?:\s|$|[^\x20-\x7E])')
 _RE_SUMMARY_ENDING = re.compile(r'这[显示表明说明证明反映代表意味着]+了')
 _RE_DIGIT = re.compile(r'\d')
 _RE_DATA_CLAIM = re.compile(r'(?:增长|下降|占比|达到|超过|突破|占比|营收|份额|规模|增速|率\s*[:：达为])')
@@ -38,6 +38,28 @@ _OVERUSED_TERMS_ZH = ['重要', '优势明显', '显著', '必不可少', '至�
                       '不可或缺', '十分关键', '日益突出', '值得关注',
                       '赋能', '落地', '闭环', '抓手', '维度',
                       '深化', '深耕', '精细化', '重塑', '重构']
+
+_BANNED_STARTERS_EN = [
+    'First and foremost', 'It is worth noting', 'It should be noted',
+    'It is important to note', 'Notably', 'Additionally',
+    'Furthermore', 'Moreover', 'In conclusion', 'To summarize',
+    'It is clear that', 'Undoubtedly',
+]
+_CONNECTORS_EN = [
+    'Therefore', 'However', 'Meanwhile', 'Moreover', 'Furthermore',
+    'Additionally', 'Nevertheless', 'Nonetheless', 'Consequently',
+    'As a result', 'In addition', 'For example', 'For instance',
+    'In particular', 'Specifically', 'On the one hand', 'On the other hand',
+    'In other words', 'In summary', 'Overall', 'In contrast',
+    'On the contrary',
+]
+_OVERUSED_TERMS_EN = [
+    'important', 'significant', 'crucial', 'essential', 'vital',
+    'key', 'critical', 'notable', 'remarkable', 'substantial',
+    'leverage', 'streamline', 'optimize', 'robust', 'scalable',
+    'innovative', 'groundbreaking', 'cutting-edge', 'state-of-the-art',
+    'indispensable', 'paramount', 'transformative', 'game-changing',
+]
 
 _REPO_CDN = "cdn.jsdelivr.net/gh/qwerkilo/context2html"
 _RE_THEME_LOADLIB = re.compile(r"__loadLib\s*\(\s*['\"]([^'\"]*report-themes\.css[^'\"]*)['\"]")
@@ -189,6 +211,14 @@ def check_echarts_color_usage(html):
                 " — use gv('--xxx') helper instead"
             )
             break
+    if not issues and 'echarts' in html:
+        for m in re.finditer(r'<[^>]*\bvar\(--[^)]*\)[^>]*>', html):
+            if 'echarts' in html[max(0, m.start() - 500):m.end()]:
+                issues.append(
+                    "ECharts options in HTML attribute use 'var(--xxx)' directly"
+                    " (Canvas2D ignores CSS var()) — use gv('--xxx') helper instead"
+                )
+                break
     return issues
 
 
@@ -213,32 +243,42 @@ def _extract_para_texts(html, lang=None):
     return texts
 
 
-def check_d4_connectors(html):
+def _run_d4_checks(texts, lang_label, banned_starters, connectors):
     issues = []
-    texts = _extract_para_texts(html)
     if not texts:
-        return []
+        return issues
     total_chars = sum(len(t) for t in texts)
     banned_seen = []
     for i, t in enumerate(texts):
-        start = t[:20]
-        for w in _BANNED_STARTERS_ZH:
-            if start.startswith(w):
-                banned_seen.append(f'第{i+1}段以"{w}"开头')
+        start = t[:40].lower()
+        for w in banned_starters:
+            if start.startswith(w.lower()):
+                banned_seen.append(f'第{i+1}段({lang_label})以"{w}"开头')
                 break
     if banned_seen:
         issues.append(f'D4: 段落开头禁用连接词 — {"; ".join(banned_seen)}')
     connector_count = 0
     for t in texts:
-        for w in _CONNECTORS_ZH:
-            connector_count += t.count(w)
+        for w in connectors:
+            connector_count += t.lower().count(w.lower())
     if total_chars > 0:
         per_1k = connector_count / (total_chars / 1000)
         if per_1k > 6:
             issues.append(
-                f'D4: 连接词频率 {per_1k:.1f}/千字（上限 6/千字，实际 {connector_count} 个/'
-                f'{total_chars} 字）'
+                f'D4({lang_label}): 连接词频率 {per_1k:.1f}/千字（上限 6/千字，'
+                f'实际 {connector_count} 个/{total_chars} 字符）'
             )
+    return issues
+
+
+def check_d4_connectors(html):
+    issues = []
+    issues.extend(_run_d4_checks(
+        _extract_para_texts(html, lang='zh'), 'zh',
+        _BANNED_STARTERS_ZH, _CONNECTORS_ZH))
+    issues.extend(_run_d4_checks(
+        _extract_para_texts(html, lang='en'), 'en',
+        _BANNED_STARTERS_EN, _CONNECTORS_EN))
     return issues
 
 
@@ -276,25 +316,33 @@ def check_d1_sentence_length(html):
     return issues
 
 
-def check_d5_term_variety(html):
+def _run_d5_checks(texts, lang_label, overused_terms):
     issues = []
-    texts = _extract_para_texts(html)
     if not texts:
-        return []
+        return issues
     total_chars = sum(len(t) for t in texts)
-    combined = ' '.join(texts)
+    combined = ' '.join(texts).lower()
     flagged = []
-    for term in _OVERUSED_TERMS_ZH:
-        count = combined.count(term)
+    for term in overused_terms:
+        count = combined.count(term.lower())
         if count > 0:
             per_800 = count / max(total_chars / 800, 1)
             if per_800 >= 1:
                 flagged.append(f'{term}×{count}')
     if flagged:
         issues.append(
-            f'D5: 高频AI术语 — {"; ".join(flagged)}（每800字同术语≥1次'
-            f' — 建议替换，参见 humanize_matrix.md 案例D5）'
+            f'D5({lang_label}): 高频AI术语 — {"; ".join(flagged)}'
+            f'（每800字符同术语≥1次 — 建议替换）'
         )
+    return issues
+
+
+def check_d5_term_variety(html):
+    issues = []
+    issues.extend(_run_d5_checks(
+        _extract_para_texts(html, lang='zh'), 'zh', _OVERUSED_TERMS_ZH))
+    issues.extend(_run_d5_checks(
+        _extract_para_texts(html, lang='en'), 'en', _OVERUSED_TERMS_EN))
     return issues
 
 

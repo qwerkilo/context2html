@@ -110,8 +110,7 @@ class TestExtractJsFromMdMulti:
     def test_multi_js_blocks(self):
         md = "```js\na\n```\n```js\nb\n```"
         result = extract_js_from_md(md, multi=True)
-        assert "a" in result
-        assert "b" in result
+        assert result == ["a", "b"]
 
     def test_multi_empty(self):
-        assert extract_js_from_md("plain text", multi=True) == ""
+        assert extract_js_from_md("plain text", multi=True) == []
