@@ -1,6 +1,7 @@
 README.md
 pyproject.toml
 context2html/__init__.py
+context2html/markdown_utils.py
 context2html/registry.py
 context2html/renderer.py
 context2html/theme.py
@@ -10,3 +11,7 @@ context2html.egg-info/dependency_links.txt
 context2html.egg-info/requires.txt
 context2html.egg-info/top_level.txt
 context2html/validator/__init__.py
+context2html/validator/common.py
+context2html/validator/content_type.py
+context2html/validator/report.py
+context2html/validator/svg.py

@@ -25,6 +25,9 @@ _RE_CMP_TABLE_MEDIA = re.compile(
 )
 _RE_CMP_TABLE_RULE = re.compile(r'\.cmp-table[^{]*\{([^}]*)\}')
 _RE_SENTENCE = re.compile(r'[^。！？.!?\n]+[。！？]|[^。！？.!?\n]+[.!?](?:\s|$)')
+_RE_SUMMARY_ENDING = re.compile(r'这[显示表明说明证明反映代表意味着]+了')
+_RE_DIGIT = re.compile(r'\d')
+_RE_DATA_CLAIM = re.compile(r'(?:增长|下降|占比|达到|超过|突破|占比|营收|份额|规模|增速|率\s*[:：达为])')
 _RE_BAR_CSS_WIDTH = re.compile(r'\.(?<![a-zA-Z0-9_-])bar-fill(?![-_])[^{]*\{[^}]*width\s*:\s*(\d+(?:\.\d+)?)\s*%\s*;')
 _RE_CMP_TABLE = re.compile(r'.cmp-table')
 
@@ -337,5 +340,65 @@ def check_d5_term_variety(html):
             f'D5: 高频AI术语 — {"; ".join(flagged)}（每800字同术语≥1次'
             f' — 建议替换，参见 humanize_matrix.md 案例D5）'
         )
+
+    return issues
+
+
+def check_d2_paragraph_structure(html):
+    """D2: detect AI-typical paragraph structure patterns."""
+    issues = []
+    texts = _extract_para_texts(html)
+    if not texts:
+        return []
+
+    if len(texts) >= 2:
+        for i in range(len(texts) - 1):
+            curr = texts[i][:40]
+            nxt = texts[i + 1][:40]
+            curr_is_data = bool(_RE_DIGIT.search(curr[:15]))
+            nxt_is_data = bool(_RE_DIGIT.search(nxt[:15]))
+            if curr_is_data and nxt_is_data and len(texts[i]) > 20 and len(texts[i+1]) > 20:
+                issues.append(f'第{i+1}-{i+2}段相邻同结构（均以数据开头）')
+
+    for i, t in enumerate(texts):
+        last_60 = t[-60:]
+        if _RE_SUMMARY_ENDING.search(last_60):
+            issues.append(f'第{i+1}段以总结句结尾（"这...了"模式）')
+
+    for i, t in enumerate(texts):
+        if t.strip().startswith('综上所述'):
+            issues.append(f'第{i+1}段以"综上所述"开头（禁止模板化总结）')
+
+    return issues
+
+
+def check_d3_info_density(html):
+    """D3: detect consecutive high/low density paragraphs."""
+    issues = []
+    texts = _extract_para_texts(html)
+    if len(texts) < 2:
+        return []
+
+    densities = []
+    for t in texts:
+        if len(t) < 20:
+            densities.append(None)
+            continue
+        sentences = [s.strip() for s in _RE_SENTENCE.findall(t) if len(s.strip()) > 5]
+        if not sentences:
+            densities.append(None)
+            continue
+        data_sentences = sum(1 for s in sentences if _RE_DIGIT.search(s) or _RE_DATA_CLAIM.search(s))
+        ratio = data_sentences / len(sentences)
+        densities.append(ratio)
+
+    for i in range(len(densities) - 1):
+        if densities[i] is None or densities[i+1] is None:
+            continue
+        d1, d2 = densities[i], densities[i+1]
+        if d1 >= 0.6 and d2 >= 0.6:
+            issues.append(f'第{i+1}-{i+2}段连续高密度（数据驱动句占比 {d1:.0%}+{d2:.0%}）')
+        if d1 <= 0.2 and d2 <= 0.2:
+            issues.append(f'第{i+1}-{i+2}段连续低密度（空泛句占比 {1-d1:.0%}+{1-d2:.0%}）')
 
     return issues

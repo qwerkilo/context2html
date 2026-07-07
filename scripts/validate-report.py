@@ -19,6 +19,7 @@ from context2html.validator import (
     check_article_structure, check_doc_structure, check_tutorial_structure,
     check_note_structure,
     check_d4_connectors, check_d1_sentence_length, check_d5_term_variety,
+    check_d2_paragraph_structure, check_d3_info_density,
 )
 
 
@@ -76,6 +77,8 @@ def build_checks(html, base_dir):
 
     warnings = [
         ("D1 — 句长交替 (≤10字短句 + ≥35字长句)", check_d1_sentence_length(html)),
+        ("D2 — 段落结构 (避免同结构相邻/总结句结尾/模板化开头)", check_d2_paragraph_structure(html)),
+        ("D3 — 信息密度交替 (避免连续高密/低密段)", check_d3_info_density(html)),
         ("D4 — 连接词控制 (段落开头禁用 + ≤6/千字)", check_d4_connectors(html)),
         ("D5 — 术语变体 (同术语 ≤1次/800字)", check_d5_term_variety(html)),
     ]

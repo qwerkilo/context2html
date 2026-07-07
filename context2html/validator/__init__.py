@@ -16,4 +16,5 @@ from context2html.validator.report import (
     check_article_structure, check_doc_structure, check_tutorial_structure,
     check_note_structure,
     check_d4_connectors, check_d1_sentence_length, check_d5_term_variety,
+    check_d2_paragraph_structure, check_d3_info_density,
 )
