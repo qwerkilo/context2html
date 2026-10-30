@@ -5,9 +5,10 @@ __pycache__/
 .idea/
 node_modules/
 *.log
-# Generated reference docs are not committed, except ADRs
+# Generated reference docs are not committed, except ADRs and specs
 docs/*
 !docs/adr/
+!docs/specs/
 *.egg-info/
 .coverage
 coverage.json
