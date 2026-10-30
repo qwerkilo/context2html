@@ -40,6 +40,8 @@
     '.ic-editor-bar button:disabled{opacity:.45;cursor:not-allowed}',
     '.ic-editor-bar .ic-editor-undo{display:none}',
     '.ic-editing .ic-editor-bar .ic-editor-undo{display:inline-block}',
+    '.ic-editor-bar .ic-editor-save{display:none}',
+    '.ic-editing .ic-editor-bar .ic-editor-save{display:inline-block}',
     '.ic-editing .ic-slot[data-slot]{outline:2px dashed var(--accent,#c0392b);',
     'outline-offset:6px;cursor:pointer;transition:outline-color .15s ease}',
     '.ic-editing .ic-slot[data-slot]:hover{outline-style:solid;',
@@ -108,11 +110,42 @@
     undo.disabled = true;
     undo.addEventListener('click', undoLast);
 
+    var save = doc.createElement('button');
+    save.type = 'button';
+    save.className = 'ic-editor-save';
+    save.textContent = '保存';
+    save.addEventListener('click', saveDocument);
+
     bar.appendChild(toggle);
     bar.appendChild(undo);
+    bar.appendChild(save);
     doc.body.appendChild(bar);
     state.toggle = toggle;
     state.undo = undo;
+  }
+
+  function downloadHtml(html, fileName) {
+    var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var link = doc.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    link.style.display = 'none';
+    doc.body.appendChild(link);
+    link.click();
+    doc.body.removeChild(link);
+    setTimeout(function () {
+      URL.revokeObjectURL(url);
+    }, 1000);
+  }
+
+  function saveDocument() {
+    /* The delivered file must look read-only on open: savedHtml drops the
+     * live editor chrome (bar, panel, tooltip, outline style) and the
+     * ic-editing class, while the runtime and data-editable flag stay, so
+     * reopening rebuilds exactly one toggle. */
+    var html = core.savedHtml(doc.documentElement.outerHTML);
+    downloadHtml(html, core.savedFileName(doc.title));
   }
 
   function updateUndo() {

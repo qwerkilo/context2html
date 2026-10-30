@@ -12,6 +12,7 @@
  *   parseModel(text)     parse JSON while preserving int/float number kinds
  *   canonicalJson(model) canonical JSON exactly as Python's slots.py emits it;
  *                        accepts an object or the raw JSON text of a data block
+ *   scriptSafe(text)     escape a JSON block for inline <script> delivery
  *   normalizeContentModel(model)
  *   componentIds
  *   ContentModelError
@@ -1339,6 +1340,7 @@
     parseModel: parseModel,
     parseContentModel: parseModel,
     canonicalJson: canonicalJson,
+    scriptSafe: scriptSafe,
     normalizeContentModel: normalizeContentModel,
     componentIds: ids,
     ContentModelError: ContentModelError,

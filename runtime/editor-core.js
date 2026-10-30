@@ -12,19 +12,27 @@
  *   isEditableFlag(value)                the data-editable gate
  *   familyOf(componentId), componentIds
  *
+ * Save pipeline (also pure, also DOM-free):
+ *
+ *   stripEditorUi(html)          drop every element marked data-ic-editor-ui
+ *   clearEditingState(html)      drop the ic-editing class from <html>
+ *   rebuildDataBlocks(html)      re-emit each slot's JSON in canonical form
+ *   savedFileName(title)         the download name derived from <title>
+ *   savedHtml(html, options)     the whole pipeline: UI out, doctype in
+ *
  * Family membership is the swap-cost heuristic from the spec: chart-family
  * renderers lead when the slot carries series, structure-family renderers lead
  * when it only carries items.
  */
 (function (root, factory) {
   'use strict';
-  var api = factory();
+  var api = factory(root);
   if (typeof module === 'object' && module.exports) {
     module.exports = api;
   } else {
     root.SlotEditorCore = api;
   }
-}(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+}(typeof globalThis !== 'undefined' ? globalThis : this, function (root) {
   'use strict';
 
   var CHART = 'chart';
@@ -367,6 +375,345 @@
     return value === 'true' || value === '';
   }
 
+  /* ------------------------------------------------------------------ *
+   * Save pipeline
+   *
+   * Saving is string surgery, not DOM surgery: the browser serializes the
+   * document and these functions decide what the delivered file contains.
+   * Keeping them here means the risky part — never shipping the live editor
+   * chrome, never losing a data block — is testable under node.
+   *
+   * The scanner below is deliberately small: it only has to survive the
+   * markup this project emits.  Raw-text elements (script/style/textarea/
+   * title) are copied verbatim, so HTML-looking strings inside the inlined
+   * runtime never look like tags.
+   * ------------------------------------------------------------------ */
+
+  var UI_ATTR = /\bdata-ic-editor-ui\b/i;
+  var DOCTYPE = /^\s*<!doctype\b/i;
+  var TAG_AT = /^<(\/?)([A-Za-z][^\s\/>]*)/;
+  var RAW_TEXT = {
+    script: true, style: true, textarea: true, title: true
+  };
+  var VOID = {
+    area: true, base: true, br: true, col: true, embed: true, hr: true,
+    img: true, input: true, link: true, meta: true, param: true,
+    source: true, track: true, wbr: true
+  };
+
+  function tagEnd(html, index) {
+    var quote = null;
+    for (var cursor = index + 1; cursor < html.length; cursor += 1) {
+      var character = html.charAt(cursor);
+      if (quote) {
+        if (character === quote) quote = null;
+      } else if (character === '"' || character === "'") {
+        quote = character;
+      } else if (character === '>') {
+        return cursor;
+      }
+    }
+    return -1;
+  }
+
+  function tagAt(html, index) {
+    if (html.charAt(index) !== '<') return null;
+    var match = TAG_AT.exec(html.slice(index, index + 256));
+    if (!match) return null;
+    var end = tagEnd(html, index);
+    if (end < 0) return null;
+    var text = html.slice(index, end + 1);
+    return {
+      name: match[2].toLowerCase(),
+      closing: match[1] === '/',
+      end: end + 1,
+      text: text,
+      selfClosing: /\/\s*>$/.test(text)
+    };
+  }
+
+  function commentEnd(html, index) {
+    var end = html.indexOf('-->', index + 4);
+    return end < 0 ? -1 : end + 3;
+  }
+
+  function findClosingTag(html, from, name) {
+    var lower = html.toLowerCase();
+    var needle = '</' + name;
+    var cursor = from;
+    while (true) {
+      var at = lower.indexOf(needle, cursor);
+      if (at < 0) return -1;
+      var after = lower.charAt(at + needle.length);
+      if (after === '' || /[\s>\/]/.test(after)) return at;
+      cursor = at + needle.length;
+    }
+  }
+
+  function hasEditorUiMarker(tagText) {
+    return UI_ATTR.test(tagText);
+  }
+
+  /* Skip an element whose open tag ended at `from`, honouring same-name
+   * nesting and raw-text children.  Unterminated markup drops the rest. */
+  function skipElement(html, from, name) {
+    var depth = 1;
+    var cursor = from;
+    while (cursor < html.length) {
+      var lt = html.indexOf('<', cursor);
+      if (lt < 0) return html.length;
+      if (html.slice(lt, lt + 4) === '<!--') {
+        var afterComment = commentEnd(html, lt);
+        if (afterComment < 0) return html.length;
+        cursor = afterComment;
+        continue;
+      }
+      var tag = tagAt(html, lt);
+      if (!tag) { cursor = lt + 1; continue; }
+      if (tag.name === name) {
+        if (tag.closing) {
+          depth -= 1;
+          if (depth === 0) return tag.end;
+        } else if (!tag.selfClosing && !VOID[tag.name]) {
+          depth += 1;
+        }
+      }
+      cursor = tag.end;
+      if (!tag.closing && !tag.selfClosing && RAW_TEXT[tag.name]) {
+        var closeAt = findClosingTag(html, cursor, tag.name);
+        cursor = closeAt < 0 ? html.length : closeAt;
+      }
+    }
+    return html.length;
+  }
+
+  function stripEditorUi(html) {
+    var text = String(html === undefined || html === null ? '' : html);
+    var out = '';
+    var cursor = 0;
+    while (cursor < text.length) {
+      var lt = text.indexOf('<', cursor);
+      if (lt < 0) {
+        out += text.slice(cursor);
+        break;
+      }
+      out += text.slice(cursor, lt);
+      if (text.slice(lt, lt + 4) === '<!--') {
+        var afterComment = commentEnd(text, lt);
+        if (afterComment < 0) {
+          out += text.slice(lt);
+          break;
+        }
+        out += text.slice(lt, afterComment);
+        cursor = afterComment;
+        continue;
+      }
+      if (text.slice(lt, lt + 2) === '<!') {
+        var declarationEnd = text.indexOf('>', lt);
+        if (declarationEnd < 0) {
+          out += text.slice(lt);
+          break;
+        }
+        out += text.slice(lt, declarationEnd + 1);
+        cursor = declarationEnd + 1;
+        continue;
+      }
+      var tag = tagAt(text, lt);
+      if (!tag) {
+        out += '<';
+        cursor = lt + 1;
+        continue;
+      }
+      if (!tag.closing && hasEditorUiMarker(tag.text)) {
+        cursor = (tag.selfClosing || VOID[tag.name])
+          ? tag.end
+          : skipElement(text, tag.end, tag.name);
+        continue;
+      }
+      out += tag.text;
+      cursor = tag.end;
+      if (!tag.closing && !tag.selfClosing && RAW_TEXT[tag.name]) {
+        var closeAt = findClosingTag(text, cursor, tag.name);
+        if (closeAt < 0) {
+          out += text.slice(cursor);
+          break;
+        }
+        out += text.slice(cursor, closeAt);
+        cursor = closeAt;
+      }
+    }
+    return out;
+  }
+
+  function clearEditingState(html) {
+    var text = String(html === undefined || html === null ? '' : html);
+    var root = /<html\b[^>]*>/i.exec(text);
+    if (!root) return text;
+    var tag = root[0];
+    var attribute = /\sclass\s*=\s*(["'])(.*?)\1/i.exec(tag);
+    if (!attribute) return text;
+    var classes = attribute[2].split(/\s+/).filter(function (name) {
+      return name && name !== 'ic-editing';
+    });
+    var replacement = classes.length ? ' class="' + classes.join(' ') + '"' : '';
+    var cleaned = tag.slice(0, attribute.index) + replacement
+      + tag.slice(attribute.index + attribute[0].length);
+    return text.slice(0, root.index) + cleaned + text.slice(root.index + tag.length);
+  }
+
+  function withDoctype(html, doctype) {
+    var text = String(html === undefined || html === null ? '' : html);
+    if (DOCTYPE.test(text)) return text;
+    return (doctype || '<!DOCTYPE html>') + '\n' + text;
+  }
+
+  /* The browser runtime is loaded alongside this file in a report, and
+   * required lazily under node.  Canonical JSON must come from the same
+   * implementation the generation path uses, so there is exactly one copy. */
+  var cachedRuntime = null;
+
+  function slotRuntime() {
+    if (cachedRuntime) return cachedRuntime;
+    if (typeof module === 'object' && module.exports && typeof require === 'function') {
+      cachedRuntime = require('./slots.js');
+    } else if (root) {
+      cachedRuntime = root.SlotRuntime;
+    }
+    return cachedRuntime;
+  }
+
+  function isDataBlockTag(tagText) {
+    if (!/^<script\b/i.test(tagText)) return false;
+    var type = /\btype\s*=\s*(["'])(.*?)\1/i.exec(tagText);
+    if (!type || type[2].toLowerCase() !== 'application/json') return false;
+    return /\bdata-slot\s*=\s*(["'])(.*?)\1/i.test(tagText);
+  }
+
+  function sameJson(left, right) {
+    if (left === right) return true;
+    if (left === null || right === null) return false;
+    if (typeof left !== 'object' || typeof right !== 'object') return false;
+    if (Array.isArray(left) !== Array.isArray(right)) return false;
+    var leftKeys = Object.keys(left);
+    var rightKeys = Object.keys(right);
+    if (leftKeys.length !== rightKeys.length) return false;
+    for (var index = 0; index < leftKeys.length; index += 1) {
+      var key = leftKeys[index];
+      if (!Object.prototype.hasOwnProperty.call(right, key)) return false;
+      if (!sameJson(left[key], right[key])) return false;
+    }
+    return true;
+  }
+
+  function rewriteDataBlock(tagText, body) {
+    if (!isDataBlockTag(tagText)) return body;
+    var api = slotRuntime();
+    if (!api || typeof api.scriptSafe !== 'function') return body;
+    var canonical;
+    try {
+      canonical = api.canonicalJson(body);
+    } catch (error) {
+      return body;
+    }
+    var original;
+    var rebuilt;
+    try {
+      original = JSON.parse(body);
+      rebuilt = JSON.parse(canonical);
+    } catch (error) {
+      return body;
+    }
+    /* canonicalJson drops fields the content model does not know.  Never
+     * trade an unknown field for a tidier block; leave it for the validator. */
+    if (!sameJson(original, rebuilt)) return body;
+    return api.scriptSafe(canonical);
+  }
+
+  function rebuildDataBlocks(html) {
+    var text = String(html === undefined || html === null ? '' : html);
+    var out = '';
+    var cursor = 0;
+    while (cursor < text.length) {
+      var lt = text.indexOf('<', cursor);
+      if (lt < 0) {
+        out += text.slice(cursor);
+        break;
+      }
+      out += text.slice(cursor, lt);
+      if (text.slice(lt, lt + 4) === '<!--') {
+        var afterComment = commentEnd(text, lt);
+        if (afterComment < 0) {
+          out += text.slice(lt);
+          break;
+        }
+        out += text.slice(lt, afterComment);
+        cursor = afterComment;
+        continue;
+      }
+      if (text.slice(lt, lt + 2) === '<!') {
+        var declarationEnd = text.indexOf('>', lt);
+        if (declarationEnd < 0) {
+          out += text.slice(lt);
+          break;
+        }
+        out += text.slice(lt, declarationEnd + 1);
+        cursor = declarationEnd + 1;
+        continue;
+      }
+      var tag = tagAt(text, lt);
+      if (!tag) {
+        out += '<';
+        cursor = lt + 1;
+        continue;
+      }
+      if (tag.closing || tag.selfClosing || tag.name !== 'script') {
+        out += tag.text;
+        cursor = tag.end;
+        if (!tag.closing && !tag.selfClosing && RAW_TEXT[tag.name]) {
+          var rawAt = findClosingTag(text, cursor, tag.name);
+          if (rawAt < 0) {
+            out += text.slice(cursor);
+            break;
+          }
+          out += text.slice(cursor, rawAt);
+          cursor = rawAt;
+        }
+        continue;
+      }
+      var closeAt = findClosingTag(text, tag.end, 'script');
+      if (closeAt < 0) {
+        out += tag.text + text.slice(tag.end);
+        break;
+      }
+      var closeEnd = text.indexOf('>', closeAt) + 1;
+      out += tag.text + rewriteDataBlock(tag.text, text.slice(tag.end, closeAt))
+        + text.slice(closeAt, closeEnd);
+      cursor = closeEnd;
+    }
+    return out;
+  }
+
+  function savedHtml(html, options) {
+    var settings = options || {};
+    var text = stripEditorUi(html);
+    text = clearEditingState(text);
+    text = rebuildDataBlocks(text);
+    return withDoctype(text, settings.doctype);
+  }
+
+  function savedFileName(title) {
+    var text = String(title === undefined || title === null ? '' : title);
+    text = text.replace(/[\\/:*?"<>|\u0000-\u001f]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/^\.+/, '')
+      .slice(0, 120)
+      .trim();
+    if (!text) text = 'report';
+    if (!/\.html?$/i.test(text)) text += '.html';
+    return text;
+  }
+
   return {
     slotShape: slotShape,
     canConsume: canConsume,
@@ -377,6 +724,11 @@
     canUndo: canUndo,
     undo: undo,
     isEditableFlag: isEditableFlag,
+    stripEditorUi: stripEditorUi,
+    clearEditingState: clearEditingState,
+    rebuildDataBlocks: rebuildDataBlocks,
+    savedFileName: savedFileName,
+    savedHtml: savedHtml,
     familyOf: familyOf,
     componentIds: IDS.slice()
   };

@@ -141,6 +141,34 @@ MUTANTS = [
         "      .split('</').join('</')",
         'scripts/test_js_parity.py',
     ),
+    (
+        'save: editor UI stripping disabled',
+        'runtime/editor-core.js',
+        '      if (!tag.closing && hasEditorUiMarker(tag.text)) {',
+        '      if (false) {',
+        'scripts/test_editor_save.py',
+    ),
+    (
+        'save: existing doctype duplicated',
+        'runtime/editor-core.js',
+        '    if (DOCTYPE.test(text)) return text;',
+        '    if (false) return text;',
+        'scripts/test_editor_save.py',
+    ),
+    (
+        'save: unknown data-block fields dropped',
+        'runtime/editor-core.js',
+        '    if (!sameJson(original, rebuilt)) return body;',
+        '    if (false) return body;',
+        'scripts/test_editor_save.py',
+    ),
+    (
+        'save: data-block script escaping disabled',
+        'runtime/editor-core.js',
+        '    return api.scriptSafe(canonical);',
+        '    return canonical;',
+        'scripts/test_editor_save.py',
+    ),
 ]
 
 
