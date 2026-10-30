@@ -1,0 +1,34 @@
+<section class="ic-slot" data-slot="slot-22-62aca150" data-component="22">
+<div class="cmp-wrap" data-anim="fade-up">
+<table class="cmp-table" data-sortable id="cmp-slot-22-62aca150"><thead><tr><th data-sort><span data-lang="zh">维度</span><span data-lang="en">Dimension</span><span class="cmp-arrow">↕</span></th><th data-sort><span data-lang="zh">甲</span><span data-lang="en">A</span><span class="cmp-arrow">↕</span></th><th data-sort><span data-lang="zh">乙</span><span data-lang="en">B</span><span class="cmp-arrow">↕</span></th></tr></thead><tbody><tr><td data-label="维度"><span data-lang="zh">交付</span><span data-lang="en">Delivery</span></td><td data-label="甲">9</td><td data-label="乙">7</td></tr><tr><td data-label="维度"><span data-lang="zh">质量</span><span data-lang="en">Quality</span></td><td data-label="甲">8</td><td data-label="乙">9</td></tr><tr><td data-label="维度"><span data-lang="zh">价格</span><span data-lang="en">Price</span></td><td data-label="甲">6</td><td data-label="乙">8</td></tr></tbody></table>
+</div>
+<script>
+(function () {
+  var table = document.getElementById("cmp-slot-22-62aca150");
+  if (!table) return;
+  table.querySelectorAll('th[data-sort]').forEach(function (th) {
+    th.addEventListener("click", function () {
+      var body = table.tBodies[0];
+      var rows = Array.prototype.slice.call(body.rows);
+      var index = Array.prototype.indexOf.call(th.parentNode.children, th);
+      var asc = !th.classList.contains("sorted-asc");
+      table.querySelectorAll("th").forEach(function (cell) {
+        cell.classList.remove("sorted-asc", "sorted-desc");
+      });
+      th.classList.add(asc ? "sorted-asc" : "sorted-desc");
+      rows.sort(function (a, b) {
+        var x = a.cells[index].textContent.trim();
+        var y = b.cells[index].textContent.trim();
+        var p = parseFloat(x);
+        var q = parseFloat(y);
+        if (!isNaN(p) && !isNaN(q)) return asc ? p - q : q - p;
+        return asc ? x.localeCompare(y, "zh-CN") : y.localeCompare(x, "zh-CN");
+      });
+      rows.forEach(function (row) { body.appendChild(row); });
+    });
+  });
+})();
+</script>
+<p class="cmp-caption" data-lang="zh">按季度评分</p><p class="cmp-caption" data-lang="en">按季度评分</p>
+</section>
+<script type="application/json" data-slot="slot-22-62aca150">{"items":[{"accent":"","label":"交付","label_en":"Delivery","note":"","value":0},{"accent":"","label":"质量","label_en":"Quality","note":"","value":0},{"accent":"","label":"价格","label_en":"Price","note":"","value":0}],"series":[{"name":"甲","name_en":"A","values":[9,8,6]},{"name":"乙","name_en":"B","values":[7,9,8]}],"subtitle":"按季度评分","title":"供应商对比"}</script>

@@ -1,0 +1,22 @@
+{
+  "title": "用户反馈",
+  "subtitle": "来自访谈",
+  "items": [
+    {
+      "label": "终于有人把复杂流程讲清楚了。",
+      "label_en": "Someone finally explained the complex flow clearly.",
+      "value": 1,
+      "note": "产品经理，李雷",
+      "note_en": "Product manager, Lei Li",
+      "accent": ""
+    },
+    {
+      "label": "希望能支持离线导出。",
+      "label_en": "I hope offline export is supported.",
+      "value": 2,
+      "note": "设计师，韩梅梅",
+      "note_en": "Designer, Meimei Han",
+      "accent": ""
+    }
+  ]
+}

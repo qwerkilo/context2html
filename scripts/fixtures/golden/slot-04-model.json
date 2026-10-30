@@ -1,0 +1,27 @@
+{
+  "title": "市场规模",
+  "subtitle": "单位：亿美元",
+  "items": [
+    {
+      "label": "美国",
+      "label_en": "United States",
+      "value": 80,
+      "note": "",
+      "accent": "accent"
+    },
+    {
+      "label": "中国",
+      "label_en": "China",
+      "value": 40,
+      "note": "",
+      "accent": "warning"
+    },
+    {
+      "label": "日本",
+      "label_en": "Japan",
+      "value": 20,
+      "note": "",
+      "accent": "#10b981"
+    }
+  ]
+}

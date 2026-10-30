@@ -1,0 +1,35 @@
+{
+  "title": "注意事项",
+  "items": [
+    {
+      "label": "请先备份数据",
+      "label_en": "Back up data first",
+      "value": 1,
+      "note": "操作不可撤销",
+      "note_en": "This cannot be undone",
+      "accent": "warning"
+    },
+    {
+      "label": "部署已完成",
+      "label_en": "Deployment complete",
+      "value": 2,
+      "note": "",
+      "accent": "success"
+    },
+    {
+      "label": "构建失败",
+      "label_en": "Build failed",
+      "value": 3,
+      "note": "检查依赖版本",
+      "note_en": "Check dependency versions",
+      "accent": "error"
+    },
+    {
+      "label": "默认提示",
+      "label_en": "Default notice",
+      "value": 4,
+      "note": "",
+      "accent": ""
+    }
+  ]
+}

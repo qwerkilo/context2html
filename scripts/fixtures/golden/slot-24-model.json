@@ -1,0 +1,25 @@
+{
+  "title": "月度访问量",
+  "items": [
+    {
+      "label": "一月",
+      "label_en": "Jan",
+      "value": 120
+    },
+    {
+      "label": "二月",
+      "label_en": "Feb",
+      "value": 80
+    },
+    {
+      "label": "三月",
+      "label_en": "Mar",
+      "value": 160
+    },
+    {
+      "label": "四月",
+      "label_en": "Apr",
+      "value": 40
+    }
+  ]
+}

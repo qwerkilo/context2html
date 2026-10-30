@@ -22,6 +22,11 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -31,6 +36,9 @@ jobs:
         run: >
           python -m pytest scripts/ --tb=short --no-header
           --cov=context2html --cov=scripts --cov-fail-under=90
+
+      - name: Check Python/JS renderer parity
+        run: python scripts/check-js-parity.py
 
       - name: Validate context2html package
         run: python -c "from context2html.theme import THEME_NAMES; print(str(len(THEME_NAMES)) + ' themes loaded')"
@@ -65,6 +73,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip

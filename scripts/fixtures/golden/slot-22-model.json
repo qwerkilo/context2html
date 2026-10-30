@@ -1,0 +1,33 @@
+{
+  "title": "供应商对比",
+  "subtitle": "按季度评分",
+  "items": [
+    {
+      "label": "交付",
+      "label_en": "Delivery",
+      "value": 0
+    },
+    {
+      "label": "质量",
+      "label_en": "Quality",
+      "value": 0
+    },
+    {
+      "label": "价格",
+      "label_en": "Price",
+      "value": 0
+    }
+  ],
+  "series": [
+    {
+      "name": "甲",
+      "name_en": "A",
+      "values": [9, 8, 6]
+    },
+    {
+      "name": "乙",
+      "name_en": "B",
+      "values": [7, 9, 8]
+    }
+  ]
+}

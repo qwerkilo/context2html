@@ -115,6 +115,25 @@ MUTANTS = [
         '    en = en',
         'scripts/test_structure.py',
     ),
+    (
+        'parity: missing-fixture guard disabled',
+        'scripts/check-js-parity.py',
+        '    if missing:\n'
+        '        return [\n'
+        "            f'{component_label(component_id)}: missing golden fixture: '\n"
+        "            + ', '.join(missing)\n"
+        '        ]',
+        '    if False:\n'
+        '        return []',
+        'scripts/test_js_parity.py',
+    ),
+    (
+        'runtime: script-closer escaping disabled',
+        'runtime/slots.js',
+        "      .split('</').join('<\\\\/')",
+        "      .split('</').join('</')",
+        'scripts/test_js_parity.py',
+    ),
 ]
 
 

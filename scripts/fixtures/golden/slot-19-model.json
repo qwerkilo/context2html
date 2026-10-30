@@ -1,0 +1,38 @@
+{
+  "title": "区域销售热度",
+  "items": [
+    {
+      "label": "Q1",
+      "value": 0
+    },
+    {
+      "label": "Q2",
+      "value": 0
+    },
+    {
+      "label": "Q3",
+      "value": 0
+    },
+    {
+      "label": "Q4",
+      "value": 0
+    }
+  ],
+  "series": [
+    {
+      "name": "华北",
+      "name_en": "North",
+      "values": [10, 20, 30, 40]
+    },
+    {
+      "name": "华东",
+      "name_en": "East",
+      "values": [15, 25, 35, 45]
+    },
+    {
+      "name": "华南",
+      "name_en": "South",
+      "values": [5, 15, 25, 35]
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "title": "项目阶段",
+  "items": [
+    {
+      "label": "需求分析",
+      "label_en": "Discovery",
+      "value": 100,
+      "note": "已完成",
+      "note_en": "Done",
+      "accent": ""
+    },
+    {
+      "label": "系统设计",
+      "label_en": "Design",
+      "value": 60,
+      "note": "进行中",
+      "note_en": "In progress",
+      "accent": ""
+    },
+    {
+      "label": "上线发布",
+      "label_en": "Launch",
+      "value": 0,
+      "note": "",
+      "accent": ""
+    }
+  ]
+}

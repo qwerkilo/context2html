@@ -1,0 +1,30 @@
+{
+  "title": "团队角色 & 分工",
+  "title_en": "Team roles & ownership",
+  "subtitle": "含 </script> 与特殊字符",
+  "items": [
+    {
+      "label": "产品 & <b>经理</b>",
+      "label_en": "Product & <b>manager</b>",
+      "value": 1,
+      "note": "负责 </script> 与\u2028换行",
+      "note_en": "Owns </script> and\u2029breaks",
+      "accent": "#3b82f6"
+    },
+    {
+      "label": "设计师",
+      "label_en": "Designer",
+      "value": 2,
+      "note": "",
+      "accent": "accent"
+    },
+    {
+      "label": "工程师",
+      "label_en": "Engineer",
+      "value": 3,
+      "note": "实现与交付",
+      "note_en": "Build and ship",
+      "accent": ""
+    }
+  ]
+}

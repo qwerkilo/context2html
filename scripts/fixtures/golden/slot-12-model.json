@@ -1,0 +1,29 @@
+{
+  "title": "关键指标",
+  "items": [
+    {
+      "label": "活跃用户",
+      "label_en": "Active users",
+      "value": 128000,
+      "note": "人",
+      "note_en": "people",
+      "accent": "var(--accent)"
+    },
+    {
+      "label": "留存率",
+      "label_en": "Retention",
+      "value": 42.5,
+      "note": "%",
+      "note_en": "%",
+      "accent": "#10b981"
+    },
+    {
+      "label": "平均时长",
+      "label_en": "Avg. session",
+      "value": 7,
+      "note": "分钟",
+      "note_en": "minutes",
+      "accent": ""
+    }
+  ]
+}

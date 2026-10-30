@@ -1,0 +1,30 @@
+{
+  "title": "产品演进时间线",
+  "subtitle": "2020 至 2024",
+  "items": [
+    {
+      "label": "2020",
+      "label_en": "2020",
+      "value": 2020,
+      "note": "项目启动",
+      "note_en": "Kickoff",
+      "accent": ""
+    },
+    {
+      "label": "2022",
+      "label_en": "2022",
+      "value": 2022,
+      "note": "首个版本",
+      "note_en": "First release",
+      "accent": "#f59e0b"
+    },
+    {
+      "label": "2024",
+      "label_en": "2024",
+      "value": 2024,
+      "note": "规模化",
+      "note_en": "Scale-up",
+      "accent": ""
+    }
+  ]
+}

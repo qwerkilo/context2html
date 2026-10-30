@@ -1,0 +1,26 @@
+{
+  "title": "技术栈",
+  "items": [
+    {
+      "label": "Python",
+      "value": 1,
+      "accent": "blue"
+    },
+    {
+      "label": "#JavaScript",
+      "value": 2,
+      "accent": "green"
+    },
+    {
+      "label": "Rust",
+      "label_en": "Rust lang",
+      "value": 3,
+      "accent": "unknown"
+    },
+    {
+      "label": "SQL",
+      "value": 4,
+      "accent": ""
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "title": "方案对比",
+  "subtitle": "两种部署方式",
+  "items": [
+    {
+      "label": "成本",
+      "label_en": "Cost",
+      "value": 0,
+      "accent": ""
+    },
+    {
+      "label": "上线速度",
+      "label_en": "Time to ship",
+      "value": 0,
+      "accent": ""
+    },
+    {
+      "label": "可维护性",
+      "label_en": "Maintainability",
+      "value": 0,
+      "accent": ""
+    }
+  ],
+  "series": [
+    {
+      "name": "自建",
+      "name_en": "Self-hosted",
+      "values": [8, 5, 9]
+    },
+    {
+      "name": "托管",
+      "name_en": "Managed",
+      "values": [4, 9, 7]
+    }
+  ]
+}

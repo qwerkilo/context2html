@@ -1,0 +1,20 @@
+{
+  "title": "上手步骤",
+  "items": [
+    {
+      "label": "安装",
+      "label_en": "Install",
+      "value": 100
+    },
+    {
+      "label": "配置",
+      "label_en": "Configure",
+      "value": 50
+    },
+    {
+      "label": "运行",
+      "label_en": "Run",
+      "value": 0
+    }
+  ]
+}
