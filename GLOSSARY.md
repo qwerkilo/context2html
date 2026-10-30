@@ -34,7 +34,7 @@ _Avoid_: Plugin, extension, addon
 
 **CDN优先加载 (CDN-first Loading)**:
 All external libraries load from jsDelivr CDN first via `__loadLib()`, falling back to local `libs/` files on failure. The template's `__loadLib` function handles this transparently. Validator checks for both CDN presence and local fallback file existence. Second argument to `__loadLib` sets a custom fallback path (e.g. `'../theme/report-themes.css'` for generated reports).
-**Exception**: slot libraries (`libs/echarts.min.js`) bypass `__loadLib` and load with a synchronous `<script src>` before `</head>`. A slot's inline init script runs while the body parses; the CDN-first loader appends asynchronously and would lose the race. Only components actually rendered as slots contribute libraries, so an editable report with no slots loads none.
+**Exception**: slot libraries (`libs/echarts.min.js`) bypass `__loadLib` and load with a synchronous `<script src>` before `</head>`. A slot's inline init script runs while the body parses; the CDN-first loader appends asynchronously and would lose the race. Only components actually rendered as slots contribute libraries, so an editable report with no slots loads none. When the reader swaps a slot to a component whose library is absent, the editor loads it at swap time through `__loadLib()` (CDN first, local `libs/` fallback) and renders once it resolves; a failed load renders a readable failure state in the slot instead of an empty chart. `__loadLib()` returns a Promise for this reason.
 _Avoid_: 直接 `<script src>`
 
 **模板CSS同步 (Template CSS Sync)**:

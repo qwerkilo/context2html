@@ -54,7 +54,7 @@ The repo has a local `.codegraph/` index (Python + JS). Prefer it over grep/glob
 
 - **Theme CSS is auto-generated** (`theme/report-themes.css`). Never hand-edit. Re-run `generate-theme-css.py` after DESIGN.md changes.
 - **Two manual themes** — `spotify` and `tesla` have NO YAML front matter in their DESIGN.md. Edit the `MANUAL_THEMES` dict (a local variable defined inside `main()`, not at module scope) in `generate-theme-css.py` instead. All other 18 themes come from `theme/*/DESIGN.md`.
-- **CDN-first + local fallback** — template has `__loadLib()` that tries jsDelivr CDN first, falls back to local `libs/`. Use `<script>__loadLib('libs/echarts.min.js')</script>` instead of raw `<script src>`. Validator checks both CDN presence AND local file existence.
+- **CDN-first + local fallback** — template has `__loadLib()` that tries jsDelivr CDN first, falls back to local `libs/`. Use `<script>__loadLib('libs/echarts.min.js')</script>` instead of raw `<script src>`. Validator checks both CDN presence AND local file existence. `__loadLib()` returns a Promise: it resolves after the CDN copy loads or the local fallback takes over, and rejects when both fail — the editor's on-demand swap path awaits it.
 - **`__loadLib` for theme CSS** — use `__loadLib('theme/report-themes.css','../theme/report-themes.css')` in generated reports.
 - **Validator path resolution** — paths resolved relative to the report HTML's own directory, NOT project root.
 - **Components are .md files** — copy the ```html/css/js code blocks, not the whole file.
