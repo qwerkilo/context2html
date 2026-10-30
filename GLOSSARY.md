@@ -67,3 +67,11 @@ _Avoid_: Instance, mount point, 占位
 **运行时组件库 (Runtime Component Library)**:
 The browser-side copy of the swappable components' render functions, inlined into an editable report so a swap needs no server and no network. Distinct from `components/NN.md`, which is the generation-time source the agent reads. Both must render identical markup from identical data, enforced by a golden fixture test.
 _Avoid_: Runtime bundle, client library
+
+**槽位输出 (Slot Output)**:
+The renderer mode that turns swappable components into component slots: rendered markup plus its JSON data block. Off by default — `TemplateRenderer.assemble(..., slots=None)` produces byte-identical output to a report generated before slots existed. When on, the caller passes `(component_id, model)` entries; the renderer emits each slot, merges that component's CSS/JS and loads its libraries synchronously in `<head>` so the inline init script can run. Only the 14 `content_model: true` components can be slots.
+_Avoid_: 编辑模式, editable report (editing is the browser side that consumes slots)
+
+**微调报告 (Tuned Report)**:
+A report the user already adjusted in the browser editor — components swapped, slots re-rendered. It is the source of truth for later work: the agent reads its slots and data blocks and edits incrementally, never regenerates the whole report over it.
+_Avoid_: 修改稿, 导出稿, exported report
