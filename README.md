@@ -73,10 +73,12 @@ html = renderer.assemble(
     slots=[                            # 可选：槽位输出，默认 None（关闭）
         (26, {'title': '销量', 'items': [{'label': '直营', 'value': 120}]}),
     ],
+    editable=True,                     # 可选：带上浏览器内编辑模式
 )
 # 返回完整 HTML，组件已插入、CSS 已合并、JS 已追加
 # 传 slots 时：可换组件渲染成插槽（data-slot + data-component + JSON 数据块），
 # 关闭时输出与未引入插槽前逐字节一致
+# editable=True：内联编辑器运行时，读者可在浏览器里换组件、撤销、下载改好的 HTML
 ```
 
 ### 主题提供器

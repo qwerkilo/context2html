@@ -70,7 +70,15 @@ _Avoid_: Runtime bundle, client library
 
 **槽位输出 (Slot Output)**:
 The renderer mode that turns swappable components into component slots: rendered markup plus its JSON data block. Off by default — `TemplateRenderer.assemble(..., slots=None)` produces byte-identical output to a report generated before slots existed. When on, the caller passes `(component_id, model)` entries; the renderer emits each slot, merges that component's CSS/JS and loads its libraries synchronously in `<head>` so the inline init script can run. Only the 14 `content_model: true` components can be slots.
-_Avoid_: 编辑模式, editable report (editing is the browser side that consumes slots)
+_Avoid_: 可编辑报告, editable report
+
+**编辑模式 (Edit Mode)**:
+The browser-side state a reader enters by clicking the 「编辑」 toggle on an editable report. Slots are outlined and clickable, a click opens the candidate list, and a swap re-renders that one slot from its data block. Leaving edit mode restores the read-only appearance exactly. Distinct from 槽位输出: slots are what the generator writes, edit mode is what the reader operates.
+_Avoid_: 编辑器, 编辑态
+
+**映射预览 (Mapping Preview)**:
+The confirmation shown before a cross-family swap. It lists the content-model fields the target component will display and the fields it will drop, so a reader sees that three series become one card before committing. Same-family swaps skip it because nothing is lost.
+_Avoid_: 预览, 差异提示
 
 **微调报告 (Tuned Report)**:
 A report the user already adjusted in the browser editor — components swapped, slots re-rendered. It is the source of truth for later work: the agent reads its slots and data blocks and edits incrementally, never regenerates the whole report over it.
