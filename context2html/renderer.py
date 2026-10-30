@@ -3,6 +3,7 @@
 import os
 import re
 
+from context2html.editor import enable_editable
 from context2html.registry import ComponentRegistry
 from context2html.slots import render_slot
 
@@ -39,7 +40,8 @@ class TemplateRenderer:
         self._reg = registry or ComponentRegistry()
         self._templates_dir = templates_dir or TEMPLATES_DIR
 
-    def assemble(self, template_name, components, theme_name='warm', slots=None):
+    def assemble(self, template_name, components, theme_name='warm', slots=None,
+                 editable=False):
         template_file = _TEMPLATE_MAP.get(template_name)
         if not template_file:
             raise ValueError(f"Unknown template: {template_name}. Use: {', '.join(_TEMPLATE_MAP.keys())}")
@@ -72,8 +74,9 @@ class TemplateRenderer:
 
         html = _RE_THEME_ATTR.sub(f'data-theme="{theme_name}"', html)
 
-        if slot_specs:
-            html = _insert_library_dependencies(html, self._reg, slot_specs)
+        if slot_specs or editable:
+            html = _insert_library_dependencies(
+                html, self._reg, slot_specs, editable=editable)
 
         component_html_parts = []
         component_css_parts = []
@@ -85,14 +88,29 @@ class TemplateRenderer:
                 continue
             comp = comps[0]
             if comp.html and cid not in slot_component_ids:
-                component_html_parts.append(comp.html)
+                markup = comp.html
+                if editable:
+                    markup = (
+                        f'<div class="ic-static" data-component="{cid}" '
+                        f'data-swap="unavailable">{markup}</div>')
+                component_html_parts.append(markup)
             if comp.css:
                 component_css_parts.append(comp.css)
             if comp.js:
                 component_js_parts.append(comp.js)
 
+        if editable:
+            # A swap can land on any of the fourteen components, so the report
+            # must already carry their CSS even when only one was used.
+            seen_css = set(merge_ids)
+            for comp in self._reg.list_components(content_model=True):
+                if comp.id in seen_css:
+                    continue
+                if comp.css:
+                    component_css_parts.append(comp.css)
+
         if component_css_parts:
-            css_zone = _RE_CSS_ZONE_SLOT if slot_specs else _RE_CSS_ZONE
+            css_zone = _RE_CSS_ZONE_SLOT if (slot_specs or editable) else _RE_CSS_ZONE
             html = css_zone.sub(
                 _make_inserter('\n'.join(component_css_parts) + '\n'), html, count=1
             )
@@ -110,6 +128,9 @@ class TemplateRenderer:
                 _make_inserter('\n'.join(component_js_parts) + '\n'), html, count=1
             )
 
+        if editable:
+            html = enable_editable(html)
+
         return html
 
 
@@ -122,16 +143,22 @@ def _reject_duplicate_slot_ids(rendered_slots):
         seen.add(slot.slot_id)
 
 
-def _insert_library_dependencies(html, registry, slot_specs):
+def _insert_library_dependencies(html, registry, slot_specs, editable=False):
     """Load each slot component's libraries synchronously before ``</head>``.
 
     The slot markup runs an inline init script while the body parses, so the
     library has to be there already; the template's CDN-first loader appends
-    asynchronously and would arrive too late.
+    asynchronously and would arrive too late.  An editable report can swap a
+    slot to any swappable component, so it loads every such dependency up
+    front (only ECharts has one).
     """
     tags = []
     seen = set()
-    for component_id in dict.fromkeys(cid for cid, _, _ in slot_specs):
+    component_ids = [cid for cid, _, _ in slot_specs]
+    if editable:
+        component_ids.extend(
+            comp.id for comp in registry.list_components(content_model=True))
+    for component_id in dict.fromkeys(component_ids):
         comps = registry.list_components(id=component_id)
         if not comps:
             continue
