@@ -650,7 +650,7 @@
   --toc-accent: #76b900;
 }
 
-/* ===== Theme: spotify (manual) ===== */
+/* ===== Theme: spotify ===== */
 [data-theme="spotify"] {
   --bg: #121212;
   --text: #ffffff;
@@ -669,14 +669,16 @@
   --font: "SpotifyMixUI",sans-serif;
   --font-h: "SpotifyMixUITitle",sans-serif;
   --lh: 1.5;
+  --body-size: 1rem;
+  --small-size: 0.85rem;
   --radius: 8px;
+  --shadow-sm: 0 1px 3px rgba(255,255,255,0.1);
+  --shadow-md: 0 4px 12px rgba(255,255,255,0.1);
+  --shadow-lg: 0 8px 30px rgba(255,255,255,0.12);
   --chart-1: #1ed760;
   --chart-2: #ffa42b;
   --chart-3: #f3727f;
   --chart-4: #b3b3b3;
-  --shadow-sm: 0 1px 3px rgba(255,255,255,0.1);
-  --shadow-md: 0 4px 12px rgba(255,255,255,0.1);
-  --shadow-lg: 0 8px 30px rgba(255,255,255,0.12);
   --tag-bg: rgba(30,215,96,0.1);
   --tag-text: #1ed760;
   --table-stripe: rgba(255,255,255,0.04);
@@ -690,7 +692,7 @@
   --toc-accent: #1ed760;
 }
 
-/* ===== Theme: tesla (manual) ===== */
+/* ===== Theme: tesla ===== */
 [data-theme="tesla"] {
   --bg: #ffffff;
   --text: #171a20;
@@ -709,14 +711,16 @@
   --font: "Universal Sans Text",sans-serif;
   --font-h: "Universal Sans Display",sans-serif;
   --lh: 1.43;
+  --body-size: 1rem;
+  --small-size: 0.85rem;
   --radius: 4px;
+  --shadow-sm: 0 1px 3px rgba(23,26,32,0.1);
+  --shadow-md: 0 4px 12px rgba(23,26,32,0.1);
+  --shadow-lg: 0 8px 30px rgba(23,26,32,0.12);
   --chart-1: #3e6ae1;
   --chart-2: #16a34a;
   --chart-3: #e82127;
   --chart-4: #f4f4f4;
-  --shadow-sm: 0 1px 3px rgba(23,26,32,0.1);
-  --shadow-md: 0 4px 12px rgba(23,26,32,0.1);
-  --shadow-lg: 0 8px 30px rgba(23,26,32,0.12);
   --tag-bg: rgba(62,106,225,0.1);
   --tag-text: #3e6ae1;
   --table-stripe: rgba(23,26,32,0.04);

@@ -11,7 +11,7 @@ A Python framework package (`context2html/`) provides programmatic access: `Comp
 ## Commands
 
 ```bash
-# All 453 tests
+# All 461 tests
 python -m pytest scripts/ -v --tb=short
 
 # Single test file
@@ -34,7 +34,7 @@ bash templates/start-server.sh
 
 ### CodeGraph
 
-The repo has a local `.codegraph/` index (~73 source files, ~6K nodes, ~34K edges; Python + JS). Prefer it over grep/glob when locating or understanding code.
+The repo has a local `.codegraph/` index (~42 source files, ~7.4K nodes, ~23K edges; Python + JS). Prefer it over grep/glob when locating or understanding code.
 
 - **MCP tool** (when available): `codegraph_explore` — one call returns the relevant symbols' verbatim source plus call paths and blast radius.
 - **Shell** (always works): `codegraph explore "<symbols or question>"`, `codegraph node <symbol>`, `codegraph callers|callees|impact <symbol>`, `codegraph status`, `codegraph sync` after edits.
@@ -65,4 +65,4 @@ Use for: multi-step report structure planning (Step 1 → Step 2 → Step 2.5 or
 
 ## Domain docs
 
-Single-context vocabulary lives in `CONTEXT.md` at the repo root. Update it when a core term gains a new meaning.
+Single-context vocabulary lives in `GLOSSARY.md` at the repo root. Update it when a core term gains a new meaning. Architectural decisions go in `docs/adr/` (the only tracked path under `docs/`).

@@ -5,8 +5,10 @@ __pycache__/
 .idea/
 node_modules/
 *.log
-# Generated reference docs are not committed
+# Generated reference docs are not committed, except ADRs
 docs/*
+!docs/adr/
+*.egg-info/
 .cortexkit/
 .codegraph/
 # Windows file-sync conflict copies (OneDrive/Dropbox/Synology Drive)

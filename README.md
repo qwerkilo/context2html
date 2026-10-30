@@ -145,12 +145,12 @@ from context2html.markdown_utils import (
 │   ├── sync-template-styles.py  base-styles.css 同步
 │   ├── extract-component.py     组件代码提取 CLI
 │   ├── conftest.py              测试路径配置
-│   └── test_*.py                453 个测试
+│   └── test_*.py                461 个测试
 ├── theme/                       20 主题（report-themes.css + theme-index.json）
 ├── libs/                        外部库离线包（CDN 优先，本地回退）
 ├── references/                  组件选择矩阵 / 人类化案例 / 页面类型参考
 ├── examples/                    2 演示 HTML（0001-demo-report + report-themes）
-├── docs/agents/                 工程技能配置
+├── docs/adr/                    架构决策记录（唯一被跟踪的 docs/ 子目录）
 ├── pyproject.toml               uv 包管理
 └── uv.lock
 ```

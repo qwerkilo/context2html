@@ -26,7 +26,7 @@ DEMO = os.path.join(_ROOT, 'examples', '0001-demo-report.html')
 _ZH = re.compile(r'(\d+)\s*项硬性检查\s*\+\s*(\d+)\s*项人类化警告')
 _EN = re.compile(r'(\d+)\s*hard checks\s*\+\s*(\d+)\s*humanization warnings')
 
-DOCS = ['SKILL.md', 'AGENTS.md', 'CONTEXT.md', 'README.md']
+DOCS = ['SKILL.md', 'AGENTS.md', 'GLOSSARY.md', 'README.md']
 
 
 def _actual():

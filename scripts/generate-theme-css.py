@@ -458,7 +458,7 @@ def generate_markdown_index(themes):
         '',
     ])
 
-    output_path = os.path.join(PROJECT_DIR, 'docs', 'theme-index.md')
+    output_path = os.path.join(PROJECT_DIR, 'theme', 'theme-index.md')
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write('\n'.join(lines))
