@@ -73,3 +73,16 @@ class TestComponentRegistry:
         # Make sure content_type filter is not bypassed by id filter
         result = self.r.list_components(content_type='not_a_real_type', id=26)
         assert result == []
+
+    def test_content_model_flag_marks_the_chart_family(self):
+        ids = {c.metadata.id for c in self.r.list_components(content_model=True)}
+        assert {4, 15, 19, 20, 24, 26} <= ids
+
+    def test_content_model_flag_defaults_to_false(self):
+        comps = self.r.list_components(id=27)
+        assert comps[0].metadata.content_model is False
+
+    def test_content_model_filter_excludes_non_swappable_components(self):
+        ids = {c.metadata.id for c in self.r.list_components(content_model=False)}
+        assert 26 not in ids
+        assert 27 in ids

@@ -62,6 +62,24 @@ MUTANTS = [
         'scripts/test_validate_slots.py',
     ),
     (
+        'bar chart: empty-state guard disabled',
+        'context2html/slots.py',
+        '    entries, field = _item_entries(model)\n'
+        '    if entries is None:\n'
+        '        return _section(4, slot_id, model, _empty_state())',
+        '    entries, field = _item_entries(model)\n'
+        '    if False:\n'
+        '        return _section(4, slot_id, model, _empty_state())',
+        'scripts/test_chart_slots.py',
+    ),
+    (
+        'registry: content_model flag ignored',
+        'context2html/registry.py',
+        "            content_model=bool(d.get('content_model', False)),",
+        '            content_model=False,',
+        'scripts/test_registry.py',
+    ),
+    (
         'lesson lang escaping removed',
         'scripts/validate-lesson.py',
         '                safe_lang = re.escape(lang)',

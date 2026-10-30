@@ -6,9 +6,11 @@ stable ``data-slot`` id and a ``data-component`` id; a sibling
 model that produced the markup.  Both come from the same call so they cannot
 drift apart.
 
-Only component #26 (ECharts interactive chart kit) plus the eight
-structure-family components are implemented here; the remaining swappable
-components join ``_RENDERERS`` as they gain a renderer.
+Both swappable families are implemented here: the chart family (#4, #15, #19,
+#20, #24, #26) and the structure family (#2, #3, #5, #12, #13, #17, #18, #22).
+The remaining swappable components join ``_RENDERERS`` as they gain renderers.
+Every renderer reads the fields it needs and ignores the rest, so a slot can be
+re-rendered as a different component from the same content model.
 """
 
 import hashlib
@@ -18,6 +20,7 @@ from dataclasses import dataclass
 
 from context2html.content_model import (
     ContentModel,
+    ContentModelError,
     ContentSeries,
     validate_content_model,
 )
@@ -28,6 +31,11 @@ _COLOR_VARS = (
     '--accent', '--chart-3', '--chart-4',
     '--success', '--warning', '--error',
 )
+_ACCENT_TOKENS = frozenset({
+    'accent', 'success', 'warning', 'error',
+    'chart-1', 'chart-2', 'chart-3', 'chart-4',
+})
+_RE_HEX_COLOR = re.compile(r'#[0-9A-Fa-f]{3,8}')
 _GV_TEXT = '@@GV_TEXT@@'
 _GV_MUTED = '@@GV_MUTED@@'
 _GV_COLOR = '@@GV_COLOR_{}@@'
@@ -97,7 +105,224 @@ def _script_safe(text):
     return text.replace('</', '<\\/').replace('\u2028', '\\u2028').replace('\u2029', '\\u2029')
 
 
+def _escape(text):
+    return (str(text)
+            .replace('&', '&amp;')
+            .replace('<', '&lt;')
+            .replace('>', '&gt;')
+            .replace('"', '&quot;')
+            .replace("'", '&#39;'))
+
+
+def _format_number(value):
+    if isinstance(value, float) and value.is_integer():
+        return str(int(value))
+    return str(value)
+
+
+def _percent(value, maximum):
+    if maximum <= 0:
+        return 0.0
+    return round(value / maximum * 100, 1)
+
+
+def _accent_css(accent, index):
+    """Map a content-model accent to a safe CSS color value."""
+    if accent in _ACCENT_TOKENS:
+        return f'var(--{accent})'
+    if accent and _RE_HEX_COLOR.fullmatch(accent):
+        return accent
+    return f'var(--chart-{(index % 4) + 1})'
+
+
+def _empty_state():
+    return (
+        '<div class="ic-empty" role="status">'
+        '<span data-lang="zh">暂无数据</span>'
+        '<span data-lang="en">No data</span>'
+        '</div>'
+    )
+
+
+def _section(component_id, slot_id, model, body):
+    return (
+        f'<section class="ic-slot" data-slot="{slot_id}" '
+        f'data-component="{component_id}" '
+        f'aria-label="{_escape(model.title)}">\n'
+        f'{body}\n'
+        '</section>\n'
+    )
+
+
+def _item_entries(model):
+    """Return ``(label, value, note, accent)`` tuples and the error field path.
+
+    Items are the natural source; a series-only model falls back to the first
+    series with positional labels so a chart-family swap never shows an empty
+    state while the slot still holds data.
+    """
+    if model.items:
+        return (
+            [(item.label, item.value, item.note, item.accent)
+             for item in model.items],
+            'items[{}].value')
+    if model.series:
+        return (
+            [(str(index + 1), value, '', '')
+             for index, value in enumerate(model.series[0].values)],
+            'series[0].values[{}]')
+    return None, ''
+
+
+def _render_bar_chart(model, slot_id):
+    entries, field = _item_entries(model)
+    if entries is None:
+        return _section(4, slot_id, model, _empty_state())
+
+    for index, (_, value, _, _) in enumerate(entries):
+        if value < 0:
+            raise ContentModelError(
+                field.format(index), 'expected a non-negative number')
+    maximum = max(value for _, value, _, _ in entries)
+
+    rows = []
+    for index, (label, value, _, accent) in enumerate(entries):
+        width = _percent(value, maximum)
+        rows.append(
+            '  <div class="bar-item">\n'
+            f'    <div class="bar-label">{_escape(label)}</div>\n'
+            '    <div class="bar-track">\n'
+            f'      <div class="bar-fill" style="width:{width:g}%; '
+            f'background:{_accent_css(accent, index)};">'
+            f'{_escape(_format_number(value))}</div>\n'
+            '    </div>\n'
+            '  </div>')
+    body = '  <div class="bar-chart">\n' + '\n'.join(rows) + '\n  </div>'
+    return _section(4, slot_id, model, body)
+
+
+def _progress_state(value):
+    if value >= 100:
+        return 'done'
+    if value > 0:
+        return 'current'
+    return 'pending'
+
+
+def _render_status_chain(model, slot_id):
+    entries, _ = _item_entries(model)
+    if entries is None:
+        return _section(15, slot_id, model, _empty_state())
+
+    steps = []
+    for label, value, note, _ in entries:
+        status = ''
+        if note:
+            status = f'\n    <div class="sc-status">{_escape(note)}</div>'
+        steps.append(
+            f'  <div class="sc-step {_progress_state(value)}">\n'
+            '    <div class="sc-dot"></div>\n'
+            f'    <div class="sc-label">{_escape(label)}</div>{status}\n'
+            '  </div>')
+    body = '  <div class="status-chain">\n' + '\n'.join(steps) + '\n  </div>'
+    return _section(15, slot_id, model, body)
+
+
+def _intensity(value, lowest, highest):
+    if highest <= lowest:
+        return 2
+    return int(round((value - lowest) / (highest - lowest) * 4))
+
+
+def _render_heatmap(model, slot_id):
+    if model.series:
+        rows = [(series.name, series.values) for series in model.series]
+    elif model.items:
+        rows = [(model.title, tuple(item.value for item in model.items))]
+    else:
+        return _section(19, slot_id, model, _empty_state())
+
+    width = max((len(values) for _, values in rows), default=0)
+    if width == 0:
+        return _section(19, slot_id, model, _empty_state())
+
+    labels = [item.label for item in model.items]
+    if not labels:
+        labels = [str(index + 1) for index in range(width)]
+
+    numbers = [value for _, values in rows for value in values]
+    lowest, highest = min(numbers), max(numbers)
+
+    header = (
+        '    <div class="hm-row">\n'
+        '      <div class="hm-label"></div>\n'
+        + '\n'.join(
+            f'      <div class="hm-hdr">{_escape(label)}</div>'
+            for label in labels)
+        + '\n    </div>')
+
+    body_rows = []
+    for name, values in rows:
+        cells = '\n'.join(
+            f'      <div class="hm-cell" data-l="{_intensity(value, lowest, highest)}">'
+            f'{_escape(_format_number(value))}</div>'
+            for value in values)
+        body_rows.append(
+            '    <div class="hm-row">\n'
+            f'      <div class="hm-label">{_escape(name)}</div>\n'
+            f'{cells}\n'
+            '    </div>')
+
+    body = ('  <div class="heatmap">\n' + header + '\n'
+            + '\n'.join(body_rows) + '\n  </div>')
+    return _section(19, slot_id, model, body)
+
+
+def _render_step_indicator(model, slot_id):
+    entries, _ = _item_entries(model)
+    if entries is None:
+        return _section(20, slot_id, model, _empty_state())
+
+    steps = []
+    for index, (label, value, _, _) in enumerate(entries):
+        steps.append(
+            f'  <div class="si-step {_progress_state(value)}">'
+            f'<div class="si-num">{index + 1}</div>'
+            f'<div class="si-label">{_escape(label)}</div></div>')
+    body = '  <div class="step-indicator">\n' + '\n'.join(steps) + '\n  </div>'
+    return _section(20, slot_id, model, body)
+
+
+def _render_chart_set(model, slot_id):
+    entries, field = _item_entries(model)
+    if entries is None:
+        return _section(24, slot_id, model, _empty_state())
+
+    for index, (_, value, _, _) in enumerate(entries):
+        if value < 0:
+            raise ContentModelError(
+                field.format(index), 'expected a non-negative number')
+    maximum = max(value for _, value, _, _ in entries)
+
+    bars = []
+    for label, value, _, _ in entries:
+        height = _percent(value, maximum)
+        bars.append(
+            f'      <div class="vc-bar" style="--h:{height:g};" '
+            f'data-label="{_escape(label)}">'
+            f'<span class="vc-val">{_escape(_format_number(value))}</span></div>')
+    body = ('  <div class="vchart">\n'
+            '    <div class="vc-group">\n'
+            + '\n'.join(bars) + '\n'
+            '    </div>\n'
+            '  </div>')
+    return _section(24, slot_id, model, body)
+
+
 def _render_echarts(model, slot_id):
+    if not model.items and not model.series:
+        return _section(26, slot_id, model, _empty_state())
+
     option = _echarts_option(model)
     option_js = json.dumps(option, ensure_ascii=False, indent=2)
     option_js = _substitute_colors(option_js)
@@ -169,6 +394,11 @@ def _substitute_colors(option_js):
 
 
 _RENDERERS = {
+    4: _render_bar_chart,
+    15: _render_status_chain,
+    19: _render_heatmap,
+    20: _render_step_indicator,
+    24: _render_chart_set,
     26: _render_echarts,
     **STRUCTURE_RENDERERS,
 }
