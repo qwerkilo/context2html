@@ -145,7 +145,7 @@ from context2html.markdown_utils import (
 │   ├── sync-template-styles.py  base-styles.css 同步
 │   ├── extract-component.py     组件代码提取 CLI
 │   ├── conftest.py              测试路径配置
-│   └── test_*.py                479 个测试
+│   └── test_*.py                pytest 测试套件
 ├── theme/                       20 主题（report-themes.css + theme-index.json）
 ├── libs/                        外部库离线包（CDN 优先，本地回退）
 ├── references/                  组件选择矩阵 / 人类化案例 / 页面类型参考

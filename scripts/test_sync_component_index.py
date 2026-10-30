@@ -22,7 +22,8 @@ def test_block_has_markers():
 
 def test_block_covers_all_components():
     block = sci.build_block()
-    rows = [l for l in block.split('\n') if l.startswith('| ') and not l.startswith('| #')]
+    rows = [row for row in block.split('\n')
+            if row.startswith('| ') and not row.startswith('| #')]
     assert len(rows) == 31, f'expected 31 component rows, got {len(rows)}'
     for n in range(1, 32):
         assert f'| {n} |' in block, f'component {n} missing from index'

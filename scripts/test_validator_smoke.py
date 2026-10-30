@@ -72,7 +72,6 @@ class TestValidatorIntegration:
 
     def test_starter_html_passes_common_checks(self):
         html = self._load_template()
-        base_dir = os.path.dirname(TEMPLATE_PATH)
 
         assert check_h1_count(html) == [], "starter should have exactly one h1 or bilingual pair"
         assert check_focus_visible(html) == [], "starter should have :focus-visible"

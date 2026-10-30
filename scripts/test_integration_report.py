@@ -1,5 +1,7 @@
 """Integration tests for validate-report.py entry point."""
-import sys, os, importlib.util
+import sys
+import os
+import importlib.util
 
 spec = importlib.util.spec_from_file_location(
     "vr_main", os.path.join(os.path.dirname(__file__), "validate-report.py")
@@ -42,7 +44,8 @@ class TestRunAllIntegration:
 
     def test_starter_html_as_article(self):
         """starter.html with data-content-type='article' should pass article checks."""
-        import tempfile, shutil
+        import tempfile
+        import shutil
         path = os.path.join(BASE_DIR, 'templates', 'starter.html')
         with open(path, 'r', encoding='utf-8') as f:
             html = f.read()
@@ -56,7 +59,8 @@ class TestRunAllIntegration:
 
     def test_starter_html_as_tutorial(self):
         """starter.html with data-content-type='tutorial' should pass tutorial checks."""
-        import tempfile, shutil
+        import tempfile
+        import shutil
         path = os.path.join(BASE_DIR, 'templates', 'starter.html')
         with open(path, 'r', encoding='utf-8') as f:
             html = f.read()
@@ -78,7 +82,8 @@ class TestRunAllIntegration:
 
     def test_relative_links_passes(self):
         """A simple report with only relative links should pass."""
-        import tempfile, shutil
+        import tempfile
+        import shutil
         html = """<!DOCTYPE html><html data-content-type="report"><head>
 <link href="theme/report-themes.css" rel="stylesheet">
 <style>body{overflow-wrap:break-word}:focus-visible{outline:2px solid red}body{font-variant-numeric:tabular-nums}</style>

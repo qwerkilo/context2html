@@ -293,13 +293,13 @@ def check_d1_sentence_length(html):
         if len(sents) < 3:
             continue
         lengths = [len(s) for s in sents]
-        has_short = any(l <= 10 for l in lengths)
-        has_long = any(l >= 35 for l in lengths)
+        has_short = any(n <= 10 for n in lengths)
+        has_long = any(n >= 35 for n in lengths)
         problems = []
         if len(sents) >= 3:
-            if all(l <= 15 for l in lengths):
+            if all(n <= 15 for n in lengths):
                 problems.append(f'连续{len(sents)}句均为短句（{min(lengths)}-{max(lengths)}字）')
-            elif all(l >= 30 for l in lengths):
+            elif all(n >= 30 for n in lengths):
                 problems.append(f'连续{len(sents)}句均为长句（{min(lengths)}-{max(lengths)}字）')
         for j in range(len(lengths) - 3):
             chunk = lengths[j:j+4]

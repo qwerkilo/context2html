@@ -1,4 +1,6 @@
-import os, re, importlib.util
+import os
+import re
+import importlib.util
 spec = importlib.util.spec_from_file_location(
     "gc", os.path.join(os.path.dirname(__file__), "generate-theme-css.py"))
 gc = importlib.util.module_from_spec(spec)
@@ -132,16 +134,16 @@ class TestManualThemeVars:
 
 class TestIsDark:
     def test_black_is_dark(self):
-        assert gc.is_dark('#000000') == True
+        assert gc.is_dark('#000000')
     def test_bright_yellow_is_not_dark(self):
-        assert gc.is_dark('#FFD700') == False
+        assert not gc.is_dark('#FFD700')
     def test_white_is_not_dark(self):
-        assert gc.is_dark('#FFFFFF') == False
+        assert not gc.is_dark('#FFFFFF')
     def test_short_hex_is_not_treated_as_dark(self):
         # Documented behaviour: 3-char hex is not expanded, so it reads as light.
-        assert gc.is_dark('#000') == False
+        assert not gc.is_dark('#000')
     def test_invalid_hex_returns_false(self):
-        assert gc.is_dark('#zzzzzz') == False
+        assert not gc.is_dark('#zzzzzz')
 
 
 class TestMainAndIndex:

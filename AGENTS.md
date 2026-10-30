@@ -11,11 +11,17 @@ A Python framework package (`context2html/`) provides programmatic access: `Comp
 ## Commands
 
 ```bash
-# All 479 tests
+# All tests (the run prints its own count)
 python -m pytest scripts/ -v --tb=short
 
 # Single test file
 python -m pytest scripts/test_validate_report.py -v --tb=short
+
+# Lint (CI gates on this)
+ruff check .
+
+# Mutation smoke — fails if a mutant survives (mutmut needs WSL; this does not)
+python scripts/mutation-smoke.py
 
 # Validate a report (22 hard checks + 5 humanization warnings)
 python scripts/validate-report.py path/to/report.html
@@ -34,21 +40,17 @@ bash templates/start-server.sh
 
 ### CodeGraph
 
-The repo has a local `.codegraph/` index (~42 source files, ~7.4K nodes, ~23K edges; Python + JS). Prefer it over grep/glob when locating or understanding code.
+The repo has a local `.codegraph/` index (Python + JS). Prefer it over grep/glob when locating or understanding code. Run `codegraph status` for current size.
 
 - **MCP tool** (when available): `codegraph_explore` — one call returns the relevant symbols' verbatim source plus call paths and blast radius.
 - **Shell** (always works): `codegraph explore "<symbols or question>"`, `codegraph node <symbol>`, `codegraph callers|callees|impact <symbol>`, `codegraph status`, `codegraph sync` after edits.
 
 **Limitation**: `libs/*.min.js` (echarts/three/d3/gsap) dominate the graph — filter by path or language when searching. For plain string patterns in `*.py` / `*.html` / `*.md`, `rg` is still faster.
 
-### sequential-thinking
-
-Use for: multi-step report structure planning (Step 1 → Step 2 → Step 2.5 ordering with human checkpoints), D1-D5 humanization analysis across paragraphs, or debugging complex validator failures where 21 checks interact.
-
 ## Gotchas
 
 - **Theme CSS is auto-generated** (`theme/report-themes.css`). Never hand-edit. Re-run `generate-theme-css.py` after DESIGN.md changes.
-- **Two manual themes** — `spotify` and `tesla` have NO YAML front matter in their DESIGN.md. Edit `MANUAL_THEMES` dict in `generate-theme-css.py` instead. All other 18 themes come from `theme/*/DESIGN.md`.
+- **Two manual themes** — `spotify` and `tesla` have NO YAML front matter in their DESIGN.md. Edit the `MANUAL_THEMES` dict (a local variable defined inside `main()`, not at module scope) in `generate-theme-css.py` instead. All other 18 themes come from `theme/*/DESIGN.md`.
 - **CDN-first + local fallback** — template has `__loadLib()` that tries jsDelivr CDN first, falls back to local `libs/`. Use `<script>__loadLib('libs/echarts.min.js')</script>` instead of raw `<script src>`. Validator checks both CDN presence AND local file existence.
 - **`__loadLib` for theme CSS** — use `__loadLib('theme/report-themes.css','../theme/report-themes.css')` in generated reports.
 - **Validator path resolution** — paths resolved relative to the report HTML's own directory, NOT project root.
@@ -62,7 +64,7 @@ Use for: multi-step report structure planning (Step 1 → Step 2 → Step 2.5 or
 - **`ComponentRegistry.get_component()` removed** — use `list_components(id=26)` which returns a list (empty if not found).
 - **Validator in framework package** — `from context2html.validator import check_h1_count, check_bilingual, ...` works directly.
 - **Framework package tests** — `test_registry.py`, `test_renderer.py`, `test_theme.py` use direct imports (`from context2html.xxx import ...`). Other tests still use `importlib`.
-- **mutmut does not run on native Windows** — it exits with "please use the WSL". Use WSL, or run the 5-mutant smoke script pattern instead (apply mutation → run targeted pytest → restore).
+- **mutmut does not run on native Windows** — it exits with "please use the WSL". `scripts/mutation-smoke.py` covers the same ground natively: it applies each mutant, runs the targeted test file, restores the source, and exits 1 if any mutant survives. Add an entry to its `MUTANTS` list when you fix a bug that a test should have caught.
 
 ## Domain docs
 

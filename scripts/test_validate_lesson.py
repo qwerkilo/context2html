@@ -1,4 +1,5 @@
-import os, importlib.util
+import os
+import importlib.util
 spec = importlib.util.spec_from_file_location("vl", os.path.join(os.path.dirname(__file__), "validate-lesson.py"))
 vl = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(vl)
@@ -452,7 +453,9 @@ class TestContainerWidth:
 
 class TestRunAllIntegration:
     def test_run_all_missing_file(self):
-        import importlib.util, sys, os
+        import importlib.util
+        import sys
+        import os
         sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'scripts'))
         spec = importlib.util.spec_from_file_location(
             "validate_lesson",
