@@ -41,7 +41,9 @@ jobs:
         run: python scripts/check-js-parity.py
 
       - name: Validate context2html package
-        run: python -c "from context2html.theme import THEME_NAMES; print(str(len(THEME_NAMES)) + ' themes loaded')"
+        run: >-
+          python -c "from context2html.theme import ThemeProvider;
+          print(str(len(ThemeProvider().list_themes())) + ' themes loaded')"
 
       - name: Validate demo report
         run: python scripts/validate-report.py examples/0001-demo-report.html
