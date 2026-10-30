@@ -1,7 +1,6 @@
-<!-- TRELLIS:START -->
-# Trellis Instructions
+# context2html — Agent notes
 
-Pure HTML/CSS/JS. No frameworks, no build tools, no package.json. Open directly in browser after generation.
+Pure HTML/CSS/JS. No frameworks, no build tools required at runtime. Open generated reports directly in a browser.
 
 **Docs hierarchy:** `SKILL.md` (workflow + API) → `AGENTS.md` (this file, quick ref) → `README.md` (human-facing overview).
 
@@ -30,13 +29,14 @@ bash templates/start-server.sh
 
 ## MCP usage
 
-### codebase-memory-mcp
+### CodeGraph
 
-Indexed as `storage-emulated-0-Download-opencode` (~5.7K nodes / 19K edges). Skips `libs/`, `node_modules/`, `.git`.
+The repo has a local `.codegraph/` index (~73 source files, ~6K nodes, ~34K edges; Python + JS). Prefer it over grep/glob when locating or understanding code.
 
-Use `search_graph` to find component names (e.g. `search_graph(query="GSAP 滚动动画")`) and `get_code_snippet` to read their source. The 31 components are indexed as Section nodes in `components/NN-name.md`. For architecture overview, `get_architecture(project="storage-emulated-0-Download-opencode")` shows clusters. `trace_path` works for cross-file JS patterns like `__loadLib` or `gv()` calls.
+- **MCP tool** (when available): `codegraph_explore` — one call returns the relevant symbols' verbatim source plus call paths and blast radius.
+- **Shell** (always works): `codegraph explore "<symbols or question>"`, `codegraph node <symbol>`, `codegraph callers|callees|impact <symbol>`, `codegraph status`, `codegraph sync` after edits.
 
-**Limitation**: `libs/*` min.js files inflate the graph. Filter with `file_pattern` or `label` when searching — or use `rg`/`fd` directly for string patterns in `*.py` / `*.html` files.
+**Limitation**: `libs/*.min.js` (echarts/three/d3/gsap) dominate the graph — filter by path or language when searching. For plain string patterns in `*.py` / `*.html` / `*.md`, `rg` is still faster.
 
 ### sequential-thinking
 
@@ -54,39 +54,12 @@ Use for: multi-step report structure planning (Step 1 → Step 2 → Step 2.5 or
 - **English text overflows on lang toggle** — English is wider than Chinese. Template has `overflow-wrap: break-word`, `.cmp-table` has `table-layout: fixed` + `word-break: break-word`. Do NOT remove.
 - **Heatmap Canvas vmin/vmax** — initialize with `vmin=Infinity, vmax=-Infinity` (not the inverse), or get NaN black cells.
 - **CSS source of truth** — edit `templates/base-styles.css`, then run `python scripts/sync-template-styles.py` to push changes to both `starter.html` and `report-starter.html`.
-- **`docs/` gitignore** — `docs/*` is gitignored except `docs/agents/`. Agent skill configs there are tracked; other docs are not.
+- **`docs/` gitignore** — `docs/*` is gitignored. Generated reference docs (`theme-index.md`, ADRs) live on disk but are not committed.
 - **`examples/report-themes.html` is NOT a valid report** — will fail `validate-report.py`. Use `examples/0001-demo-report.html` for smoke tests.
 - **`ComponentRegistry.get_component()` removed** — use `list_components(id=26)` which returns a list (empty if not found).
 - **Validator in framework package** — `from context2html.validator import check_h1_count, check_bilingual, ...` works directly.
 - **Framework package tests** — `test_registry.py`, `test_renderer.py`, `test_theme.py` use direct imports (`from context2html.xxx import ...`). Other tests still use `importlib`.
 
-## Agent skills
+## Domain docs
 
-### Issue tracker
-
-GitHub issues via `gh` CLI. External PRs not a triage surface. See `docs/agents/issue-tracker.md`.
-
-### Triage labels
-
-Default strings: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
-
-### Domain docs
-
-Single-context — `CONTEXT.md` at root + `docs/adr/`. See `docs/agents/domain.md`.
-
-## Trellis project management
-
-This project is managed by Trellis. The working knowledge you need lives under `.trellis/`:
-
-- `.trellis/workflow.md` — development phases, when to create tasks, skill routing
-- `.trellis/spec/` — package- and layer-scoped coding guidelines (read before writing code in a given layer)
-- `.trellis/workspace/` — per-developer journals and session traces
-- `.trellis/tasks/` — active and archived tasks (PRDs, research, jsonl context)
-
-If a Trellis command is available on your platform (e.g. `/trellis:finish-work`, `/trellis:continue`), prefer it over manual steps. Not every platform exposes every command.
-
-If you're using Codex or another agent-capable tool, additional project-scoped helpers may live in:
-- `.agents/skills/` — reusable Trellis skills
-- `.codex/agents/` — optional custom subagents
-
-Managed by Trellis. Edits outside this block are preserved; edits inside may be overwritten by a future `trellis update`.
+Single-context vocabulary lives in `CONTEXT.md` at the repo root. Update it when a core term gains a new meaning.
