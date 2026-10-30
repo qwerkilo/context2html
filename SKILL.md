@@ -75,8 +75,13 @@ html = renderer.assemble(
         {'component': 3, 'model': {'title': '里程碑', 'items': []},
          'slot_id': 'milestones'},
     ],
+    editable=True,                     # optional; adds the in-browser edit mode
 )
 # Returns full HTML with components inserted, CSS merged, JS appended
+# editable=True inlines the editor runtime (~78 KB), merges CSS for all 14
+# swappable components and preloads ECharts, so any swap renders styled.
+# The escape hatch is data-editable="true" on <html> — the runtime initialises
+# only when that flag is present.
 
 # 单个插槽（一次拿到标记与数据块）
 from context2html.slots import render_slot
@@ -112,6 +117,16 @@ slot.markup, slot.data_block, slot.fragment
 - 可换集合（14 个，front matter `content_model: true`）：图表族 #4 #15 #19 #20 #24 #26，结构族 #2 #3 #5 #12 #13 #17 #18 #22。其余 17 个组件不参与互换，标记照旧手抄。
 - 校验器要求每个插槽有且仅有一个对应数据块（计入 23 项硬性检查）。
 - 手动写报告时，也可以在 `<!-- INSERT: 视觉组件 HTML -->` 处粘贴 `render_slot(...).fragment`。
+
+### 编辑模式（`editable=True`）
+
+报告可以带上浏览器内微调能力。开启方式有两种：`TemplateRenderer.assemble(..., editable=True)`，或手动在 `<html>` 上加 `data-editable="true"`。运行时只在检测到该标记时初始化，否则一行脚本都不跑。
+
+- 顶部出现「编辑」开关；进入后插槽描边可点，点击弹出按数据过滤的候选列表，同族优先。
+- 跨族互换先显示映射预览（显示什么、丢什么），确认后才替换；同族互换无信息损失，直接换。
+- 多步撤销（`Ctrl/Cmd+Z`）；保存下载一份完整 HTML，`file://` 下同样可用。
+- 运行时内联（约 78 KB），并合并 14 个可换组件的 CSS、预载 ECharts，否则换到 #26 会无样式或直接失效。可编辑报告体积约 136 KB，比普通报告大。
+- 保存会剥掉编辑器自身的面板与提示节点，保留运行时与标记，所以交付的文件打开时是只读外观、但仍可再次编辑。
 
 ---
 
