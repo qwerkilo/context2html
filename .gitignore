@@ -9,6 +9,9 @@ node_modules/
 docs/*
 !docs/adr/
 *.egg-info/
+.coverage
+coverage.json
+lizard.json
 .cortexkit/
 .codegraph/
 # Windows file-sync conflict copies (OneDrive/Dropbox/Synology Drive)
