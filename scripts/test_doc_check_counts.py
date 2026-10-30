@@ -38,7 +38,7 @@ def _actual():
 
 def test_actual_counts_are_stable():
     hard, warn = _actual()
-    assert hard == 22, f'report type has {hard} hard checks (update docs + this test)'
+    assert hard == 23, f'report type has {hard} hard checks (update docs + this test)'
     assert warn == 5, f'{warn} humanization warnings (update docs + this test)'
 
 

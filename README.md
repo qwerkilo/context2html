@@ -92,9 +92,12 @@ from context2html.validator import (
     check_svg_links, check_lib_deps,
     check_d1_sentence_length, check_d4_connectors,
     detect_content_type, check_content_type_valid,
+    check_slot_data_blocks,
     # ... 全部 30+ 检查函数
 )
 ```
+
+`scripts/validate-report.py` 运行 23 项硬性检查 + 5 项人类化警告；其中新增的插槽数据块配对检查要求每个组件插槽都有对应的 JSON 数据块。
 
 ### 工具函数
 

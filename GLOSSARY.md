@@ -25,7 +25,7 @@ One of five layout profiles: `report`, `article`, `doc`, `tutorial`, `note`. Set
 _Avoid_: 页面类型, section type
 
 **验证 (Validation)**:
-Running `validate-report.py` performs 22 hard checks + 5 humanization warnings (hard checks are blocking — any failure exits with code 1; D1-D5 warnings are non-blocking). Hard checks cover SVG validity, HTML structure (h1 count, semantic elements, relative links), CSS rules (bar-fill overflow, English layout overflow-wrap, cmp-table responsive breakpoints), library dependency paths, GSAP `data-gsap` modes, `data-anim` syntax, chapter cross-references (`#chN`), and ECharts Canvas color usage (`gv()` helper).
+Running `validate-report.py` performs 23 hard checks + 5 humanization warnings (hard checks are blocking — any failure exits with code 1; D1-D5 warnings are non-blocking). Hard checks cover SVG validity, HTML structure (h1 count, semantic elements, relative links), CSS rules (bar-fill overflow, English layout overflow-wrap, cmp-table responsive breakpoints), library dependency paths, GSAP `data-gsap` modes, `data-anim` syntax, chapter cross-references (`#chN`), ECharts Canvas color usage (`gv()` helper), and slot/data-block pairing (one JSON block per component slot).
 _Avoid_: 自动检查, quality gate
 
 **技能仓库 (Skill Repo)**:

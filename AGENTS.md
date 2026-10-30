@@ -23,7 +23,7 @@ ruff check .
 # Mutation smoke — fails if a mutant survives (mutmut needs WSL; this does not)
 python scripts/mutation-smoke.py
 
-# Validate a report (22 hard checks + 5 humanization warnings)
+# Validate a report (23 hard checks + 5 humanization warnings)
 python scripts/validate-report.py path/to/report.html
 
 # Regenerate theme CSS from theme/*/DESIGN.md

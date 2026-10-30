@@ -212,7 +212,7 @@ ceil(总字数 / 500) = 报告最少组件数
 
 ## 交付前验证清单
 
-生成报告 HTML 后，必须通过 `python scripts/validate-report.py path/to/report.html` 验证。以下是验证器检查的 22 项硬性检查 + 3 项人类化建议（warning，不计入失败）：
+生成报告 HTML 后，必须通过 `python scripts/validate-report.py path/to/report.html` 验证。以下是验证器检查的 23 项硬性检查 + 5 项人类化警告（warning，不计入失败）：
 
 | # | 检查项 | 失败时处理 |
 |---|--------|-----------|
@@ -237,6 +237,8 @@ ceil(总字数 / 500) = 报告最少组件数
 | 19 | 章节交叉引用使用 `#chN` 锚点 | 把 `href="#chapter-name"` 改为 `#chN` |
 | 20 | GSAP `data-gsap` 模式值有效 | 仅允许 fade/stagger/parallax/flip/zoom |
 | 21 | `data-anim` 语法有效 | 仅允许 fade-up/fade/slide-left/blur |
+| 22 | 内容类型 `data-content-type` 有效 | 使用 report/article/doc/tutorial/note 之一 |
+| 23 | 每个组件插槽有对应 JSON 数据块 | 为 `data-slot` 补上同 id 的 `<script type="application/json">` |
 | — | **D1 句长交替（warning）** | 每段混入 ≤10 字短句 1-2 + ≥35 字长句 1-2 |
 | — | **D4 连接词控制（warning）** | 段落开头禁用"首先/其次/值得注意的是"；≤6 个/千字 |
 | — | **D5 术语变体（warning）** | 每 800 字替换同义术语（"重要"→"关键/绕不开/真正"） |

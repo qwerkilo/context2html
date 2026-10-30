@@ -54,6 +54,14 @@ MUTANTS = [
         'scripts/test_renderer.py',
     ),
     (
+        'slot data blocks: missing-block issue suppressed',
+        'context2html/validator/slots.py',
+        '            issues.append(\n'
+        '                f"Slot \'{slot_id}\' (component {component_id}) has no matching data block")',
+        '            pass',
+        'scripts/test_validate_slots.py',
+    ),
+    (
         'lesson lang escaping removed',
         'scripts/validate-lesson.py',
         '                safe_lang = re.escape(lang)',
@@ -64,25 +72,30 @@ MUTANTS = [
 
 
 def _run_tests(test_path):
+    env = dict(os.environ, PYTHONIOENCODING='utf-8')
     return subprocess.run(
         [sys.executable, '-m', 'pytest', test_path, '-q', '--no-header', '-p', 'no:cacheprovider'],
-        cwd=ROOT, capture_output=True, text=True, encoding='utf-8').returncode
+        cwd=ROOT, capture_output=True, text=True, encoding='utf-8', errors='replace',
+        env=env).returncode
 
 
 def run_mutant(mutant):
     label, rel_path, old, new, test_path = mutant
     path = os.path.join(ROOT, rel_path)
-    original = io.open(path, encoding='utf-8').read()
-    if old not in original:
+    original_bytes = io.open(path, 'rb').read()
+    original = original_bytes.decode('utf-8')
+    newline = '\r\n' if '\r\n' in original else '\n'
+    normalized = original.replace('\r\n', '\n')
+    if old not in normalized:
         return 'STALE', label
 
     try:
-        io.open(path, 'w', encoding='utf-8', newline='').write(
-            original.replace(old, new, 1))
+        mutated = normalized.replace(old, new, 1).replace('\n', newline)
+        io.open(path, 'wb').write(mutated.encode('utf-8'))
         return ('KILLED' if _run_tests(test_path) != 0 else 'SURVIVED'), label
     finally:
-        io.open(path, 'w', encoding='utf-8', newline='').write(original)
-        if io.open(path, encoding='utf-8').read() != original:
+        io.open(path, 'wb').write(original_bytes)
+        if io.open(path, 'rb').read() != original_bytes:
             raise RuntimeError(f'failed to restore {rel_path}')
 
 

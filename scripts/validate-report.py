@@ -7,6 +7,8 @@ import os
 import json
 from dataclasses import dataclass, field
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from context2html.validator import (
     PASS, FAIL,
     check_svg_links, check_h1_count, check_relative_links,
@@ -14,6 +16,7 @@ from context2html.validator import (
     check_semantic_html, check_lib_deps, check_bilingual,
     check_gsap_modes, check_cross_refs, check_data_anim_syntax,
     detect_content_type, check_content_type_valid,
+    check_slot_data_blocks, SLOT_DATA_BLOCK_LABEL,
     check_exec_summary, check_report_chapters, check_conclusion_page,
     check_report_footer, check_theme_css, check_bar_fill_width,
     check_cmp_table_responsive, check_english_layout, check_echarts_color_usage,
@@ -46,6 +49,7 @@ def build_checks(html, base_dir):
         ("Library deps (ECharts/Three.js)", check_lib_deps(html, base_dir)),
         ("Bilingual (data-lang zh/en + toggle)", check_bilingual(html)),
         ("Content type valid", check_content_type_valid(html)),
+        (SLOT_DATA_BLOCK_LABEL, check_slot_data_blocks(html)),
         ("theme/report-themes.css referenced", check_theme_css(html, base_dir)),
     ]
 

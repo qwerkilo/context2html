@@ -9,6 +9,7 @@ from context2html.validator.common import (
 )
 from context2html.validator.svg import check_svg_links, check_svg_contrast
 from context2html.validator.content_type import detect_content_type, check_content_type_valid
+from context2html.validator.slots import check_slot_data_blocks, SLOT_DATA_BLOCK_LABEL
 from context2html.validator.report import (
     check_exec_summary, check_report_chapters, check_conclusion_page,
     check_report_footer, check_theme_css, check_bar_fill_width,
@@ -27,6 +28,7 @@ __all__ = [
     'check_cross_refs', 'check_data_anim_syntax', 'check_gsap_modes',
     'check_svg_links', 'check_svg_contrast',
     'detect_content_type', 'check_content_type_valid',
+    'check_slot_data_blocks', 'SLOT_DATA_BLOCK_LABEL',
     'check_exec_summary', 'check_report_chapters', 'check_conclusion_page',
     'check_report_footer', 'check_theme_css', 'check_bar_fill_width',
     'check_cmp_table_responsive', 'check_english_layout',

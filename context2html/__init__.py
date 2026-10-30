@@ -5,6 +5,11 @@ __version__ = "0.3.0"
 from context2html.registry import ComponentRegistry, ComponentMeta, Component
 from context2html.renderer import TemplateRenderer
 from context2html.theme import ThemeProvider, ThemeInfo
+from context2html.content_model import (
+    ContentModel, ContentItem, ContentSeries,
+    ContentModelError, validate_content_model,
+)
+from context2html.slots import RenderedSlot, SlotError, render_slot
 from context2html.markdown_utils import (
     parse_front_matter, extract_code_block, extract_js_from_md,
 )
@@ -16,6 +21,7 @@ from context2html.validator import (
     check_cross_refs, check_data_anim_syntax, check_gsap_modes,
     check_svg_links, check_svg_contrast,
     detect_content_type, check_content_type_valid,
+    check_slot_data_blocks, SLOT_DATA_BLOCK_LABEL,
     check_exec_summary, check_report_chapters, check_conclusion_page,
     check_report_footer, check_theme_css, check_bar_fill_width,
     check_cmp_table_responsive, check_english_layout, check_echarts_color_usage,
@@ -30,6 +36,9 @@ __all__ = [
     'ComponentRegistry', 'ComponentMeta', 'Component',
     'TemplateRenderer',
     'ThemeProvider', 'ThemeInfo',
+    'ContentModel', 'ContentItem', 'ContentSeries',
+    'ContentModelError', 'validate_content_model',
+    'RenderedSlot', 'SlotError', 'render_slot',
     'parse_front_matter', 'extract_code_block', 'extract_js_from_md',
     'PASS', 'FAIL',
     'check_h1_count', 'check_relative_links',
@@ -38,6 +47,7 @@ __all__ = [
     'check_cross_refs', 'check_data_anim_syntax', 'check_gsap_modes',
     'check_svg_links', 'check_svg_contrast',
     'detect_content_type', 'check_content_type_valid',
+    'check_slot_data_blocks', 'SLOT_DATA_BLOCK_LABEL',
     'check_exec_summary', 'check_report_chapters', 'check_conclusion_page',
     'check_report_footer', 'check_theme_css', 'check_bar_fill_width',
     'check_cmp_table_responsive', 'check_english_layout',

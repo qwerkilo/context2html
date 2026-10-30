@@ -723,5 +723,5 @@ class TestJsonOutput:
         vr.run_all(self.DEMO, as_json=True)
         data = json.loads(capsys.readouterr().out)
         assert data['all_pass'] is True
-        assert data['summary']['hard_checks'] == 22
+        assert data['summary']['hard_checks'] == 23
         assert data['summary']['warnings'] == 5
