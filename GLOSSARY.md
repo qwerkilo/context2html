@@ -58,7 +58,7 @@ A variant chart embedded inside a single component definition. Components #24 (E
 _Avoid_: 子变体, sub-variant, child chart
 
 **内容模型 (Content Model)**:
-The single normalized data shape that every swappable component consumes: `{title, subtitle, items[{label, value, note, accent}], series[{name, values[]}]}`. A component reads the fields it needs and ignores the rest, which is what makes cross-family swapping (chart → card grid → table) possible at all. Components that do not consume a content model (Three.js scenes, PPT-style layouts, decorative SVG) are outside the swappable set.
+The single normalized data shape that every swappable component consumes: `{title, subtitle, items[{label, value, note, accent}], series[{name, values[]}]}`. `title` is the only required field; `value` is optional and a component that needs numbers either finds them in `series` or raises naming `items[i].value`. A component reads the fields it needs and ignores the rest, which is what makes cross-family swapping (chart → card grid → table) possible at all. Components that do not consume a content model (Three.js scenes, PPT-style layouts, decorative SVG) are outside the swappable set.
 _Avoid_: Data schema, props, 数据契约
 
 **组件插槽 (Component Slot)**:
