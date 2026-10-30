@@ -55,3 +55,15 @@ _Avoid_: Component picker, 选型指南
 **子图表 (Sub-chart)**:
 A variant chart embedded inside a single component definition. Components #24 (ECharts), #25 (Three.js), #26 (ECharts kit), #28 (D3.js), and #31 (SVG.js) define multiple sub-charts in one ` ```html ` block, extracted together by `extract_code_block(multi=True)`. The validator checks that all sub-charts within a component are present before flagging a missing chart.
 _Avoid_: 子变体, sub-variant, child chart
+
+**内容模型 (Content Model)**:
+The single normalized data shape that every swappable component consumes: `{title, subtitle, items[{label, value, note, accent}], series[{name, values[]}]}`. A component reads the fields it needs and ignores the rest, which is what makes cross-family swapping (chart → card grid → table) possible at all. Components that do not consume a content model (Three.js scenes, PPT-style layouts, decorative SVG) are outside the swappable set.
+_Avoid_: Data schema, props, 数据契约
+
+**组件插槽 (Component Slot)**:
+One occurrence of a visual component in a finished report, identified by `data-slot` and `data-component`. A slot owns both its rendered markup and its content-model data, so the browser can re-render the same slot as a different component without touching the surrounding text. Swapping is a slot-level operation, never a document-level one.
+_Avoid_: Instance, mount point, 占位
+
+**运行时组件库 (Runtime Component Library)**:
+The browser-side copy of the swappable components' render functions, inlined into an editable report so a swap needs no server and no network. Distinct from `components/NN.md`, which is the generation-time source the agent reads. Both must render identical markup from identical data, enforced by a golden fixture test.
+_Avoid_: Runtime bundle, client library
