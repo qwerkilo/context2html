@@ -58,12 +58,27 @@ class TestContentModelValidation:
             })
         assert exc.value.field == 'items[0].label'
 
-    def test_missing_item_value_names_field(self):
-        with pytest.raises(ContentModelError) as exc:
-            validate_content_model({
-                'title': 'T', 'items': [{'label': 'A'}],
-            })
-        assert exc.value.field == 'items[0].value'
+    def test_item_value_is_optional(self):
+        model = validate_content_model({
+            'title': 'T', 'items': [{'label': 'A'}, {'label': 'B'}],
+        })
+        assert [item.value for item in model.items] == [None, None]
+        assert model.to_dict()['items'] == [
+            {'label': 'A', 'note': '', 'accent': ''},
+            {'label': 'B', 'note': '', 'accent': ''},
+        ]
+
+    def test_absent_item_value_is_omitted_from_the_canonical_form(self):
+        data = validate_content_model({
+            'title': 'T', 'items': [{'label': 'A'}],
+        }).to_dict()
+        assert 'value' not in data['items'][0]
+
+    def test_zero_item_value_is_kept(self):
+        data = validate_content_model({
+            'title': 'T', 'items': [{'label': 'A', 'value': 0}],
+        }).to_dict()
+        assert data['items'][0]['value'] == 0
 
     def test_item_value_must_be_numeric(self):
         with pytest.raises(ContentModelError) as exc:

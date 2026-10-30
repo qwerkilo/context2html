@@ -72,6 +72,26 @@ class TestCssBarChart:
             })
         assert exc.value.field == 'items[0].value'
 
+    def test_missing_value_names_the_field(self):
+        with pytest.raises(ContentModelError) as exc:
+            render_slot(4, {
+                'title': 'T',
+                'items': [{'label': 'A'}],
+            })
+        assert exc.value.field == 'items[0].value'
+        assert 'missing field' in str(exc.value)
+
+    def test_series_supplies_values_when_items_have_none(self):
+        slot = render_slot(4, {
+            'title': 'T',
+            'items': [{'label': 'A'}, {'label': 'B'}],
+            'series': [{'name': 'S', 'values': [10, 20]}],
+        })
+        assert slot.markup.count('class="bar-item"') == 2
+        assert 'width:50%' in slot.markup
+        assert '>10</div>' in slot.markup
+        assert '>20</div>' in slot.markup
+
 
 class TestStatusChain:
     """#15 — one milestone per item; ``value`` is completion percentage."""
@@ -434,3 +454,29 @@ def test_echarts_carries_english_legend_and_subtitle():
 def test_every_chart_section_has_an_aria_label(component_id, model):
     slot = render_slot(component_id, model)
     assert 'aria-label="' + model['title'] + '"' in slot.markup
+
+
+NUMBER_IDS = [4, 15, 19, 20, 24, 26]
+
+
+@pytest.mark.parametrize('component_id', NUMBER_IDS)
+def test_numbers_component_rejects_value_less_items_without_series(component_id):
+    with pytest.raises(ContentModelError) as exc:
+        render_slot(component_id, {
+            'title': 'T',
+            'items': [{'label': 'A'}],
+        })
+    assert exc.value.field == 'items[0].value'
+    assert 'missing field' in str(exc.value)
+
+
+@pytest.mark.parametrize('component_id', NUMBER_IDS)
+def test_numbers_component_accepts_value_less_items_when_series_supply_numbers(
+        component_id):
+    slot = render_slot(component_id, {
+        'title': 'T',
+        'items': [{'label': 'A'}, {'label': 'B'}],
+        'series': [{'name': 'S', 'values': [10, 20]}],
+    })
+    assert 'ic-empty' not in slot.markup
+    assert slot.markup.count('data-lang="zh"') == slot.markup.count('data-lang="en"')

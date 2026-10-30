@@ -489,8 +489,8 @@
     return value;
   }
 
-  function requireNumber(source, key, path) {
-    if (!(key in source)) throw new ContentModelError(path + key, 'missing field');
+  function optionalNumber(source, key, path) {
+    if (!(key in source)) return undefined;
     var value = source[key];
     if (typeof value !== 'number') {
       throw new ContentModelError(path + key, 'expected a number');
@@ -521,15 +521,18 @@
       }
       var item = {
         label: requireString(raw, 'label', path),
-        value: requireNumber(raw, 'value', path),
         note: optionalString(raw, 'note', path),
         accent: optionalString(raw, 'accent', path)
       };
+      var itemValue = optionalNumber(raw, 'value', path);
+      if (itemValue !== undefined) item.value = itemValue;
       var labelEn = optionalString(raw, 'label_en', path);
       var noteEn = optionalString(raw, 'note_en', path);
       if (labelEn) item.label_en = labelEn;
       if (noteEn) item.note_en = noteEn;
-      recordKind(meta, item, 'value', numberKind(sourceMeta, raw, 'value'));
+      if (itemValue !== undefined) {
+        recordKind(meta, item, 'value', numberKind(sourceMeta, raw, 'value'));
+      }
       items.push(item);
     }
 
@@ -782,6 +785,24 @@
 
   function itemEntries(model) {
     if (model.items.length) {
+      var useSeries = model.series.length && model.items.some(function (item) {
+        return item.value === undefined;
+      });
+      if (useSeries) {
+        return {
+          entries: model.items.map(function (item, index) {
+            return {
+              label: item.label,
+              value: model.series[0].values[index],
+              note: item.note,
+              accent: item.accent,
+              labelEn: item.label_en || '',
+              noteEn: item.note_en || ''
+            };
+          }),
+          field: 'series[0].values[{}]'
+        };
+      }
       return {
         entries: model.items.map(function (item) {
           return {
@@ -819,6 +840,7 @@
    * ------------------------------------------------------------------ */
 
   function renderBarChart(model, slotId) {
+    requireNumbers(model);
     var source = itemEntries(model);
     var entries = source.entries;
     if (!entries) return section(4, slotId, model, EMPTY_SLOT);
@@ -850,6 +872,7 @@
   }
 
   function renderStatusChain(model, slotId) {
+    requireNumbers(model);
     var entries = itemEntries(model).entries;
     if (!entries) return section(15, slotId, model, EMPTY_SLOT);
 
@@ -869,6 +892,7 @@
   }
 
   function renderHeatmap(model, slotId) {
+    requireNumbers(model);
     var rows;
     if (model.series.length) {
       rows = model.series.map(function (series) {
@@ -939,6 +963,7 @@
   }
 
   function renderStepIndicator(model, slotId) {
+    requireNumbers(model);
     var entries = itemEntries(model).entries;
     if (!entries) return section(20, slotId, model, EMPTY_SLOT);
 
@@ -953,6 +978,7 @@
   }
 
   function renderChartSet(model, slotId) {
+    requireNumbers(model);
     var source = itemEntries(model);
     var entries = source.entries;
     if (!entries) return section(24, slotId, model, EMPTY_SLOT);
@@ -1057,6 +1083,7 @@
   }
 
   function renderEcharts(model, slotId, meta) {
+    requireNumbers(model);
     if (!model.items.length && !model.series.length) {
       return section(26, slotId, model, EMPTY_SLOT);
     }
@@ -1126,8 +1153,22 @@
     return false;
   }
 
+  function requireItemValues(model) {
+    for (var index = 0; index < model.items.length; index += 1) {
+      if (model.items[index].value === undefined) {
+        throw new ContentModelError('items[' + index + '].value', 'missing field');
+      }
+    }
+  }
+
+  function requireNumbers(model) {
+    if (model.series.length) return;
+    requireItemValues(model);
+  }
+
   function renderDataCards(model, slotId) {
     if (!requireItems(model, 12)) return slot(12, slotId, EMPTY_STRUCTURE);
+    requireItemValues(model);
 
     var cards = model.items.map(function (item) {
       var parts = ['<div class="dg-card" data-anim="fade-up">'];
@@ -1170,6 +1211,7 @@
 
   function renderTimeline(model, slotId) {
     if (!requireItems(model, 3)) return slot(3, slotId, EMPTY_STRUCTURE);
+    requireItemValues(model);
 
     var ordered = model.items.slice().sort(function (left, right) {
       return left.value - right.value;
@@ -1275,6 +1317,7 @@
 
   function renderComparisonTable(model, slotId) {
     if (!requireItems(model, 5)) return slot(5, slotId, EMPTY_STRUCTURE);
+    requireNumbers(model);
 
     var body = tableMarkup(model, 'cmp-table', '', false);
     if (model.subtitle) {
@@ -1285,6 +1328,7 @@
 
   function renderComparisonTableEnhanced(model, slotId) {
     if (!requireItems(model, 22)) return slot(22, slotId, EMPTY_STRUCTURE);
+    requireNumbers(model);
 
     var table = tableMarkup(
       model, 'cmp-table', ' data-sortable id="cmp-' + slotId + '"', true);

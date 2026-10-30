@@ -160,3 +160,48 @@ class TestRejectedData:
         with pytest.raises(parity.ParityError) as exc:
             parity.render_node(2, str(model_path))
         assert 'needs items' in str(exc.value)
+
+
+class TestOptionalValue:
+    def _model(self, tmp_path, data):
+        model_path = tmp_path / 'model.json'
+        model_path.write_text(json.dumps(data), encoding='utf-8')
+        return str(model_path)
+
+    def test_node_accepts_value_less_items_for_a_value_free_component(self, tmp_path):
+        model_path = self._model(tmp_path, {
+            'title': 'T', 'items': [{'label': 'A'}, {'label': 'B'}],
+        })
+        fragment = parity.render_node(17, model_path)
+        assert 'class="tag-group"' in fragment
+        assert '"value"' not in fragment
+        assert parity.render_python(17, model_path) == fragment
+
+    def test_node_rejects_value_less_items_for_a_numbers_component(self, tmp_path):
+        model_path = self._model(tmp_path, {
+            'title': 'T', 'items': [{'label': 'A'}],
+        })
+        with pytest.raises(parity.ParityError) as exc:
+            parity.render_node(4, model_path)
+        assert 'items[0].value: missing field' in str(exc.value)
+
+    def test_node_rejects_value_less_items_for_an_item_value_component(self, tmp_path):
+        model_path = self._model(tmp_path, {
+            'title': 'T',
+            'items': [{'label': 'A'}],
+            'series': [{'name': 'S', 'values': [1]}],
+        })
+        with pytest.raises(parity.ParityError) as exc:
+            parity.render_node(12, model_path)
+        assert 'items[0].value: missing field' in str(exc.value)
+
+    def test_node_series_supplies_values_when_items_have_none(self, tmp_path):
+        model_path = self._model(tmp_path, {
+            'title': 'T',
+            'items': [{'label': 'A'}, {'label': 'B'}],
+            'series': [{'name': 'S', 'values': [10, 20]}],
+        })
+        fragment = parity.render_node(4, model_path)
+        assert fragment.count('class="bar-item"') == 2
+        assert '>10</div>' in fragment
+        assert parity.render_python(4, model_path) == fragment

@@ -5,12 +5,14 @@ Every swappable visual component consumes this normalized shape::
     {
       "title": str,
       "subtitle": str,
-      "items": [{"label": str, "value": number, "note": str, "accent": str}],
+      "items": [{"label": str, "value": number or absent, "note": str, "accent": str}],
       "series": [{"name": str, "values": [number, ...]}]
     }
 
 Components read the fields they need and ignore the rest.  ``title`` is the
-only required field; everything else defaults to an empty value.
+only required field; everything else defaults to an empty value.  ``value``
+is optional too: a purely categorical item may omit it, and a component that
+needs numbers raises when neither the item values nor a series supply them.
 
 Every human-readable field has an optional English counterpart (``title_en``,
 ``label_en``, ``note_en``, ``name_en``, ...).  A component that emits body text
@@ -37,7 +39,7 @@ class ContentModelError(ValueError):
 @dataclass(frozen=True)
 class ContentItem:
     label: str
-    value: int | float
+    value: int | float | None = None
     note: str = ''
     accent: str = ''
     label_en: str = ''
@@ -66,14 +68,7 @@ class ContentModel:
             'title': self.title,
             'subtitle': self.subtitle,
             'items': [
-                _drop_empty({
-                    'label': item.label,
-                    'value': item.value,
-                    'note': item.note,
-                    'accent': item.accent,
-                    'label_en': item.label_en,
-                    'note_en': item.note_en,
-                })
+                _drop_empty(_item_fields(item))
                 for item in self.items
             ],
             'series': [
@@ -102,6 +97,20 @@ def _drop_empty(mapping):
         for key, value in mapping.items()
         if not (key.endswith('_en') and value == '')
     }
+
+
+def _item_fields(item):
+    """Canonical item keys; ``value`` is absent when the item carries none."""
+    fields = {
+        'label': item.label,
+        'note': item.note,
+        'accent': item.accent,
+        'label_en': item.label_en,
+        'note_en': item.note_en,
+    }
+    if item.value is not None:
+        fields['value'] = item.value
+    return fields
 
 
 def _field(path, key):
@@ -151,12 +160,11 @@ def _number_value(value, field):
     return value
 
 
-def _require_number(mapping, key, path):
+def _optional_number(mapping, key, path):
     value = mapping.get(key, _MISSING)
-    field = _field(path, key)
     if value is _MISSING:
-        raise ContentModelError(field, 'missing field')
-    return _number_value(value, field)
+        return None
+    return _number_value(value, _field(path, key))
 
 
 def validate_content_model(data):
@@ -183,7 +191,7 @@ def validate_content_model(data):
             raise ContentModelError(f'items[{index}]', 'expected an object')
         items.append(ContentItem(
             label=_require_string(raw, 'label', path),
-            value=_require_number(raw, 'value', path),
+            value=_optional_number(raw, 'value', path),
             note=_optional_string(raw, 'note', path),
             accent=_optional_string(raw, 'accent', path),
             label_en=_optional_string(raw, 'label_en', path),
@@ -219,3 +227,25 @@ def validate_content_model(data):
         title_en=title_en,
         subtitle_en=subtitle_en,
     )
+
+
+def require_item_values(model):
+    """Raise naming the first item without a value (#3, #12).
+
+    These components render or order by ``item.value``; a series cannot
+    substitute for it.
+    """
+    for index, item in enumerate(model.items):
+        if item.value is None:
+            raise ContentModelError(f'items[{index}].value', 'missing field')
+
+
+def require_numbers(model):
+    """Numbers may come from item values or a series (#4, #5, #15, ...).
+
+    A series supplies every number, so items may be labels only.  Without a
+    series every item must carry its own value.
+    """
+    if model.series:
+        return
+    require_item_values(model)

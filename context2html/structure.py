@@ -27,7 +27,11 @@ quote", not "no data" (see :func:`_render_quote_card`).
 import html
 import re
 
-from context2html.content_model import ContentModelError
+from context2html.content_model import (
+    ContentModelError,
+    require_item_values,
+    require_numbers,
+)
 
 COMPONENT_ROLE_CARDS = 2
 COMPONENT_TIMELINE = 3
@@ -108,6 +112,7 @@ def _num(value):
 def _render_data_cards(model, slot_id):
     if not _require_items(model, COMPONENT_DATA_CARDS):
         return _slot(COMPONENT_DATA_CARDS, slot_id, _empty_state())
+    require_item_values(model)
 
     cards = []
     for item in model.items:
@@ -154,6 +159,7 @@ def _render_timeline(model, slot_id):
     """Events ordered by ``value``; a non-empty ``accent`` marks a key milestone."""
     if not _require_items(model, COMPONENT_TIMELINE):
         return _slot(COMPONENT_TIMELINE, slot_id, _empty_state())
+    require_item_values(model)
 
     events = []
     for item in sorted(model.items, key=lambda event: event.value):
@@ -250,6 +256,7 @@ def _table_markup(model, table_class, table_attrs='', sortable=False):
 def _render_comparison_table(model, slot_id):
     if not _require_items(model, COMPONENT_COMPARISON_TABLE):
         return _slot(COMPONENT_COMPARISON_TABLE, slot_id, _empty_state())
+    require_numbers(model)
 
     body = _table_markup(model, 'cmp-table')
     if model.subtitle:
@@ -260,6 +267,7 @@ def _render_comparison_table(model, slot_id):
 def _render_comparison_table_enhanced(model, slot_id):
     if not _require_items(model, COMPONENT_COMPARISON_TABLE_ENHANCED):
         return _slot(COMPONENT_COMPARISON_TABLE_ENHANCED, slot_id, _empty_state())
+    require_numbers(model)
 
     table = _table_markup(
         model, 'cmp-table', f' data-sortable id="cmp-{slot_id}"', sortable=True)

@@ -22,6 +22,7 @@ from context2html.content_model import (
     ContentModel,
     ContentModelError,
     ContentSeries,
+    require_numbers,
     validate_content_model,
 )
 from context2html.structure import STRUCTURE_RENDERERS
@@ -165,16 +166,23 @@ def _inline_pair(zh, en=''):
 def _item_entries(model):
     """Return ``(label, value, note, accent, label_en, note_en)`` tuples.
 
-    Items are the natural source; a series-only model falls back to the first
-    series with positional labels so a chart-family swap never shows an empty
-    state while the slot still holds data.
+    Items are the natural source; when they are labels only, the first series
+    supplies the numbers.  A series-only model falls back to positional labels
+    so a chart-family swap never shows an empty state while the slot still
+    holds data.
     """
     if model.items:
+        if model.series and any(item.value is None for item in model.items):
+            values = model.series[0].values
+            field = 'series[0].values[{}]'
+        else:
+            values = [item.value for item in model.items]
+            field = 'items[{}].value'
         return (
-            [(item.label, item.value, item.note, item.accent,
+            [(item.label, value, item.note, item.accent,
               item.label_en, item.note_en)
-             for item in model.items],
-            'items[{}].value')
+             for item, value in zip(model.items, values)],
+            field)
     if model.series:
         return (
             [(str(index + 1), value, '', '', '', '')
@@ -184,6 +192,7 @@ def _item_entries(model):
 
 
 def _render_bar_chart(model, slot_id):
+    require_numbers(model)
     entries, field = _item_entries(model)
     if entries is None:
         return _section(4, slot_id, model, _empty_state())
@@ -219,6 +228,7 @@ def _progress_state(value):
 
 
 def _render_status_chain(model, slot_id):
+    require_numbers(model)
     entries, _ = _item_entries(model)
     if entries is None:
         return _section(15, slot_id, model, _empty_state())
@@ -247,6 +257,7 @@ def _intensity(value, lowest, highest):
 
 
 def _render_heatmap(model, slot_id):
+    require_numbers(model)
     if model.series:
         rows = [(series.name, series.name_en, series.values)
                 for series in model.series]
@@ -300,6 +311,7 @@ def _render_heatmap(model, slot_id):
 
 
 def _render_step_indicator(model, slot_id):
+    require_numbers(model)
     entries, _ = _item_entries(model)
     if entries is None:
         return _section(20, slot_id, model, _empty_state())
@@ -315,6 +327,7 @@ def _render_step_indicator(model, slot_id):
 
 
 def _render_chart_set(model, slot_id):
+    require_numbers(model)
     entries, field = _item_entries(model)
     if entries is None:
         return _section(24, slot_id, model, _empty_state())
@@ -343,6 +356,7 @@ def _render_chart_set(model, slot_id):
 
 
 def _render_echarts(model, slot_id):
+    require_numbers(model)
     if not model.items and not model.series:
         return _section(26, slot_id, model, _empty_state())
 

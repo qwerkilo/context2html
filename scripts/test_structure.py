@@ -487,6 +487,15 @@ class TestTagGroup:
         assert_well_formed(markup)
         assert_balanced_languages(markup)
 
+    def test_tag_list_without_values_renders(self):
+        slot = render_slot(17, {
+            'title': '关键词',
+            'items': [{'label': '宏观经济'}, {'label': '金融危机'}],
+        })
+        assert slot.markup.count('<span class="tag ') == 4
+        assert '# 宏观经济' in slot.markup
+        assert '"value"' not in slot.data_block
+
 
 CALLOUTS = {
     'title': '提示',
@@ -603,3 +612,59 @@ def test_items_component_rejects_series_only_data(component_id):
         })
     assert exc.value.field == 'items'
     assert 'items' in str(exc.value)
+
+
+VALUE_FREE_IDS = [2, 13, 17, 18]
+
+
+@pytest.mark.parametrize('component_id', VALUE_FREE_IDS)
+def test_value_free_components_render_value_less_items(component_id):
+    slot = render_slot(component_id, {
+        'title': 'T',
+        'items': [{'label': 'A'}, {'label': 'B'}],
+    })
+    assert 'ic-empty' not in slot.markup
+    assert '"value"' not in slot.data_block
+
+
+@pytest.mark.parametrize('component_id', [5, 22])
+def test_comparison_table_rejects_value_less_items_without_series(component_id):
+    with pytest.raises(ContentModelError) as exc:
+        render_slot(component_id, {
+            'title': 'T',
+            'items': [{'label': 'A'}],
+        })
+    assert exc.value.field == 'items[0].value'
+    assert 'missing field' in str(exc.value)
+
+
+@pytest.mark.parametrize('component_id', [5, 22])
+def test_comparison_table_accepts_value_less_items_when_series_supply_numbers(
+        component_id):
+    slot = render_slot(component_id, {
+        'title': 'T',
+        'items': [{'label': 'A'}],
+        'series': [{'name': 'S', 'values': [1]}],
+    })
+    assert '<td data-label="S">1</td>' in slot.markup
+
+
+@pytest.mark.parametrize('component_id', [3, 12])
+def test_item_value_component_rejects_value_less_items_even_with_series(component_id):
+    with pytest.raises(ContentModelError) as exc:
+        render_slot(component_id, {
+            'title': 'T',
+            'items': [{'label': 'A'}],
+            'series': [{'name': 'S', 'values': [1]}],
+        })
+    assert exc.value.field == 'items[0].value'
+    assert 'missing field' in str(exc.value)
+
+
+def test_names_the_first_item_without_a_value():
+    with pytest.raises(ContentModelError) as exc:
+        render_slot(12, {
+            'title': 'T',
+            'items': [{'label': 'A', 'value': 1}, {'label': 'B'}],
+        })
+    assert exc.value.field == 'items[1].value'
