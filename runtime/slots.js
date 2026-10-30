@@ -1098,6 +1098,10 @@
       meta: meta
     });
     optionJs = substituteColors(optionJs);
+    /* The option object lives inside a script block: a label containing a
+     * script close tag would end the element early and turn the rest of the
+     * model into markup. Escape it exactly as the data block is escaped. */
+    optionJs = scriptSafe(optionJs);
     var lines = optionJs.split('\n');
     optionJs = [lines[0]].concat(lines.slice(1).map(function (line) {
       return '  ' + line;

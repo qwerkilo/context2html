@@ -366,6 +366,10 @@ def _render_echarts(model, slot_id):
     }
     option_js = json.dumps(options, ensure_ascii=False, indent=2)
     option_js = _substitute_colors(option_js)
+    # The option object is embedded inside a <script> block, so a title or label
+    # containing `</script>` would close the element and let the rest of the
+    # model become markup. Escape it the same way the data block is escaped.
+    option_js = _script_safe(option_js)
     lines = option_js.splitlines()
     option_js = '\n'.join([lines[0]] + ['  ' + line for line in lines[1:]])
 

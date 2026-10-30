@@ -141,6 +141,27 @@ class TestStatusChain:
             })
         assert exc.value.field == 'items[0].value'
 
+    def test_out_of_range_values_clamp_instead_of_raising(self):
+        """A percentage outside 0-100 is a data smell, not a crash: clamp it."""
+        slot = render_slot(15, {
+            'title': 'T',
+            'items': [
+                {'label': 'over', 'value': 150},
+                {'label': 'under', 'value': -5},
+                {'label': 'exactly done', 'value': 100},
+                {'label': 'barely started', 'value': 0.5},
+            ],
+        })
+        assert 'sc-step done' in slot.markup
+        assert 'sc-step pending' in slot.markup
+        assert 'sc-step current' in slot.markup
+        states = [line.strip() for line in slot.markup.split('\n')
+                  if 'class="sc-step ' in line]
+        assert len(states) == 4
+        assert states[0].startswith('<div class="sc-step done')
+        assert states[1].startswith('<div class="sc-step pending')
+        assert states[3].startswith('<div class="sc-step current')
+
 
 class TestHeatmap:
     """#19 — series are rows, items are columns, values become intensity 0-4."""
@@ -202,6 +223,15 @@ class TestHeatmap:
                 'series': [{'name': 'S', 'values': [1, 'high']}],
             })
         assert exc.value.field == 'series[0].values[1]'
+
+    def test_all_values_equal_land_every_cell_on_the_middle_intensity(self):
+        """Zero spread would divide by zero; the guard pins every cell to 2."""
+        slot = render_slot(19, {
+            'title': '全等值',
+            'series': [{'name': 'S', 'values': [7, 7, 7]}],
+        })
+        assert slot.markup.count('class="hm-cell"') == 3
+        assert slot.markup.count('data-l="2"') == 3
 
 
 class TestStepIndicator:

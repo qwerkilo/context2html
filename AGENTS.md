@@ -54,6 +54,7 @@ CI (`.github/workflows/ci.yml`) gates on three jobs for push/PR to `main`: **tes
 - **`examples/0001-demo-report.html` is the smoke fixture**; `examples/report-themes.html` is a theme gallery and fails validation.
 - **`ComponentRegistry.get_component()` is gone** — `list_components(id=26)` returns a list, empty when missing.
 - **mutmut needs WSL** — `scripts/mutation-smoke.py` is the native stand-in. Entries live in `scripts/mutants/<area>.py`, one module per area so parallel work never appends to the same list; add one when you fix a bug a test should have caught.
+- **The security surface is text escaping.** There is no server, auth or session, so the whole trust boundary is "model text must stay text". `scripts/test_trust_boundary.py` asserts the DOM shape is invariant under hostile payloads across all 14 components on both renderers — add a payload there rather than a one-off assertion. A runtime file must never contain a literal script close tag, because `editor.py` inlines it and refuses the file.
 - **Most tests import the package directly**; tests for standalone scripts load them with `importlib.util`.
 
 ## Domain docs
