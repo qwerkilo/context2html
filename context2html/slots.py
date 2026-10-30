@@ -154,8 +154,16 @@ def _section(component_id, slot_id, model, body):
     )
 
 
+def _inline_pair(zh, en=''):
+    """Both languages inside one parent element (labels, table-like cells)."""
+    return (
+        f'<span data-lang="zh">{_escape(zh)}</span>'
+        f'<span data-lang="en">{_escape(en or zh)}</span>'
+    )
+
+
 def _item_entries(model):
-    """Return ``(label, value, note, accent)`` tuples and the error field path.
+    """Return ``(label, value, note, accent, label_en, note_en)`` tuples.
 
     Items are the natural source; a series-only model falls back to the first
     series with positional labels so a chart-family swap never shows an empty
@@ -163,12 +171,13 @@ def _item_entries(model):
     """
     if model.items:
         return (
-            [(item.label, item.value, item.note, item.accent)
+            [(item.label, item.value, item.note, item.accent,
+              item.label_en, item.note_en)
              for item in model.items],
             'items[{}].value')
     if model.series:
         return (
-            [(str(index + 1), value, '', '')
+            [(str(index + 1), value, '', '', '', '')
              for index, value in enumerate(model.series[0].values)],
             'series[0].values[{}]')
     return None, ''
@@ -179,18 +188,18 @@ def _render_bar_chart(model, slot_id):
     if entries is None:
         return _section(4, slot_id, model, _empty_state())
 
-    for index, (_, value, _, _) in enumerate(entries):
-        if value < 0:
+    for index, entry in enumerate(entries):
+        if entry[1] < 0:
             raise ContentModelError(
                 field.format(index), 'expected a non-negative number')
-    maximum = max(value for _, value, _, _ in entries)
+    maximum = max(entry[1] for entry in entries)
 
     rows = []
-    for index, (label, value, _, accent) in enumerate(entries):
+    for index, (label, value, _, accent, label_en, _) in enumerate(entries):
         width = _percent(value, maximum)
         rows.append(
             '  <div class="bar-item">\n'
-            f'    <div class="bar-label">{_escape(label)}</div>\n'
+            f'    <div class="bar-label">{_inline_pair(label, label_en)}</div>\n'
             '    <div class="bar-track">\n'
             f'      <div class="bar-fill" style="width:{width:g}%; '
             f'background:{_accent_css(accent, index)};">'
@@ -215,14 +224,17 @@ def _render_status_chain(model, slot_id):
         return _section(15, slot_id, model, _empty_state())
 
     steps = []
-    for label, value, note, _ in entries:
+    for label, value, note, _, label_en, note_en in entries:
         status = ''
         if note:
-            status = f'\n    <div class="sc-status">{_escape(note)}</div>'
+            status = (
+                '\n    <div class="sc-status">'
+                f'{_inline_pair(note, note_en)}</div>')
         steps.append(
             f'  <div class="sc-step {_progress_state(value)}">\n'
             '    <div class="sc-dot"></div>\n'
-            f'    <div class="sc-label">{_escape(label)}</div>{status}\n'
+            f'    <div class="sc-label">{_inline_pair(label, label_en)}</div>'
+            f'{status}\n'
             '  </div>')
     body = '  <div class="status-chain">\n' + '\n'.join(steps) + '\n  </div>'
     return _section(15, slot_id, model, body)
@@ -236,40 +248,49 @@ def _intensity(value, lowest, highest):
 
 def _render_heatmap(model, slot_id):
     if model.series:
-        rows = [(series.name, series.values) for series in model.series]
+        rows = [(series.name, series.name_en, series.values)
+                for series in model.series]
     elif model.items:
-        rows = [(model.title, tuple(item.value for item in model.items))]
+        rows = [(model.title, model.title_en,
+                 tuple(item.value for item in model.items))]
     else:
         return _section(19, slot_id, model, _empty_state())
 
-    width = max((len(values) for _, values in rows), default=0)
+    width = max((len(values) for _, _, values in rows), default=0)
     if width == 0:
         return _section(19, slot_id, model, _empty_state())
 
-    labels = [item.label for item in model.items]
-    if not labels:
+    labels = [(item.label, item.label_en) for item in model.items]
+    positional = not labels
+    if positional:
         labels = [str(index + 1) for index in range(width)]
 
-    numbers = [value for _, values in rows for value in values]
+    numbers = [value for _, _, values in rows for value in values]
     lowest, highest = min(numbers), max(numbers)
 
+    if positional:
+        header_cells = [
+            f'      <div class="hm-hdr">{_escape(label)}</div>'
+            for label in labels]
+    else:
+        header_cells = [
+            f'      <div class="hm-hdr">{_inline_pair(label, label_en)}</div>'
+            for label, label_en in labels]
     header = (
         '    <div class="hm-row">\n'
         '      <div class="hm-label"></div>\n'
-        + '\n'.join(
-            f'      <div class="hm-hdr">{_escape(label)}</div>'
-            for label in labels)
+        + '\n'.join(header_cells)
         + '\n    </div>')
 
     body_rows = []
-    for name, values in rows:
+    for name, name_en, values in rows:
         cells = '\n'.join(
             f'      <div class="hm-cell" data-l="{_intensity(value, lowest, highest)}">'
             f'{_escape(_format_number(value))}</div>'
             for value in values)
         body_rows.append(
             '    <div class="hm-row">\n'
-            f'      <div class="hm-label">{_escape(name)}</div>\n'
+            f'      <div class="hm-label">{_inline_pair(name, name_en)}</div>\n'
             f'{cells}\n'
             '    </div>')
 
@@ -284,11 +305,11 @@ def _render_step_indicator(model, slot_id):
         return _section(20, slot_id, model, _empty_state())
 
     steps = []
-    for index, (label, value, _, _) in enumerate(entries):
+    for index, (label, value, _, _, label_en, _) in enumerate(entries):
         steps.append(
             f'  <div class="si-step {_progress_state(value)}">'
             f'<div class="si-num">{index + 1}</div>'
-            f'<div class="si-label">{_escape(label)}</div></div>')
+            f'<div class="si-label">{_inline_pair(label, label_en)}</div></div>')
     body = '  <div class="step-indicator">\n' + '\n'.join(steps) + '\n  </div>'
     return _section(20, slot_id, model, body)
 
@@ -298,18 +319,20 @@ def _render_chart_set(model, slot_id):
     if entries is None:
         return _section(24, slot_id, model, _empty_state())
 
-    for index, (_, value, _, _) in enumerate(entries):
-        if value < 0:
+    for index, entry in enumerate(entries):
+        if entry[1] < 0:
             raise ContentModelError(
                 field.format(index), 'expected a non-negative number')
-    maximum = max(value for _, value, _, _ in entries)
+    maximum = max(entry[1] for entry in entries)
 
     bars = []
-    for label, value, _, _ in entries:
+    for label, value, _, _, label_en, _ in entries:
         height = _percent(value, maximum)
         bars.append(
-            f'      <div class="vc-bar" style="--h:{height:g};" '
-            f'data-label="{_escape(label)}">'
+            f'      <div class="vc-bar" style="--h:{height:g};">'
+            f'<span class="vc-label" data-lang="zh">{_escape(label)}</span>'
+            f'<span class="vc-label" data-lang="en">'
+            f'{_escape(label_en or label)}</span>'
             f'<span class="vc-val">{_escape(_format_number(value))}</span></div>')
     body = ('  <div class="vchart">\n'
             '    <div class="vc-group">\n'
@@ -323,43 +346,79 @@ def _render_echarts(model, slot_id):
     if not model.items and not model.series:
         return _section(26, slot_id, model, _empty_state())
 
-    option = _echarts_option(model)
-    option_js = json.dumps(option, ensure_ascii=False, indent=2)
+    options = {
+        'zh': _echarts_option(model, 'zh'),
+        'en': _echarts_option(model, 'en'),
+    }
+    option_js = json.dumps(options, ensure_ascii=False, indent=2)
     option_js = _substitute_colors(option_js)
     lines = option_js.splitlines()
     option_js = '\n'.join([lines[0]] + ['  ' + line for line in lines[1:]])
 
-    return (
-        f'<section class="ic-slot" data-slot="{slot_id}" data-component="26">\n'
+    body = (
         '  <div class="ic-chart" '
         f'id="chart-{slot_id}" style="width:100%;height:350px;margin:1rem 0;"></div>\n'
-        '  <div class="no-js-fallback"><p>图表加载需要 JavaScript</p></div>\n'
-        '</section>\n'
+        '  <div class="no-js-fallback">\n'
+        '    <p data-lang="zh">图表加载需要 JavaScript</p>\n'
+        '    <p data-lang="en">This chart needs JavaScript</p>\n'
+        '  </div>'
+    )
+    return _section(26, slot_id, model, body) + _echarts_init(slot_id, option_js)
+
+
+def _echarts_init(slot_id, option_js):
+    """Inline init: pick the option matching the reader's current language."""
+    return (
         '<script>\n'
         '(function () {\n'
         f'  var el = document.getElementById("chart-{slot_id}");\n'
         '  if (!el || typeof echarts === "undefined") return;\n'
         '  function gv(n) { return getComputedStyle(document.documentElement)'
         '.getPropertyValue(n).trim(); }\n'
+        '  function readLang() {\n'
+        '    try {\n'
+        '      var saved = localStorage.getItem("lang");\n'
+        '      if (saved === "zh" || saved === "en") return saved;\n'
+        '    } catch (error) {}\n'
+        '    var active = document.querySelector("[data-lang].active");\n'
+        '    return active ? active.getAttribute("data-lang") : "zh";\n'
+        '  }\n'
+        f'  var options = {option_js};\n'
+        '  var lang = readLang();\n'
         '  var chart = echarts.init(el);\n'
-        f'  chart.setOption({option_js});\n'
+        '  chart.setOption(options[lang] || options.zh);\n'
+        '  document.addEventListener("click", function () {\n'
+        '    var next = readLang();\n'
+        '    if (next === lang) return;\n'
+        '    lang = next;\n'
+        '    chart.setOption(options[lang] || options.zh, true);\n'
+        '  });\n'
         '})();\n'
         '</script>'
     )
 
 
-def _echarts_option(model):
+def _text(zh, en, lang):
+    """Pick the language variant, falling back to Chinese when absent."""
+    return (en or zh) if lang == 'en' else zh
+
+
+def _echarts_option(model, lang):
     series = list(model.series) or [
-        ContentSeries(name=model.title, values=tuple(item.value for item in model.items))
+        ContentSeries(
+            name=model.title,
+            values=tuple(item.value for item in model.items),
+            name_en=model.title_en,
+        )
     ]
-    labels = [item.label for item in model.items]
+    labels = [_text(item.label, item.label_en, lang) for item in model.items]
     if not labels:
         longest = max((len(item.values) for item in series), default=0)
         labels = [str(index + 1) for index in range(longest)]
 
-    title = {'text': model.title}
+    title = {'text': _text(model.title, model.title_en, lang)}
     if model.subtitle:
-        title['subtext'] = model.subtitle
+        title['subtext'] = _text(model.subtitle, model.subtitle_en, lang)
 
     option = {
         'title': title,
@@ -375,7 +434,7 @@ def _echarts_option(model):
         'grid': {'left': 60, 'right': 30, 'top': 60, 'bottom': 30},
     }
     for index, item in enumerate(series):
-        entry = {'name': item.name, 'type': 'bar'}
+        entry = {'name': _text(item.name, item.name_en, lang), 'type': 'bar'}
         if len(series) > 1:
             entry['stack'] = 'total'
         entry['data'] = list(item.values)

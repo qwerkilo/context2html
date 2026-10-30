@@ -27,6 +27,8 @@ quote", not "no data" (see :func:`_render_quote_card`).
 import html
 import re
 
+from context2html.content_model import ContentModelError
+
 COMPONENT_ROLE_CARDS = 2
 COMPONENT_TIMELINE = 3
 COMPONENT_COMPARISON_TABLE = 5
@@ -75,6 +77,21 @@ def _slot(component_id, slot_id, body):
     )
 
 
+def _require_items(model, component_id):
+    """Return True when items exist; raise when the model only has series.
+
+    A component that cannot read series must not silently render an empty
+    state over real data — the caller has to pick a component that can.
+    """
+    if model.items:
+        return True
+    if model.series:
+        raise ContentModelError(
+            'items',
+            f'component {component_id} needs items; the model has series only')
+    return False
+
+
 def _accent(item, fallback=''):
     """Return the item's emphasis colour when it is a safe CSS value."""
     if _SAFE_COLOR.fullmatch(item.accent):
@@ -89,7 +106,7 @@ def _num(value):
 
 
 def _render_data_cards(model, slot_id):
-    if not model.items:
+    if not _require_items(model, COMPONENT_DATA_CARDS):
         return _slot(COMPONENT_DATA_CARDS, slot_id, _empty_state())
 
     cards = []
@@ -109,7 +126,7 @@ def _render_data_cards(model, slot_id):
 
 
 def _render_role_cards(model, slot_id):
-    if not model.items:
+    if not _require_items(model, COMPONENT_ROLE_CARDS):
         return _slot(COMPONENT_ROLE_CARDS, slot_id, _empty_state())
 
     palette = ('#3b82f6', '#f59e0b', '#ef4444', '#10b981')
@@ -135,7 +152,7 @@ def _render_role_cards(model, slot_id):
 
 def _render_timeline(model, slot_id):
     """Events ordered by ``value``; a non-empty ``accent`` marks a key milestone."""
-    if not model.items:
+    if not _require_items(model, COMPONENT_TIMELINE):
         return _slot(COMPONENT_TIMELINE, slot_id, _empty_state())
 
     events = []
@@ -231,7 +248,7 @@ def _table_markup(model, table_class, table_attrs='', sortable=False):
 
 
 def _render_comparison_table(model, slot_id):
-    if not model.items:
+    if not _require_items(model, COMPONENT_COMPARISON_TABLE):
         return _slot(COMPONENT_COMPARISON_TABLE, slot_id, _empty_state())
 
     body = _table_markup(model, 'cmp-table')
@@ -241,7 +258,7 @@ def _render_comparison_table(model, slot_id):
 
 
 def _render_comparison_table_enhanced(model, slot_id):
-    if not model.items:
+    if not _require_items(model, COMPONENT_COMPARISON_TABLE_ENHANCED):
         return _slot(COMPONENT_COMPARISON_TABLE_ENHANCED, slot_id, _empty_state())
 
     table = _table_markup(
@@ -294,7 +311,7 @@ def _tag_class(item, index):
 
 
 def _render_tag_group(model, slot_id):
-    if not model.items:
+    if not _require_items(model, COMPONENT_TAG_GROUP):
         return _slot(COMPONENT_TAG_GROUP, slot_id, _empty_state())
 
     tags = []
@@ -316,7 +333,7 @@ _CALLOUT_TYPES = {
 
 
 def _render_callouts(model, slot_id):
-    if not model.items:
+    if not _require_items(model, COMPONENT_CALLOUTS):
         return _slot(COMPONENT_CALLOUTS, slot_id, _empty_state())
 
     bars = []

@@ -8,6 +8,9 @@ the bilingual pairs it emits stay balanced.
 from html.parser import HTMLParser
 
 
+import pytest
+
+from context2html.content_model import ContentModelError
 from context2html.registry import ComponentRegistry
 from context2html.slots import render_slot
 
@@ -586,3 +589,17 @@ class TestSwappableSetFlag:
 
 
 
+
+ITEMS_ONLY_IDS = [2, 3, 5, 12, 17, 18, 22]
+
+
+@pytest.mark.parametrize('component_id', ITEMS_ONLY_IDS)
+def test_items_component_rejects_series_only_data(component_id):
+    """A component that needs items must fail loudly instead of showing empty."""
+    with pytest.raises(ContentModelError) as exc:
+        render_slot(component_id, {
+            'title': 'T',
+            'series': [{'name': 'S', 'values': [1, 2]}],
+        })
+    assert exc.value.field == 'items'
+    assert 'items' in str(exc.value)

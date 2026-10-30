@@ -285,6 +285,12 @@ body, body * { transition: background-color 0.35s ease-out, color 0.35s ease-out
   h1 { font-size: 1.5rem; }
 }
 
+/* ===== 组件插槽 (slot output / edit mode) ===== */
+.ic-empty { margin: 0; padding: 1rem 0; color: var(--muted, #777); font-size: 0.9rem; text-align: center; }
+.ic-static { display: contents; }
+.ic-editing .ic-slot[data-slot] { outline: 2px dashed var(--accent, #c0392b); outline-offset: 6px; cursor: pointer; transition: outline-color 0.15s ease; }
+.ic-editing .ic-slot[data-slot]:hover { outline-style: solid; outline-color: var(--accent, #c0392b); }
+
 </style>
 <!-- CDN-first 加载器：CDN 加载失败时回退到本地。模板内所有动态库/样式通过它加载 -->
 <script>

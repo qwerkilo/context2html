@@ -111,11 +111,22 @@ class TestCandidateFiltering:
         assert quote[0]['sameFamily'] is False
         assert quote[0]['family'] == 'structure'
 
-    def test_items_slot_leads_with_structure_family(self):
+    def test_items_slot_rendered_by_a_chart_leads_with_the_chart_family(self):
         candidates = call('candidatesFor', ITEMS_MODEL, 4)
-        assert ids(candidates)[:len(STRUCTURE_IDS)] == STRUCTURE_IDS
-        assert [c['sameFamily'] for c in candidates[:8]] == [True] * 8
-        assert [c['sameFamily'] for c in candidates[8:]] == [False] * 5
+        assert ids(candidates)[:5] == [15, 19, 20, 24, 26]
+        assert [c['sameFamily'] for c in candidates[:5]] == [True] * 5
+        assert all(c['sameFamily'] is False for c in candidates[5:])
+
+    def test_items_slot_rendered_by_a_structure_component_leads_with_structure(self):
+        candidates = call('candidatesFor', ITEMS_MODEL, 2)
+        assert ids(candidates)[:7] == [3, 5, 12, 13, 17, 18, 22]
+        assert [c['sameFamily'] for c in candidates[:7]] == [True] * 7
+        assert ids(candidates)[7:] == [4, 15, 19, 20, 24, 26]
+
+    def test_both_slot_rendered_by_a_structure_component_leads_with_structure(self):
+        candidates = call('candidatesFor', BOTH_MODEL, 13)
+        assert ids(candidates)[:7] == [2, 3, 5, 12, 17, 18, 22]
+        assert ids(candidates)[7:] == [4, 15, 19, 20, 24, 26]
 
     def test_items_slot_offers_every_component_that_can_read_items(self):
         result_ids = ids(call('candidatesFor', ITEMS_MODEL, 4))
@@ -155,8 +166,8 @@ class TestMappingPreview:
         assert preview['crossFamily'] is True
         assert preview['from'] == {'id': 4, 'name': 'CSS 条形图', 'family': 'chart'}
         assert preview['to'] == {'id': 12, 'name': '数据卡片网格', 'family': 'structure'}
-        assert preview['displays'] == ['标题', '条目标签', '条目数值', '条目备注', '强调色']
-        assert preview['drops'] == ['副标题', '系列名称', '系列数值']
+        assert preview['displays'] == ['条目标签', '条目数值', '条目备注', '强调色']
+        assert preview['drops'] == ['标题', '副标题', '系列名称', '系列数值']
         assert '新组件显示' in preview['summary']
         assert '将丢弃' in preview['summary']
 
@@ -171,6 +182,7 @@ class TestMappingPreview:
         assert '条目数值（排序依据）' in preview['displays']
         assert '条目备注' in preview['displays']
         assert '系列数值' in preview['drops']
+        assert '标题' in preview['drops']
 
     def test_preview_marks_item_values_used_for_progress_state(self):
         preview = call('mappingPreview', 12, 15, ITEMS_MODEL)
@@ -178,24 +190,34 @@ class TestMappingPreview:
 
     def test_preview_drops_the_second_series_when_only_the_first_is_read(self):
         preview = call('mappingPreview', 13, 4, SERIES_MODEL)
-        assert preview['displays'] == ['标题', '系列数值']
-        assert preview['drops'] == ['系列名称', '第 2 条及之后的系列']
+        assert preview['displays'] == ['系列数值']
+        assert preview['drops'] == ['标题', '系列名称', '第 2 条及之后的系列']
 
     def test_preview_of_a_table_reads_series_as_columns(self):
         preview = call('mappingPreview', 4, 5, BOTH_MODEL)
         assert preview['displays'] == [
-            '标题', '副标题', '条目标签', '系列名称', '系列数值']
-        assert preview['drops'] == ['条目数值', '条目备注', '强调色']
+            '副标题', '条目标签', '系列名称', '系列数值']
+        assert preview['drops'] == ['标题', '条目数值', '条目备注', '强调色']
 
     def test_preview_of_the_quote_card_keeps_labels_and_notes(self):
         preview = call('mappingPreview', 4, 13, ITEMS_MODEL)
-        assert preview['displays'] == ['标题', '条目标签', '条目备注']
-        assert preview['drops'] == ['条目数值', '强调色']
+        assert preview['displays'] == ['条目标签', '条目备注']
+        assert preview['drops'] == ['标题', '条目数值', '强调色']
 
     def test_preview_with_nothing_to_drop_says_so(self):
         preview = call('mappingPreview', 13, 13, {'title': '只有标题'})
         assert preview['drops'] == []
         assert '无' in preview['summary']
+
+    def test_preview_drops_a_title_the_target_only_uses_as_a_label(self):
+        preview = call('mappingPreview', 4, 12, ITEMS_MODEL)
+        assert '标题' in preview['drops']
+        assert '标题' not in preview['displays']
+
+    def test_preview_of_a_quote_card_without_items_shows_the_title(self):
+        preview = call('mappingPreview', 4, 13, {'title': '只有标题'})
+        assert preview['displays'] == ['标题']
+        assert preview['drops'] == []
 
 
 class TestUndoHistory:

@@ -42,10 +42,6 @@
     '.ic-editing .ic-editor-bar .ic-editor-undo{display:inline-block}',
     '.ic-editor-bar .ic-editor-save{display:none}',
     '.ic-editing .ic-editor-bar .ic-editor-save{display:inline-block}',
-    '.ic-editing .ic-slot[data-slot]{outline:2px dashed var(--accent,#c0392b);',
-    'outline-offset:6px;cursor:pointer;transition:outline-color .15s ease}',
-    '.ic-editing .ic-slot[data-slot]:hover{outline-style:solid;',
-    'outline-color:var(--accent,#c0392b)}',
     '.ic-editing [data-swap="unavailable"]{cursor:not-allowed}',
     '.ic-editor-backdrop{position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,.35)}',
     '.ic-editor-panel{position:fixed;z-index:10002;top:50%;left:50%;',
@@ -75,8 +71,7 @@
     'border-color:var(--accent,#c0392b);color:#fff}',
     '.ic-editor-tooltip{position:fixed;z-index:10003;pointer-events:none;',
     'padding:4px 8px;border-radius:6px;background:rgba(20,20,20,.9);color:#fff;',
-    'font-size:.75rem;line-height:1.3;white-space:nowrap}',
-    '.ic-static{display:contents}'
+    'font-size:.75rem;line-height:1.3;white-space:nowrap}'
   ].join('');
 
   function injectStyle() {

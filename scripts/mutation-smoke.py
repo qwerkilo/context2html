@@ -169,6 +169,38 @@ MUTANTS = [
         '    return canonical;',
         'scripts/test_editor_save.py',
     ),
+    (
+        'structure: series-only data silently shows an empty state',
+        'context2html/structure.py',
+        '    if model.items:\n'
+        '        return True\n'
+        '    if model.series:\n',
+        '    if model.items:\n'
+        '        return True\n'
+        '    if False:\n',
+        'scripts/test_structure.py',
+    ),
+    (
+        'charts: bilingual pair falls back to Chinese in both slots',
+        'context2html/slots.py',
+        'f\'<span data-lang="en">{_escape(en or zh)}</span>\'',
+        'f\'<span data-lang="en">{_escape(zh)}</span>\'',
+        'scripts/test_chart_slots.py',
+    ),
+    (
+        'preview: title claimed as displayed for every target',
+        'runtime/editor-core.js',
+        '    var titleUse = TITLE_CONSUMPTION[descriptor.id] || false;',
+        '    var titleUse = true;',
+        'scripts/test_editor_core.py',
+    ),
+    (
+        'renderer: editable report preloads every slot library',
+        'context2html/renderer.py',
+        '    component_ids = [cid for cid, _, _ in slot_specs]',
+        '    component_ids = [comp.id for comp in registry.list_components(content_model=True)]',
+        'scripts/test_editor_runtime.py',
+    ),
 ]
 
 

@@ -20,6 +20,9 @@ python -m pytest scripts/test_validate_report.py -v --tb=short
 # Lint (CI gates on this)
 ruff check .
 
+# Python/JS slot renderer parity — CI gates on this (must be 14/14)
+python scripts/check-js-parity.py
+
 # Mutation smoke — fails if a mutant survives (mutmut needs WSL; this does not)
 python scripts/mutation-smoke.py
 
@@ -64,7 +67,7 @@ The repo has a local `.codegraph/` index (Python + JS). Prefer it over grep/glob
 - **`ComponentRegistry.get_component()` removed** — use `list_components(id=26)` which returns a list (empty if not found).
 - **Slot output is opt-in** — `TemplateRenderer.assemble(..., slots=None)` is the default and keeps output byte-identical to the pre-slot renderer (baseline: `scripts/fixtures/renderer-baseline-report-starter.html`). Pass `(component_id, model)` entries to emit `data-slot`/`data-component` markup plus its JSON data block; only the 14 `content_model: true` components are accepted.
 - **Validator in framework package** — `from context2html.validator import check_h1_count, check_bilingual, ...` works directly.
-- **Framework package tests** — `test_registry.py`, `test_renderer.py`, `test_theme.py` use direct imports (`from context2html.xxx import ...`). Other tests still use `importlib`.
+- **Test imports** — most tests import the package directly (`from context2html.xxx import ...`), including `test_chart_slots.py`, `test_structure.py`, `test_slots.py`, `test_content_model.py`, `test_content_model_bilingual.py`, `test_editor_core.py`, `test_editor_runtime.py`, `test_editor_save.py` and the older framework tests. Tests for standalone scripts (`validate-report.py`, `check-js-parity.py`, `sync-template-styles.py`, `extract-component.py`, ...) load those files with `importlib.util` because they are not importable modules; a few files do both.
 - **mutmut does not run on native Windows** — it exits with "please use the WSL". `scripts/mutation-smoke.py` covers the same ground natively: it applies each mutant, runs the targeted test file, restores the source, and exits 1 if any mutant survives. Add an entry to its `MUTANTS` list when you fix a bug that a test should have caught.
 
 ## Domain docs

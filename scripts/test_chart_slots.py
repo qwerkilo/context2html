@@ -36,7 +36,10 @@ class TestCssBarChart:
         slot = render_slot(4, self.MODEL)
         assert 'data-component="4"' in slot.markup
         assert slot.markup.count('class="bar-item"') == 3
-        assert '<div class="bar-label">美国</div>' in slot.markup
+        assert (
+            '<div class="bar-label"><span data-lang="zh">美国</span>'
+            '<span data-lang="en">美国</span></div>'
+        ) in slot.markup
         assert 'width:100%' in slot.markup
         assert 'width:50%' in slot.markup
         assert 'width:25%' in slot.markup
@@ -89,8 +92,14 @@ class TestStatusChain:
         assert 'sc-step done' in slot.markup
         assert 'sc-step current' in slot.markup
         assert 'sc-step pending' in slot.markup
-        assert '<div class="sc-label">需求分析</div>' in slot.markup
-        assert '<div class="sc-status">已完成</div>' in slot.markup
+        assert (
+            '<div class="sc-label"><span data-lang="zh">需求分析</span>'
+            '<span data-lang="en">需求分析</span></div>'
+        ) in slot.markup
+        assert (
+            '<div class="sc-status"><span data-lang="zh">已完成</span>'
+            '<span data-lang="en">已完成</span></div>'
+        ) in slot.markup
 
     def test_note_is_optional(self):
         slot = render_slot(15, {
@@ -134,8 +143,14 @@ class TestHeatmap:
         assert 'data-component="19"' in slot.markup
         assert 'class="heatmap"' in slot.markup
         assert slot.markup.count('class="hm-cell"') == 6
-        assert '<div class="hm-hdr">2007</div>' in slot.markup
-        assert '<div class="hm-label">美国</div>' in slot.markup
+        assert (
+            '<div class="hm-hdr"><span data-lang="zh">2007</span>'
+            '<span data-lang="en">2007</span></div>'
+        ) in slot.markup
+        assert (
+            '<div class="hm-label"><span data-lang="zh">美国</span>'
+            '<span data-lang="en">美国</span></div>'
+        ) in slot.markup
         assert 'data-l="4">4</div>' in slot.markup
         assert 'data-l="0">0</div>' in slot.markup
 
@@ -191,7 +206,10 @@ class TestStepIndicator:
         assert 'si-step pending' in slot.markup
         assert '<div class="si-num">1</div>' in slot.markup
         assert '<div class="si-num">4</div>' in slot.markup
-        assert '<div class="si-label">需求分析</div>' in slot.markup
+        assert (
+            '<div class="si-label"><span data-lang="zh">需求分析</span>'
+            '<span data-lang="en">需求分析</span></div>'
+        ) in slot.markup
 
     def test_empty_items_render_an_explicit_empty_state(self):
         slot = render_slot(20, {'title': '没有数据'})
@@ -226,7 +244,10 @@ class TestDataChartSet:
         assert '--h:100;' in slot.markup
         assert '--h:50;' in slot.markup
         assert '--h:25;' in slot.markup
-        assert 'data-label="美国"' in slot.markup
+        assert (
+            '<span class="vc-label" data-lang="zh">美国</span>'
+            '<span class="vc-label" data-lang="en">美国</span>'
+        ) in slot.markup
         assert '<span class="vc-val">100</span>' in slot.markup
 
     def test_falls_back_to_the_first_series_when_items_are_absent(self):
@@ -235,8 +256,8 @@ class TestDataChartSet:
             'series': [{'name': 'S', 'values': [10, 20]}],
         })
         assert slot.markup.count('class="vc-bar"') == 2
-        assert 'data-label="1"' in slot.markup
-        assert 'data-label="2"' in slot.markup
+        assert 'data-lang="zh">1</span>' in slot.markup
+        assert 'data-lang="zh">2</span>' in slot.markup
         assert '--h:100;' in slot.markup
 
     def test_empty_data_renders_an_explicit_empty_state(self):
@@ -323,3 +344,93 @@ def test_labels_are_html_escaped(component_id):
     slot = render_slot(component_id, model)
     assert '<script>alert(1)</script>' not in slot.markup
     assert '&lt;script&gt;alert(1)&lt;/script&gt;' in slot.markup
+
+BILINGUAL_CHART_MODEL = {
+    'title': '市场规模',
+    'title_en': 'Market size',
+    'subtitle': '单位：亿美元',
+    'subtitle_en': 'USD 100m',
+    'items': [
+        {
+            'label': '美国', 'label_en': 'United States',
+            'value': 80, 'note': '来源：统计局', 'note_en': 'Source: statistics',
+            'accent': 'accent',
+        },
+        {'label': '中国', 'label_en': 'China', 'value': 40},
+    ],
+    'series': [
+        {'name': '纯电', 'name_en': 'BEV', 'values': [50, 30]},
+        {'name': '插混', 'name_en': 'PHEV', 'values': [30, 10]},
+    ],
+}
+
+
+@pytest.mark.parametrize('component_id', [4, 15, 19, 20, 24, 26])
+def test_chart_renderers_pair_english_text(component_id):
+    """A bilingual slot swapped to a chart must stay paired in both languages."""
+    slot = render_slot(component_id, BILINGUAL_CHART_MODEL)
+    assert slot.markup.count('data-lang="zh"') == slot.markup.count('data-lang="en"')
+    assert slot.markup.count('data-lang="en"') >= 1
+    assert 'United States' in slot.markup
+
+
+def test_bar_chart_pairs_the_item_label():
+    markup = render_slot(4, BILINGUAL_CHART_MODEL).markup
+    assert (
+        '<div class="bar-label"><span data-lang="zh">美国</span>'
+        '<span data-lang="en">United States</span></div>'
+    ) in markup
+
+
+def test_status_chain_pairs_label_and_note():
+    markup = render_slot(15, BILINGUAL_CHART_MODEL).markup
+    assert (
+        '<div class="sc-label"><span data-lang="zh">美国</span>'
+        '<span data-lang="en">United States</span></div>'
+    ) in markup
+    assert (
+        '<div class="sc-status"><span data-lang="zh">来源：统计局</span>'
+        '<span data-lang="en">Source: statistics</span></div>'
+    ) in markup
+
+
+def test_heatmap_pairs_column_and_row_labels():
+    markup = render_slot(19, BILINGUAL_CHART_MODEL).markup
+    assert (
+        '<div class="hm-hdr"><span data-lang="zh">美国</span>'
+        '<span data-lang="en">United States</span></div>'
+    ) in markup
+    assert (
+        '<div class="hm-label"><span data-lang="zh">纯电</span>'
+        '<span data-lang="en">BEV</span></div>'
+    ) in markup
+
+
+def test_step_indicator_pairs_the_label():
+    markup = render_slot(20, BILINGUAL_CHART_MODEL).markup
+    assert (
+        '<div class="si-label"><span data-lang="zh">美国</span>'
+        '<span data-lang="en">United States</span></div>'
+    ) in markup
+
+
+def test_chart_set_pairs_the_bar_label():
+    markup = render_slot(24, BILINGUAL_CHART_MODEL).markup
+    assert (
+        '<span class="vc-label" data-lang="zh">美国</span>'
+        '<span class="vc-label" data-lang="en">United States</span>'
+    ) in markup
+
+
+def test_echarts_carries_english_legend_and_subtitle():
+    markup = render_slot(26, BILINGUAL_CHART_MODEL).markup
+    assert '"name": "BEV"' in markup
+    assert '"subtext": "USD 100m"' in markup
+    assert '"subtext": "单位：亿美元"' in markup
+    assert '<p data-lang="en">' in markup
+
+
+@pytest.mark.parametrize('component_id, model', CHART_MODELS)
+def test_every_chart_section_has_an_aria_label(component_id, model):
+    slot = render_slot(component_id, model)
+    assert 'aria-label="' + model['title'] + '"' in slot.markup

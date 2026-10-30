@@ -68,3 +68,15 @@ class TestSyncTemplateStyles:
         with open(REPORT_STARTER_PATH, 'r', encoding='utf-8') as f:
             report_css = _get_css_without_header(f.read())
         assert starter_css == report_css
+
+    def test_slot_surface_is_styled_in_base_and_both_templates(self):
+        with open(CSS_PATH, 'r', encoding='utf-8') as f:
+            base_css = f.read()
+        for selector in ('.ic-slot', '.ic-empty', '.ic-static',
+                         '.ic-editing .ic-slot'):
+            assert selector in base_css, selector
+        for path in (STARTER_PATH, REPORT_STARTER_PATH):
+            with open(path, 'r', encoding='utf-8') as f:
+                inline = _get_style_inner(f.read())
+            for selector in ('.ic-slot', '.ic-empty', '.ic-static'):
+                assert selector in inline, (os.path.basename(path), selector)

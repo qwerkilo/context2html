@@ -727,6 +727,14 @@
       + '<span data-lang="en">' + escapeStructure(english) + '</span>';
   }
 
+  /* Chart-family twin of inlinePair: uses the slot escaper so a chart label
+   * escapes exactly like the rest of slots.py output (&#39;, not &#x27;). */
+  function inlinePairSlot(zh, en) {
+    var english = en || zh;
+    return '<span data-lang="zh">' + escapeSlot(zh) + '</span>'
+      + '<span data-lang="en">' + escapeSlot(english) + '</span>';
+  }
+
   function structureAccent(item, fallback) {
     if (STRUCTURE_COLOR.test(item.accent) && item.accent.indexOf('\n') < 0) {
       return item.accent;
@@ -757,7 +765,14 @@
     if (model.items.length) {
       return {
         entries: model.items.map(function (item) {
-          return { label: item.label, value: item.value, note: item.note, accent: item.accent };
+          return {
+            label: item.label,
+            value: item.value,
+            note: item.note,
+            accent: item.accent,
+            labelEn: item.label_en || '',
+            noteEn: item.note_en || ''
+          };
         }),
         field: 'items[{}].value'
       };
@@ -765,7 +780,14 @@
     if (model.series.length) {
       return {
         entries: model.series[0].values.map(function (value, index) {
-          return { label: String(index + 1), value: value, note: '', accent: '' };
+          return {
+            label: String(index + 1),
+            value: value,
+            note: '',
+            accent: '',
+            labelEn: '',
+            noteEn: ''
+          };
         }),
         field: 'series[0].values[{}]'
       };
@@ -796,7 +818,7 @@
     var rows = entries.map(function (entry, index) {
       var width = percent(entry.value, maximum);
       return '  <div class="bar-item">\n'
-        + '    <div class="bar-label">' + escapeSlot(entry.label) + '</div>\n'
+        + '    <div class="bar-label">' + inlinePairSlot(entry.label, entry.labelEn) + '</div>\n'
         + '    <div class="bar-track">\n'
         + '      <div class="bar-fill" style="width:' + formatPercent(width) + '%; '
         + 'background:' + accentCss(entry.accent, index) + ';">'
@@ -814,11 +836,13 @@
 
     var steps = entries.map(function (entry) {
       var status = entry.note
-        ? '\n    <div class="sc-status">' + escapeSlot(entry.note) + '</div>'
+        ? '\n    <div class="sc-status">'
+          + inlinePairSlot(entry.note, entry.noteEn) + '</div>'
         : '';
       return '  <div class="sc-step ' + progressState(entry.value) + '">\n'
         + '    <div class="sc-dot"></div>\n'
-        + '    <div class="sc-label">' + escapeSlot(entry.label) + '</div>' + status + '\n'
+        + '    <div class="sc-label">' + inlinePairSlot(entry.label, entry.labelEn)
+        + '</div>' + status + '\n'
         + '  </div>';
     });
     return section(15, slotId, model,
@@ -829,11 +853,12 @@
     var rows;
     if (model.series.length) {
       rows = model.series.map(function (series) {
-        return { name: series.name, values: series.values };
+        return { name: series.name, nameEn: series.name_en || '', values: series.values };
       });
     } else if (model.items.length) {
       rows = [{
         name: model.title,
+        nameEn: model.title_en || '',
         values: model.items.map(function (item) { return item.value; })
       }];
     } else {
@@ -846,10 +871,15 @@
     });
     if (width === 0) return section(19, slotId, model, EMPTY_SLOT);
 
-    var labels = model.items.map(function (item) { return item.label; });
-    if (!labels.length) {
+    var labels = model.items.map(function (item) {
+      return { zh: item.label, en: item.label_en || '' };
+    });
+    var positional = !labels.length;
+    if (positional) {
       labels = [];
-      for (var index = 0; index < width; index += 1) labels.push(String(index + 1));
+      for (var index = 0; index < width; index += 1) {
+        labels.push({ zh: String(index + 1), en: '' });
+      }
     }
 
     var numbers = [];
@@ -866,7 +896,10 @@
     var header = '    <div class="hm-row">\n'
       + '      <div class="hm-label"></div>\n'
       + labels.map(function (label) {
-        return '      <div class="hm-hdr">' + escapeSlot(label) + '</div>';
+        var inner = positional
+          ? escapeSlot(label.zh)
+          : inlinePairSlot(label.zh, label.en);
+        return '      <div class="hm-hdr">' + inner + '</div>';
       }).join('\n')
       + '\n    </div>';
 
@@ -877,7 +910,7 @@
           + escapeSlot(formatNumber(value)) + '</div>';
       }).join('\n');
       return '    <div class="hm-row">\n'
-        + '      <div class="hm-label">' + escapeSlot(row.name) + '</div>\n'
+        + '      <div class="hm-label">' + inlinePairSlot(row.name, row.nameEn) + '</div>\n'
         + cells + '\n'
         + '    </div>';
     });
@@ -893,7 +926,8 @@
     var steps = entries.map(function (entry, index) {
       return '  <div class="si-step ' + progressState(entry.value) + '">'
         + '<div class="si-num">' + (index + 1) + '</div>'
-        + '<div class="si-label">' + escapeSlot(entry.label) + '</div></div>';
+        + '<div class="si-label">' + inlinePairSlot(entry.label, entry.labelEn)
+        + '</div></div>';
     });
     return section(20, slotId, model,
       '  <div class="step-indicator">\n' + steps.join('\n') + '\n  </div>');
@@ -917,8 +951,10 @@
 
     var bars = entries.map(function (entry) {
       var height = percent(entry.value, maximum);
-      return '      <div class="vc-bar" style="--h:' + formatPercent(height) + ';" '
-        + 'data-label="' + escapeSlot(entry.label) + '">'
+      return '      <div class="vc-bar" style="--h:' + formatPercent(height) + ';">'
+        + '<span class="vc-label" data-lang="zh">' + escapeSlot(entry.label) + '</span>'
+        + '<span class="vc-label" data-lang="en">'
+        + escapeSlot(entry.labelEn || entry.label) + '</span>'
         + '<span class="vc-val">' + escapeSlot(formatNumber(entry.value)) + '</span></div>';
     });
     return section(24, slotId, model,
@@ -941,11 +977,21 @@
     return values;
   }
 
-  function echartsOption(model, meta) {
+  function pickText(zh, en, lang) {
+    return (lang === 'en' && en) ? en : zh;
+  }
+
+  function echartsOption(model, meta, lang) {
     var series = model.series.length
       ? model.series
-      : [{ name: model.title, values: valuesFromItems(model.items, meta) }];
-    var labels = model.items.map(function (item) { return item.label; });
+      : [{
+        name: model.title,
+        name_en: model.title_en || '',
+        values: valuesFromItems(model.items, meta)
+      }];
+    var labels = model.items.map(function (item) {
+      return pickText(item.label, item.label_en, lang);
+    });
     if (!labels.length) {
       var longest = 0;
       series.forEach(function (item) {
@@ -955,8 +1001,10 @@
       for (var index = 0; index < longest; index += 1) labels.push(String(index + 1));
     }
 
-    var title = { text: model.title };
-    if (model.subtitle) title.subtext = model.subtitle;
+    var title = { text: pickText(model.title, model.title_en, lang) };
+    if (model.subtitle) {
+      title.subtext = pickText(model.subtitle, model.subtitle_en, lang);
+    }
 
     var option = {
       title: title,
@@ -972,7 +1020,7 @@
       grid: { left: 60, right: 30, top: 60, bottom: 30 }
     };
     series.forEach(function (item, index) {
-      var entry = { name: item.name, type: 'bar' };
+      var entry = { name: pickText(item.name, item.name_en, lang), type: 'bar' };
       if (series.length > 1) entry.stack = 'total';
       entry.data = item.values;
       entry.itemStyle = { color: '@@GV_COLOR_' + index + '@@' };
@@ -994,7 +1042,11 @@
       return section(26, slotId, model, EMPTY_SLOT);
     }
 
-    var optionJs = stringifyJson(echartsOption(model, meta), {
+    var options = {
+      zh: echartsOption(model, meta, 'zh'),
+      en: echartsOption(model, meta, 'en')
+    };
+    var optionJs = stringifyJson(options, {
       sortKeys: false,
       indent: 2,
       meta: meta
@@ -1005,20 +1057,38 @@
       return '  ' + line;
     })).join('\n');
 
-    return '<section class="ic-slot" data-slot="' + slotId + '" data-'
-      + 'component="26">\n'
-      + '  <div class="ic-chart" '
+    var body = '  <div class="ic-chart" '
       + 'id="chart-' + slotId + '" style="width:100%;height:350px;margin:1rem 0;"></div>\n'
-      + '  <div class="no-js-fallback"><p>图表加载需要 JavaScript</p></div>\n'
-      + '</section>\n'
+      + '  <div class="no-js-fallback">\n'
+      + '    <p data-lang="zh">图表加载需要 JavaScript</p>\n'
+      + '    <p data-lang="en">This chart needs JavaScript</p>\n'
+      + '  </div>';
+
+    return section(26, slotId, model, body)
       + '<script>\n'
       + '(function () {\n'
       + '  var el = document.getElementById("chart-' + slotId + '");\n'
       + '  if (!el || typeof echarts === "undefined") return;\n'
       + '  function gv(n) { return getComputedStyle(document.documentElement)'
       + '.getPropertyValue(n).trim(); }\n'
+      + '  function readLang() {\n'
+      + '    try {\n'
+      + '      var saved = localStorage.getItem("lang");\n'
+      + '      if (saved === "zh" || saved === "en") return saved;\n'
+      + '    } catch (error) {}\n'
+      + '    var active = document.querySelector("[data-lang].active");\n'
+      + '    return active ? active.getAttribute("data-lang") : "zh";\n'
+      + '  }\n'
+      + '  var options = ' + optionJs + ';\n'
+      + '  var lang = readLang();\n'
       + '  var chart = echarts.init(el);\n'
-      + '  chart.setOption(' + optionJs + ');\n'
+      + '  chart.setOption(options[lang] || options.zh);\n'
+      + '  document.addEventListener("click", function () {\n'
+      + '    var next = readLang();\n'
+      + '    if (next === lang) return;\n'
+      + '    lang = next;\n'
+      + '    chart.setOption(options[lang] || options.zh, true);\n'
+      + '  });\n'
       + '})();\n'
       + '<\/script>';
   }
@@ -1027,8 +1097,18 @@
    * Structure family
    * ------------------------------------------------------------------ */
 
+  function requireItems(model, componentId) {
+    if (model.items.length) return true;
+    if (model.series.length) {
+      throw new ContentModelError(
+        'items',
+        'component ' + componentId + ' needs items; the model has series only');
+    }
+    return false;
+  }
+
   function renderDataCards(model, slotId) {
-    if (!model.items.length) return slot(12, slotId, EMPTY_STRUCTURE);
+    if (!requireItems(model, 12)) return slot(12, slotId, EMPTY_STRUCTURE);
 
     var cards = model.items.map(function (item) {
       var parts = ['<div class="dg-card" data-anim="fade-up">'];
@@ -1049,7 +1129,7 @@
   }
 
   function renderRoleCards(model, slotId) {
-    if (!model.items.length) return slot(2, slotId, EMPTY_STRUCTURE);
+    if (!requireItems(model, 2)) return slot(2, slotId, EMPTY_STRUCTURE);
 
     var palette = ['#3b82f6', '#f59e0b', '#ef4444', '#10b981'];
     var cards = model.items.map(function (item, index) {
@@ -1070,7 +1150,7 @@
   }
 
   function renderTimeline(model, slotId) {
-    if (!model.items.length) return slot(3, slotId, EMPTY_STRUCTURE);
+    if (!requireItems(model, 3)) return slot(3, slotId, EMPTY_STRUCTURE);
 
     var ordered = model.items.slice().sort(function (left, right) {
       return left.value - right.value;
@@ -1175,7 +1255,7 @@
   }
 
   function renderComparisonTable(model, slotId) {
-    if (!model.items.length) return slot(5, slotId, EMPTY_STRUCTURE);
+    if (!requireItems(model, 5)) return slot(5, slotId, EMPTY_STRUCTURE);
 
     var body = tableMarkup(model, 'cmp-table', '', false);
     if (model.subtitle) {
@@ -1185,7 +1265,7 @@
   }
 
   function renderComparisonTableEnhanced(model, slotId) {
-    if (!model.items.length) return slot(22, slotId, EMPTY_STRUCTURE);
+    if (!requireItems(model, 22)) return slot(22, slotId, EMPTY_STRUCTURE);
 
     var table = tableMarkup(
       model, 'cmp-table', ' data-sortable id="cmp-' + slotId + '"', true);
@@ -1235,7 +1315,7 @@
   }
 
   function renderTagGroup(model, slotId) {
-    if (!model.items.length) return slot(17, slotId, EMPTY_STRUCTURE);
+    if (!requireItems(model, 17)) return slot(17, slotId, EMPTY_STRUCTURE);
 
     var tags = model.items.map(function (item, index) {
       var classes = tagClass(item, index);
@@ -1248,7 +1328,7 @@
   }
 
   function renderCallouts(model, slotId) {
-    if (!model.items.length) return slot(18, slotId, EMPTY_STRUCTURE);
+    if (!requireItems(model, 18)) return slot(18, slotId, EMPTY_STRUCTURE);
 
     var bars = model.items.map(function (item) {
       var type = CALLOUT_TYPES[item.accent] || CALLOUT_TYPES.info;

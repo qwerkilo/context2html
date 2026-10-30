@@ -12,6 +12,8 @@ import shutil
 import subprocess
 import sys
 
+import pytest
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCRIPTS = os.path.dirname(os.path.abspath(__file__))
 FIXTURES = os.path.join(SCRIPTS, 'fixtures', 'golden')
@@ -147,3 +149,14 @@ class TestCanonicalJson:
         golden = parity.read_text(golden_path)
         assert '"value":3.0' in golden
         assert '13.0' in golden
+
+class TestRejectedData:
+    def test_node_renderer_rejects_series_only_data_for_an_items_component(self, tmp_path):
+        model_path = tmp_path / 'model.json'
+        model_path.write_text(json.dumps({
+            'title': 'T',
+            'series': [{'name': 'S', 'values': [1, 2]}],
+        }), encoding='utf-8')
+        with pytest.raises(parity.ParityError) as exc:
+            parity.render_node(2, str(model_path))
+        assert 'needs items' in str(exc.value)

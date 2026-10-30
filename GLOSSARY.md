@@ -34,6 +34,7 @@ _Avoid_: Plugin, extension, addon
 
 **CDN优先加载 (CDN-first Loading)**:
 All external libraries load from jsDelivr CDN first via `__loadLib()`, falling back to local `libs/` files on failure. The template's `__loadLib` function handles this transparently. Validator checks for both CDN presence and local fallback file existence. Second argument to `__loadLib` sets a custom fallback path (e.g. `'../theme/report-themes.css'` for generated reports).
+**Exception**: slot libraries (`libs/echarts.min.js`) bypass `__loadLib` and load with a synchronous `<script src>` before `</head>`. A slot's inline init script runs while the body parses; the CDN-first loader appends asynchronously and would lose the race. Only components actually rendered as slots contribute libraries, so an editable report with no slots loads none.
 _Avoid_: 直接 `<script src>`
 
 **模板CSS同步 (Template CSS Sync)**:
@@ -70,7 +71,11 @@ _Avoid_: Runtime bundle, client library
 
 **槽位输出 (Slot Output)**:
 The renderer mode that turns swappable components into component slots: rendered markup plus its JSON data block. Off by default — `TemplateRenderer.assemble(..., slots=None)` produces byte-identical output to a report generated before slots existed. When on, the caller passes `(component_id, model)` entries; the renderer emits each slot, merges that component's CSS/JS and loads its libraries synchronously in `<head>` so the inline init script can run. Only the 14 `content_model: true` components can be slots.
-_Avoid_: 可编辑报告, editable report
+_Avoid_: 组件输出, slot markup
+
+**可编辑报告 (Editable Report)**:
+A report produced by `TemplateRenderer.assemble(..., editable=True)`: `<html>` carries `data-editable="true"` and the three runtime layers are inlined, so the reader can enter edit mode and swap slots. Distinct from 槽位输出 (`slots=`), which only decides whether components are emitted as slots; `editable=True` adds the editor, `slots=` alone does not.
+_Avoid_: 可编辑 HTML, 交互报告
 
 **编辑模式 (Edit Mode)**:
 The browser-side state a reader enters by clicking the 「编辑」 toggle on an editable report. Slots are outlined and clickable, a click opens the candidate list, and a swap re-renders that one slot from its data block. Leaving edit mode restores the read-only appearance exactly. Distinct from 槽位输出: slots are what the generator writes, edit mode is what the reader operates.

@@ -78,8 +78,8 @@ html = renderer.assemble(
     editable=True,                     # optional; adds the in-browser edit mode
 )
 # Returns full HTML with components inserted, CSS merged, JS appended
-# editable=True inlines the editor runtime (~78 KB), merges CSS for all 14
-# swappable components and preloads ECharts, so any swap renders styled.
+# editable=True inlines the editor runtime (~93 KB), merges CSS for all 14
+# swappable components; only a slot that needs ECharts loads it synchronously.
 # The escape hatch is data-editable="true" on <html> — the runtime initialises
 # only when that flag is present.
 
@@ -122,10 +122,10 @@ slot.markup, slot.data_block, slot.fragment
 
 报告可以带上浏览器内微调能力。开启方式有两种：`TemplateRenderer.assemble(..., editable=True)`，或手动在 `<html>` 上加 `data-editable="true"`。运行时只在检测到该标记时初始化，否则一行脚本都不跑。
 
-- 顶部出现「编辑」开关；进入后插槽描边可点，点击弹出按数据过滤的候选列表，同族优先。
+- 顶部出现「编辑」开关；进入后插槽描边可点，点击弹出按数据过滤的候选列表，与当前组件同族优先。
 - 跨族互换先显示映射预览（显示什么、丢什么），确认后才替换；同族互换无信息损失，直接换。
 - 多步撤销（`Ctrl/Cmd+Z`）；保存下载一份完整 HTML，`file://` 下同样可用。
-- 运行时内联（约 78 KB），并合并 14 个可换组件的 CSS、预载 ECharts，否则换到 #26 会无样式或直接失效。可编辑报告体积约 136 KB，比普通报告大。
+- 运行时内联（约 93 KB），并合并 14 个可换组件的 CSS；只有实际用到 #26 的插槽才同步加载 ECharts。可编辑报告体积约 150 KB，比普通报告大。
 - 保存会剥掉编辑器自身的面板与提示节点，保留运行时与标记，所以交付的文件打开时是只读外观、但仍可再次编辑。
 
 ---

@@ -20,9 +20,9 @@
  *   savedFileName(title)         the download name derived from <title>
  *   savedHtml(html, options)     the whole pipeline: UI out, doctype in
  *
- * Family membership is the swap-cost heuristic from the spec: chart-family
- * renderers lead when the slot carries series, structure-family renderers lead
- * when it only carries items.
+ * Candidate order is the swap-cost heuristic from the spec: the current
+ * component's family leads, so the least lossy option comes first.  An
+ * unknown current id falls back to the slot's data shape (series → chart).
  */
 (function (root, factory) {
   'use strict';
@@ -40,10 +40,12 @@
 
   /* Descriptor fields:
    *   needsItems  renderer produces nothing meaningful without items
-   *   subtitle    renderer shows model.subtitle
+   *   subtitle    true | 'empty-only' | false — shows model.subtitle
    *   itemValue   true | false | 'no-series' | 'status' | 'order'
    *   series      'all' | 'first' | 'none'
    *   nonNegative bar renderers reject negative numbers
+   * Title consumption lives in TITLE_CONSUMPTION below: most renderers use
+   * the title only as an aria-label, so the mapping preview must not claim it.
    */
   var DESCRIPTORS = {
     2: {
@@ -78,7 +80,7 @@
     },
     13: {
       id: 13, name: '引用引文卡片', family: STRUCTURE,
-      needsItems: false, subtitle: true,
+      needsItems: false, subtitle: 'empty-only',
       itemLabel: true, itemValue: false, itemNote: true, itemAccent: false,
       series: 'none'
     },
@@ -133,6 +135,13 @@
   };
 
   var IDS = [2, 3, 4, 5, 12, 13, 15, 17, 18, 19, 20, 22, 24, 26];
+
+  /* Which components actually render the title.  Every other renderer only
+   * uses it as the section's aria-label, which is not "displayed" content. */
+  var TITLE_CONSUMPTION = {
+    13: 'empty-only',
+    26: true
+  };
 
   var LABELS = {
     title: '标题',
@@ -210,7 +219,9 @@
   }
 
   function candidatesFor(model, currentComponentId) {
-    var preferred = preferredFamily(model);
+    /* Story 9: lead with the current component's family so the least lossy
+     * swap is first.  An unknown current id falls back to the data shape. */
+    var preferred = familyOf(currentComponentId) || preferredFamily(model);
     var currentFamily = familyOf(currentComponentId);
     var candidates = [];
     IDS.forEach(function (componentId) {
@@ -256,11 +267,18 @@
   }
 
   function consumedFields(descriptor, model) {
-    var consumed = { title: true };
+    var consumed = {};
     var itemCount = items(model).length;
     var seriesCount = seriesValueCount(model);
 
-    if (descriptor.subtitle && model && model.subtitle) consumed.subtitle = true;
+    var titleUse = TITLE_CONSUMPTION[descriptor.id] || false;
+    if (titleUse === true) consumed.title = true;
+    else if (titleUse === 'empty-only' && !itemCount) consumed.title = true;
+
+    if (descriptor.subtitle && model && model.subtitle
+        && (descriptor.subtitle !== 'empty-only' || !itemCount)) {
+      consumed.subtitle = true;
+    }
     if (itemCount && descriptor.itemLabel) consumed.itemLabel = true;
     if (itemCount) {
       if (descriptor.itemValue === true) consumed.itemValue = true;

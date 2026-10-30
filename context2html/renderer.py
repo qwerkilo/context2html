@@ -74,9 +74,8 @@ class TemplateRenderer:
 
         html = _RE_THEME_ATTR.sub(f'data-theme="{theme_name}"', html)
 
-        if slot_specs or editable:
-            html = _insert_library_dependencies(
-                html, self._reg, slot_specs, editable=editable)
+        if slot_specs:
+            html = _insert_library_dependencies(html, self._reg, slot_specs)
 
         component_html_parts = []
         component_css_parts = []
@@ -143,21 +142,18 @@ def _reject_duplicate_slot_ids(rendered_slots):
         seen.add(slot.slot_id)
 
 
-def _insert_library_dependencies(html, registry, slot_specs, editable=False):
+def _insert_library_dependencies(html, registry, slot_specs):
     """Load each slot component's libraries synchronously before ``</head>``.
 
     The slot markup runs an inline init script while the body parses, so the
     library has to be there already; the template's CDN-first loader appends
-    asynchronously and would arrive too late.  An editable report can swap a
-    slot to any swappable component, so it loads every such dependency up
-    front (only ECharts has one).
+    asynchronously and would arrive too late.  Only components actually
+    rendered as slots contribute dependencies: an editable report with no
+    slots loads nothing, which keeps "mail one file" delivery honest.
     """
     tags = []
     seen = set()
     component_ids = [cid for cid, _, _ in slot_specs]
-    if editable:
-        component_ids.extend(
-            comp.id for comp in registry.list_components(content_model=True))
     for component_id in dict.fromkeys(component_ids):
         comps = registry.list_components(id=component_id)
         if not comps:

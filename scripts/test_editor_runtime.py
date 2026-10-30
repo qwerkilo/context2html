@@ -82,9 +82,19 @@ class TestEditableReport:
             css = self.r._reg.list_components(id=component_id)[0].css
             assert css in html, component_id
 
-    def test_editable_report_loads_echarts_for_a_later_swap(self):
+    def test_editable_report_without_slots_loads_no_chart_library(self):
         html = self.r.assemble('report-starter', [], 'warm', editable=True)
+        assert '<script src="libs/echarts.min.js"></script>' not in html
+
+    def test_editable_report_with_an_echarts_slot_loads_the_library(self):
+        html = self.r.assemble(
+            'report-starter', [], 'warm', slots=[(26, MODEL)], editable=True)
         assert '<script src="libs/echarts.min.js"></script>' in html
+
+    def test_editable_report_with_a_structure_slot_loads_no_chart_library(self):
+        html = self.r.assemble(
+            'report-starter', [], 'warm', slots=[(12, MODEL)], editable=True)
+        assert '<script src="libs/echarts.min.js"></script>' not in html
 
     def test_non_swappable_components_are_marked_for_the_hint(self):
         html = self.r.assemble('report-starter', [1], 'warm', editable=True)
