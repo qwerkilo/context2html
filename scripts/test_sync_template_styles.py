@@ -1,5 +1,5 @@
 """Tests for sync-template-styles.py."""
-import sys, os, re, importlib.util
+import os, re, importlib.util
 
 spec = importlib.util.spec_from_file_location(
     "sts", os.path.join(os.path.dirname(__file__), "sync-template-styles.py")

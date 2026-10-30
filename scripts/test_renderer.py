@@ -30,6 +30,20 @@ class TestTemplateRenderer:
         with pytest.raises(ValueError, match="Unknown template"):
             self.r.assemble('nonexistent', [], 'warm')
 
+    def test_assemble_rejects_theme_name_with_quotes(self):
+        import pytest
+        with pytest.raises(ValueError, match="Invalid theme name"):
+            self.r.assemble('starter', [], 'x" onload="alert(1)')
+
+    def test_assemble_rejects_theme_name_with_angle_bracket(self):
+        import pytest
+        with pytest.raises(ValueError, match="Invalid theme name"):
+            self.r.assemble('starter', [], '<script>')
+
+    def test_assemble_accepts_dotted_theme_name(self):
+        result = self.r.assemble('starter', [], 'x.ai')
+        assert 'data-theme="x.ai"' in result
+
     def test_assemble_unknown_component_skipped(self):
         result = self.r.assemble('starter', [999], 'warm')
         assert 'data-theme="warm"' in result

@@ -102,7 +102,11 @@ def main(argv):
 
     with open(GUIDE, 'w', encoding='utf-8', newline='\n') as fh:
         fh.write(updated)
-    print(f'[OK] Updated {os.path.relpath(GUIDE, ROOT)}')
+    try:
+        shown = os.path.relpath(GUIDE, ROOT)
+    except ValueError:  # different drives on Windows
+        shown = GUIDE
+    print(f'[OK] Updated {shown}')
     return 0
 
 

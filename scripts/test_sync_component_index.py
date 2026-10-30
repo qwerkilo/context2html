@@ -53,3 +53,21 @@ def test_replace_block_appends_when_absent():
 def test_description_strips_pipes():
     body = '> **🎯 效果**：a | b 效果'
     assert '\\|' in sci._description(body)
+
+
+def test_main_check_mode_passes_when_in_sync():
+    assert sci.main(['--check']) == 0
+
+
+def test_main_write_mode_is_idempotent():
+    assert sci.main([]) == 0
+
+
+def test_main_check_mode_detects_drift(tmp_path, monkeypatch):
+    guide = tmp_path / 'decision-guide.md'
+    guide.write_text('# Guide\n\n' + sci.START + '\n| stale |\n' + sci.END + '\n',
+                     encoding='utf-8')
+    monkeypatch.setattr(sci, 'GUIDE', str(guide))
+    assert sci.main(['--check']) == 1
+    assert sci.main([]) == 0
+    assert sci.main(['--check']) == 0

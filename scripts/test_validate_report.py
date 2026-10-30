@@ -1,4 +1,4 @@
-import sys, os, importlib.util
+import os, importlib.util
 spec = importlib.util.spec_from_file_location("vr", os.path.join(os.path.dirname(__file__), "validate-report.py"))
 vr = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(vr)
@@ -135,22 +135,36 @@ class TestSVG:
     def test_valid_svg_passes(self, tmp_path):
         (tmp_path / "chart-ok.svg").write_text(
             '<svg xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100"/></svg>')
-        assert not vr.check_svg_links(f'<html><img src="chart-ok.svg"/></html>', tmp_path)
+        assert not vr.check_svg_links('<html><img src="chart-ok.svg"/></html>', tmp_path)
     def test_missing_svg_fails(self, tmp_path):
         assert len(vr.check_svg_links('<html><img src="missing.svg"/></html>', tmp_path)) > 0
     def test_invalid_xml_fails(self, tmp_path):
         (tmp_path / "chart-bad.svg").write_text("not valid xml {{{")
-        assert len(vr.check_svg_links(f'<html><img src="chart-bad.svg"/></html>', tmp_path)) > 0
+        assert len(vr.check_svg_links('<html><img src="chart-bad.svg"/></html>', tmp_path)) > 0
     def test_mixed_valid_invalid_fails(self, tmp_path):
         (tmp_path / "chart-ok.svg").write_text(
             '<svg xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100"/></svg>')
         assert len(vr.check_svg_links(
-            f'<html><img src="chart-ok.svg"/><img src="missing.svg"/></html>', tmp_path)) > 0
+            '<html><img src="chart-ok.svg"/><img src="missing.svg"/></html>', tmp_path)) > 0
     def test_multiple_valid_passes(self, tmp_path):
         (tmp_path / "chart-ok.svg").write_text(
             '<svg xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100"/></svg>')
         assert not vr.check_svg_links(
-            f'<html><img src="chart-ok.svg"/><img src="chart-ok.svg"/></html>', tmp_path)
+            '<html><img src="chart-ok.svg"/><img src="chart-ok.svg"/></html>', tmp_path)
+    def test_path_traversal_is_rejected(self, tmp_path):
+        outside = tmp_path.parent / "outside.svg"
+        outside.write_text('<svg xmlns="http://www.w3.org/2000/svg"/>')
+        issues = vr.check_svg_links(
+            '<html><img src="../outside.svg"/></html>', tmp_path)
+        assert any('escapes' in i for i in issues), issues
+    def test_sibling_prefix_does_not_escape(self, tmp_path):
+        """A sibling dir sharing the base prefix must still count as outside."""
+        sibling = tmp_path.parent / (tmp_path.name + "_evil")
+        sibling.mkdir(exist_ok=True)
+        (sibling / "x.svg").write_text('<svg xmlns="http://www.w3.org/2000/svg"/>')
+        issues = vr.check_svg_links(
+            f'<html><img src="../{sibling.name}/x.svg"/></html>', tmp_path)
+        assert any('escapes' in i for i in issues), issues
 
 
 class TestFocusVisible:
@@ -243,11 +257,11 @@ class TestSVGContrast:
     def test_safe_colors_passes(self, tmp_path):
         (tmp_path / "safe.svg").write_text(
             '<svg><rect fill="#333" width="100"/><text fill="#fff">white on dark</text></svg>')
-        assert not vr.check_svg_contrast(f'<html><img src="safe.svg"/></html>', tmp_path)
+        assert not vr.check_svg_contrast('<html><img src="safe.svg"/></html>', tmp_path)
     def test_light_fill_white_text_fails(self, tmp_path):
         (tmp_path / "risky.svg").write_text(
             '<svg><rect fill="#fef2f2" width="100"/><text fill="#fff">white on light</text></svg>')
-        assert len(vr.check_svg_contrast(f'<html><img src="risky.svg"/></html>', tmp_path)) > 0
+        assert len(vr.check_svg_contrast('<html><img src="risky.svg"/></html>', tmp_path)) > 0
     def test_missing_file_no_crash(self, tmp_path):
         assert not vr.check_svg_contrast('<html><img src="noexist.svg"/></html>', tmp_path)
     def test_mixed_safe_risky_fails(self, tmp_path):
@@ -256,7 +270,7 @@ class TestSVGContrast:
         (tmp_path / "risky.svg").write_text(
             '<svg><rect fill="#fef2f2" width="100"/><text fill="#fff">white on light</text></svg>')
         assert len(vr.check_svg_contrast(
-            f'<html><img src="safe.svg"/><img src="risky.svg"/></html>', tmp_path)) > 0
+            '<html><img src="safe.svg"/><img src="risky.svg"/></html>', tmp_path)) > 0
 
 
 class TestLibDeps:
@@ -574,6 +588,20 @@ class TestD1EdgeCases:
         html = '<p data-lang="zh">短句。</p>'
         assert not vr.check_d1_sentence_length(html)
 
+    def test_ten_char_sentence_counts_as_short(self):
+        """Boundary: a 10-char sentence satisfies the "≤10 短句" rule."""
+        html = ('<p data-lang="zh">一二三四五六七八九。'
+                '这是一句长度中等的句子啊。这是另一句长度中等的句子。</p>')
+        issues = vr.check_d1_sentence_length(html)
+        assert not any('所有句子均为中等长度' in i for i in issues), issues
+
+    def test_eleven_char_sentence_does_not_count_as_short(self):
+        """Boundary: an 11-char sentence is no longer short."""
+        html = ('<p data-lang="zh">一二三四五六七八九十。'
+                '这是一句长度中等的句子啊。这是另一句长度中等的句子。</p>')
+        issues = vr.check_d1_sentence_length(html)
+        assert any('所有句子均为中等长度' in i for i in issues), issues
+
     def test_consecutive_short_sentences_fails(self):
         html = '<p data-lang="zh">今天天气很好。我很快乐。他很高兴。大家都很开心。</p>'
         assert len(vr.check_d1_sentence_length(html)) > 0
@@ -668,3 +696,31 @@ class TestD3InfoDensity:
         html = ('<p data-lang="zh">数字化转型非常重要。企业需要重视这方面的工作。</p>'
                 '<p data-lang="zh">行业整体呈现向好趋势。各方面都在稳步推进。</p>')
         assert len(vr.check_d3_info_density(html)) > 0
+
+
+class TestJsonOutput:
+    DEMO = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                        'examples', '0001-demo-report.html')
+
+    def test_result_to_dict_shape(self):
+        res = vr.ValidationResult(content_type='report')
+        res.checks.append(('a', []))
+        res.checks.append(('b', ['x']))
+        res.warnings.append(('w', []))
+        res.all_pass = False
+        d = vr.result_to_dict(res, 'x.html')
+        assert d['file'] == 'x.html'
+        assert d['content_type'] == 'report'
+        assert d['all_pass'] is False
+        assert d['summary'] == {'hard_checks': 2, 'hard_failed': 1,
+                                'warnings': 1, 'warnings_triggered': 0}
+        assert d['checks'][0]['pass'] is True
+        assert d['checks'][1] == {'label': 'b', 'pass': False, 'issues': ['x']}
+
+    def test_run_all_json_on_demo(self, capsys):
+        import json
+        vr.run_all(self.DEMO, as_json=True)
+        data = json.loads(capsys.readouterr().out)
+        assert data['all_pass'] is True
+        assert data['summary']['hard_checks'] == 22
+        assert data['summary']['warnings'] == 5

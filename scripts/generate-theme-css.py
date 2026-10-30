@@ -10,7 +10,6 @@ generate-theme-css.py — 从项目 theme/DESIGN.md 读取 YAML 设计 Token
 """
 
 import os
-import re
 import json
 import sys
 
@@ -61,7 +60,7 @@ def hex_to_rgba(hex_color, alpha=0.15):
     try:
         r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
         return f'rgba({r},{g},{b},{alpha})'
-    except:
+    except ValueError:
         return hex_color
 
 
@@ -99,7 +98,7 @@ def make_chart_colors(accent, colors):
             offset_g = min(255, max(0, g + (40 if n < 3 else -50)))
             offset_b = min(255, max(0, b + (60 if n == 1 else -20)))
             palette.append(f'rgb({offset_r},{offset_g},{offset_b})')
-        except:
+        except ValueError:
             palette.extend(['#5470c6', '#91cc75', '#fac858'])
             break
     result = palette[:4]
@@ -257,7 +256,7 @@ def is_dark(color):
     try:
         r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
         return (r * 0.299 + g * 0.587 + b * 0.114) < 128
-    except:
+    except ValueError:
         return False
 
 

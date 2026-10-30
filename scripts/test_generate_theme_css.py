@@ -1,4 +1,4 @@
-import sys, os, re, importlib.util
+import os, re, importlib.util
 spec = importlib.util.spec_from_file_location(
     "gc", os.path.join(os.path.dirname(__file__), "generate-theme-css.py"))
 gc = importlib.util.module_from_spec(spec)
@@ -137,6 +137,62 @@ class TestIsDark:
         assert gc.is_dark('#FFD700') == False
     def test_white_is_not_dark(self):
         assert gc.is_dark('#FFFFFF') == False
+    def test_short_hex_is_not_treated_as_dark(self):
+        # Documented behaviour: 3-char hex is not expanded, so it reads as light.
+        assert gc.is_dark('#000') == False
+    def test_invalid_hex_returns_false(self):
+        assert gc.is_dark('#zzzzzz') == False
+
+
+class TestMainAndIndex:
+    def _theme(self, name, accent='#123456', bg='#ffffff'):
+        return {'name': name, 'accent': accent, 'bg': bg, 'font': 'X Sans',
+                'radius': '8px', 'has_dark_bg': False}
+
+    def test_generate_markdown_index_writes_file(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(gc, 'PROJECT_DIR', str(tmp_path))
+        (tmp_path / 'theme').mkdir()
+        gc.generate_markdown_index([self._theme('warm'), self._theme('custom')])
+        text = (tmp_path / 'theme' / 'theme-index.md').read_text(encoding='utf-8')
+        assert '共 2 个主题' in text
+        assert '| `warm` |' in text
+        assert '通用报告' in text
+
+    def test_main_writes_css_json_and_markdown(self, tmp_path, monkeypatch):
+        import json
+        theme_dir = tmp_path / 'themes'
+        (theme_dir / 'ok').mkdir(parents=True)
+        (theme_dir / 'ok' / 'DESIGN.md').write_text(
+            "---\ncolors:\n  primary: '#ff0000'\n  bg: '#ffffff'\n---\n",
+            encoding='utf-8')
+        (theme_dir / 'nodoc').mkdir()
+        monkeypatch.setattr(gc, 'THEME_DIR', str(theme_dir))
+        monkeypatch.setattr(gc, 'PROJECT_DIR', str(tmp_path))
+        monkeypatch.setattr(gc, 'OUTPUT_CSS', str(tmp_path / 'out.css'))
+        monkeypatch.setattr(gc, 'OUTPUT_JSON', str(tmp_path / 'out.json'))
+
+        gc.main()
+
+        assert (tmp_path / 'out.css').exists()
+        data = json.loads((tmp_path / 'out.json').read_text(encoding='utf-8'))
+        assert [t['name'] for t in data] == ['warm', 'ok']
+        assert (tmp_path / 'theme' / 'theme-index.md').exists()
+
+    def test_main_handles_manual_theme_without_front_matter(self, tmp_path, monkeypatch):
+        import json
+        theme_dir = tmp_path / 'themes'
+        (theme_dir / 'spotify').mkdir(parents=True)
+        (theme_dir / 'spotify' / 'DESIGN.md').write_text(
+            "no front matter\n", encoding='utf-8')
+        monkeypatch.setattr(gc, 'THEME_DIR', str(theme_dir))
+        monkeypatch.setattr(gc, 'PROJECT_DIR', str(tmp_path))
+        monkeypatch.setattr(gc, 'OUTPUT_CSS', str(tmp_path / 'out.css'))
+        monkeypatch.setattr(gc, 'OUTPUT_JSON', str(tmp_path / 'out.json'))
+
+        gc.main()
+
+        data = json.loads((tmp_path / 'out.json').read_text(encoding='utf-8'))
+        assert [t['name'] for t in data] == ['warm', 'spotify']
 
 class TestGenerateThemeCss:
     def test_generates_valid_css(self, tmp_path):

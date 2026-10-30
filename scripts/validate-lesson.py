@@ -58,9 +58,10 @@ def check_quiz_correct_count(html):
         if langs:
             langs = set(langs)
             for lang in langs:
+                safe_lang = re.escape(lang)
                 corrects = re.findall(
-                    r'data-correct="true"[^>]*data-lang="' + lang + r'"|'
-                    r'data-lang="' + lang + r'"[^>]*data-correct="true"', q
+                    r'data-correct="true"[^>]*data-lang="' + safe_lang + r'"|'
+                    r'data-lang="' + safe_lang + r'"[^>]*data-correct="true"', q
                 )
                 if len(corrects) != 1:
                     issues.append(f"Quiz Q{i} ({lang}): {len(corrects)} correct answers (expected 1)")
@@ -91,9 +92,10 @@ def check_quiz_completeness(html):
         if langs:
             langs = set(langs)
             for lang in langs:
+                safe_lang = re.escape(lang)
                 lang_opts = re.findall(
-                    r'class="[^"]*quiz-option[^"]*"[^>]*data-lang="' + lang + r'"|'
-                    r'data-lang="' + lang + r'"[^>]*class="[^"]*quiz-option[^"]*"', q
+                    r'class="[^"]*quiz-option[^"]*"[^>]*data-lang="' + safe_lang + r'"|'
+                    r'data-lang="' + safe_lang + r'"[^>]*class="[^"]*quiz-option[^"]*"', q
                 )
                 if len(lang_opts) != 3:
                     issues.append(f"Quiz Q{i} ({lang}): {len(lang_opts)} options (expected 3)")
@@ -211,8 +213,8 @@ def check_spa_integration(html, path):
             if sid in ids:
                 issues.append(f"Duplicate section id=\"lesson-{sid}\"")
             ids.append(sid)
-        if f'</section>' not in html:
-            issues.append(f"Missing closing </section>")
+        if '</section>' not in html:
+            issues.append("Missing closing </section>")
         return issues
 
     if "graphdata" in html.lower():

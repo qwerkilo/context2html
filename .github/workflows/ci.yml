@@ -10,8 +10,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.12"]
+        python-version: ["3.12", "3.13", "3.14"]
 
     steps:
       - uses: actions/checkout@v4
@@ -31,3 +32,12 @@ jobs:
 
       - name: Validate context2html package
         run: python -c "from context2html.theme import THEME_NAMES; print(str(len(THEME_NAMES)) + ' themes loaded')"
+
+      - name: Validate demo report
+        run: python scripts/validate-report.py examples/0001-demo-report.html
+
+      - name: Check generated artifacts are in sync
+        run: |
+          python scripts/sync-component-index.py --check
+          python scripts/generate-theme-css.py
+          git diff --exit-code theme/

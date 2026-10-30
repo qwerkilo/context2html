@@ -23,6 +23,7 @@ _RE_JS_ZONE = re.compile(
     r'<!-- INSERT: 从 components/NN-name\.md 复制 JS 到这里（可追加在下方） -->'
 )
 _RE_THEME_ATTR = re.compile(r'data-theme="[^"]*"')
+_RE_THEME_NAME = re.compile(r'[A-Za-z0-9._-]+')
 
 
 class TemplateRenderer:
@@ -34,6 +35,11 @@ class TemplateRenderer:
         template_file = _TEMPLATE_MAP.get(template_name)
         if not template_file:
             raise ValueError(f"Unknown template: {template_name}. Use: {', '.join(_TEMPLATE_MAP.keys())}")
+
+        if not _RE_THEME_NAME.fullmatch(theme_name):
+            raise ValueError(
+                f"Invalid theme name: {theme_name!r} "
+                "(expected letters, digits, dot, underscore or hyphen)")
 
         tpl_path = os.path.join(self._templates_dir, template_file)
         if not os.path.exists(tpl_path):

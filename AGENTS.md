@@ -11,7 +11,7 @@ A Python framework package (`context2html/`) provides programmatic access: `Comp
 ## Commands
 
 ```bash
-# All 461 tests
+# All 479 tests
 python -m pytest scripts/ -v --tb=short
 
 # Single test file
@@ -62,6 +62,7 @@ Use for: multi-step report structure planning (Step 1 → Step 2 → Step 2.5 or
 - **`ComponentRegistry.get_component()` removed** — use `list_components(id=26)` which returns a list (empty if not found).
 - **Validator in framework package** — `from context2html.validator import check_h1_count, check_bilingual, ...` works directly.
 - **Framework package tests** — `test_registry.py`, `test_renderer.py`, `test_theme.py` use direct imports (`from context2html.xxx import ...`). Other tests still use `importlib`.
+- **mutmut does not run on native Windows** — it exits with "please use the WSL". Use WSL, or run the 5-mutant smoke script pattern instead (apply mutation → run targeted pytest → restore).
 
 ## Domain docs
 

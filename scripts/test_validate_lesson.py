@@ -1,4 +1,4 @@
-import sys, os, importlib.util
+import os, importlib.util
 spec = importlib.util.spec_from_file_location("vl", os.path.join(os.path.dirname(__file__), "validate-lesson.py"))
 vl = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(vl)
@@ -24,6 +24,18 @@ class TestRelativeLinks:
 
 
 class TestQuizCorrectCount:
+    def test_regex_metacharacters_in_lang_are_escaped(self):
+        """A crafted data-lang must not act as regex syntax."""
+        html = ('<div class="quiz-question">'
+                '<button data-correct="true" data-lang="zh">A</button>'
+                '<button data-correct="false" data-lang="zh">B</button>'
+                '<button data-correct="true" data-lang="zh|en">A</button>'
+                '</div>')
+        issues = vl.check_quiz_correct_count(html)
+        # "zh|en" is a literal lang here, so it has exactly one correct answer
+        # and must not be reported; the old unescaped pattern matched both.
+        assert not any('zh|en' in i and 'correct answers' in i for i in issues)
+
     def test_single_correct_passes(self):
         assert not vl.check_quiz_correct_count(
             '<div class="quiz-question"><button data-correct="true">A</button>'
