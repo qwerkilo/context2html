@@ -7,6 +7,7 @@ compat_types:
 - article
 - tutorial
 requires_3d: false
+content_model: true
 ---
 
 ### 3. CSS 时间线（替换事件表格）

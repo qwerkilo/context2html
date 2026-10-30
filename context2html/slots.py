@@ -6,8 +6,9 @@ stable ``data-slot`` id and a ``data-component`` id; a sibling
 model that produced the markup.  Both come from the same call so they cannot
 drift apart.
 
-Only component #26 (ECharts interactive chart kit) is implemented here; the
-remaining swappable components join ``_RENDERERS`` as they gain a renderer.
+Only component #26 (ECharts interactive chart kit) plus the eight
+structure-family components are implemented here; the remaining swappable
+components join ``_RENDERERS`` as they gain a renderer.
 """
 
 import hashlib
@@ -20,6 +21,7 @@ from context2html.content_model import (
     ContentSeries,
     validate_content_model,
 )
+from context2html.structure import STRUCTURE_RENDERERS
 
 _SLOT_ID = re.compile(r'[A-Za-z0-9][A-Za-z0-9._:-]*')
 _COLOR_VARS = (
@@ -168,4 +170,5 @@ def _substitute_colors(option_js):
 
 _RENDERERS = {
     26: _render_echarts,
+    **STRUCTURE_RENDERERS,
 }

@@ -68,6 +68,35 @@ MUTANTS = [
         '                safe_lang = lang',
         'scripts/test_validate_lesson.py',
     ),
+    (
+        'structure: empty state body emptied',
+        'context2html/structure.py',
+        '        \'<p class="ic-empty" data-lang="zh">暂无数据</p>\'\n'
+        '        \'<p class="ic-empty" data-lang="en">No data</p>\'',
+        '        \'\'',
+        'scripts/test_structure.py',
+    ),
+    (
+        'structure: model text escaping removed',
+        'context2html/structure.py',
+        '    return html.escape(str(value), quote=True)',
+        '    return str(value)',
+        'scripts/test_structure.py',
+    ),
+    (
+        'structure: unsafe accent accepted',
+        'context2html/structure.py',
+        '    if _SAFE_COLOR.fullmatch(item.accent):',
+        '    if item.accent:',
+        'scripts/test_structure.py',
+    ),
+    (
+        'structure: bilingual fallback disabled',
+        'context2html/structure.py',
+        '    en = en or zh',
+        '    en = en',
+        'scripts/test_structure.py',
+    ),
 ]
 
 

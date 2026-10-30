@@ -11,6 +11,14 @@ Every swappable visual component consumes this normalized shape::
 
 Components read the fields they need and ignore the rest.  ``title`` is the
 only required field; everything else defaults to an empty value.
+
+Every human-readable field has an optional English counterpart (``title_en``,
+``label_en``, ``note_en``, ``name_en``, ...).  A component that emits body text
+emits the Chinese and the English version as a ``data-lang`` pair, so the
+bilingual check stays balanced after a component swap.  When the counterpart
+is absent the renderer falls back to the Chinese text rather than emitting an
+empty block; empty counterparts are left out of ``to_dict()`` so a
+single-language model keeps its original canonical form.
 """
 
 from dataclasses import dataclass
@@ -32,12 +40,15 @@ class ContentItem:
     value: int | float
     note: str = ''
     accent: str = ''
+    label_en: str = ''
+    note_en: str = ''
 
 
 @dataclass(frozen=True)
 class ContentSeries:
     name: str
     values: tuple[int | float, ...]
+    name_en: str = ''
 
 
 @dataclass(frozen=True)
@@ -46,26 +57,51 @@ class ContentModel:
     subtitle: str = ''
     items: tuple[ContentItem, ...] = ()
     series: tuple[ContentSeries, ...] = ()
+    title_en: str = ''
+    subtitle_en: str = ''
 
     def to_dict(self):
         """Return the canonical plain-data form (what a data block stores)."""
-        return {
+        data = {
             'title': self.title,
             'subtitle': self.subtitle,
             'items': [
-                {
+                _drop_empty({
                     'label': item.label,
                     'value': item.value,
                     'note': item.note,
                     'accent': item.accent,
-                }
+                    'label_en': item.label_en,
+                    'note_en': item.note_en,
+                })
                 for item in self.items
             ],
             'series': [
-                {'name': series.name, 'values': list(series.values)}
+                _drop_empty({
+                    'name': series.name,
+                    'values': list(series.values),
+                    'name_en': series.name_en,
+                })
                 for series in self.series
             ],
         }
+        return _drop_empty({
+            'title': self.title,
+            'subtitle': self.subtitle,
+            'title_en': self.title_en,
+            'subtitle_en': self.subtitle_en,
+            'items': data['items'],
+            'series': data['series'],
+        })
+
+
+def _drop_empty(mapping):
+    """Drop empty English counterparts; keep every other key, empty or not."""
+    return {
+        key: value
+        for key, value in mapping.items()
+        if not (key.endswith('_en') and value == '')
+    }
 
 
 def _field(path, key):
@@ -135,6 +171,8 @@ def validate_content_model(data):
 
     title = _require_string(data, 'title', '')
     subtitle = _optional_string(data, 'subtitle', '')
+    title_en = _optional_string(data, 'title_en', '')
+    subtitle_en = _optional_string(data, 'subtitle_en', '')
     raw_items = _optional_list(data, 'items', '')
     raw_series = _optional_list(data, 'series', '')
 
@@ -148,6 +186,8 @@ def validate_content_model(data):
             value=_require_number(raw, 'value', path),
             note=_optional_string(raw, 'note', path),
             accent=_optional_string(raw, 'accent', path),
+            label_en=_optional_string(raw, 'label_en', path),
+            note_en=_optional_string(raw, 'note_en', path),
         ))
 
     series = []
@@ -165,11 +205,17 @@ def validate_content_model(data):
             raise ContentModelError(
                 f'{path}values',
                 f'expected {len(items)} values to match items, got {len(values)}')
-        series.append(ContentSeries(name=name, values=values))
+        series.append(ContentSeries(
+            name=name,
+            values=values,
+            name_en=_optional_string(raw, 'name_en', path),
+        ))
 
     return ContentModel(
         title=title,
         subtitle=subtitle,
         items=tuple(items),
         series=tuple(series),
+        title_en=title_en,
+        subtitle_en=subtitle_en,
     )
