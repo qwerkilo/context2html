@@ -136,6 +136,16 @@
 
   var IDS = [2, 3, 4, 5, 12, 13, 15, 17, 18, 19, 20, 22, 24, 26];
 
+  /* Only #26 renders through a third-party library; the other thirteen are
+   * pure markup.  `global` is the name the library installs on globalThis. */
+  var LIBRARIES = {
+    26: { name: 'echarts.min.js', global: 'echarts' }
+  };
+
+  function libraryFor(componentId) {
+    return LIBRARIES[componentId] || null;
+  }
+
   /* Which components actually render the title.  Every other renderer only
    * uses it as the section's aria-label, which is not "displayed" content. */
   var TITLE_CONSUMPTION = {
@@ -391,6 +401,52 @@
 
   function isEditableFlag(value) {
     return value === 'true' || value === '';
+  }
+
+  /* ------------------------------------------------------------------ *
+   * Swap orchestration
+   *
+   * A swap may need a library the report does not carry.  Only the browser
+   * can fetch it, so the effects arrive as injected functions and the
+   * decision stays testable under node:
+   *
+   *   hasLibrary(library)             is the global already defined?
+   *   loadLibrary(library)            CDN-first load, resolves when ready
+   *   render(componentId, model, id)  SlotRuntime.renderSlot
+   *   commit(rendered)                put the markup into the document
+   *
+   * A failed load commits a readable failure state instead of an empty
+   * chart.  A render failure is not a load failure, so it propagates.
+   * ------------------------------------------------------------------ */
+
+  function swapSlot(options) {
+    var settings = options || {};
+    var library = libraryFor(settings.componentId);
+
+    function render() {
+      var rendered = settings.render(
+        settings.componentId, settings.model, settings.slotId);
+      settings.commit(rendered);
+      return {
+        status: 'rendered',
+        library: library ? library.name : null
+      };
+    }
+
+    if (!library || settings.hasLibrary(library)) {
+      return Promise.resolve().then(render);
+    }
+    return Promise.resolve()
+      .then(function () { return settings.loadLibrary(library); })
+      .then(render, function () {
+        settings.commit(failureMarkup(settings));
+        return { status: 'failed', library: library.name };
+      });
+  }
+
+  function failureMarkup(settings) {
+    return slotRuntime().renderLibraryFailure(
+      settings.componentId, settings.model, settings.slotId);
   }
 
   /* ------------------------------------------------------------------ *
@@ -748,6 +804,8 @@
     savedFileName: savedFileName,
     savedHtml: savedHtml,
     familyOf: familyOf,
+    libraryFor: libraryFor,
+    swapSlot: swapSlot,
     componentIds: IDS.slice()
   };
 }));

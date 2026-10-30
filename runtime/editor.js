@@ -238,9 +238,41 @@
     if (instance) instance.dispose();
   }
 
-  function replaceSlot(slot, componentId, model) {
-    var slotId = slot.getAttribute('data-slot');
-    var rendered = runtime.renderSlot(componentId, model, slotId);
+  function hasLibrary(library) {
+    return typeof globalThis !== 'undefined'
+      && typeof globalThis[library.global] !== 'undefined';
+  }
+
+  /* The template's loader is CDN-first with a local libs/ fallback.  It
+   * resolves once either copy has run; a report saved before the loader
+   * returned a promise resolves at once, so verify the global appeared. */
+  function loadLibrary(library) {
+    var loader = typeof globalThis !== 'undefined' ? globalThis.__loadLib : null;
+    if (typeof loader !== 'function') {
+      return Promise.reject(new Error('no library loader'));
+    }
+    return Promise.resolve(loader(library.name)).then(function () {
+      if (!hasLibrary(library)) {
+        throw new Error(library.name + ' did not load');
+      }
+    });
+  }
+
+  function swapInto(slot, model, componentId) {
+    return core.swapSlot({
+      componentId: componentId,
+      model: model,
+      slotId: slot.getAttribute('data-slot'),
+      hasLibrary: hasLibrary,
+      loadLibrary: loadLibrary,
+      render: runtime.renderSlot,
+      commit: function (rendered) {
+        if (slot.isConnected) replaceSlot(slot, rendered);
+      }
+    });
+  }
+
+  function replaceSlot(slot, rendered) {
     disposeChart(slot);
     removeSlotScripts(slot);
 
@@ -289,14 +321,19 @@
     }
     var slotId = slot.getAttribute('data-slot');
     var fromId = Number(slot.getAttribute('data-component'));
-    replaceSlot(slot, componentId, model);
-    state.history = core.recordPatch(state.history, {
-      slotId: slotId,
-      from: fromId,
-      to: componentId
-    });
-    updateUndo();
-    closePanel();
+    swapInto(slot, model, componentId).then(function () {
+      if (!slot.isConnected) {
+        closePanel();
+        return;
+      }
+      state.history = core.recordPatch(state.history, {
+        slotId: slotId,
+        from: fromId,
+        to: componentId
+      });
+      updateUndo();
+      closePanel();
+    }, closePanel);
   }
 
   function undoLast() {
@@ -309,11 +346,16 @@
     var patch = result.patch;
     var slot = doc.querySelector('.ic-slot[data-slot="' + patch.slotId + '"]');
     if (!slot) return;
+    var model;
     try {
-      replaceSlot(slot, patch.from, readModel(slot));
+      model = readModel(slot);
     } catch (error) {
       /* A missing data block means the report was hand-edited; leave it alone. */
+      return;
     }
+    /* Undo goes through the same loader: the component being restored may
+     * need a library the report never shipped. */
+    swapInto(slot, model, patch.from).catch(function () {});
   }
 
   function closePanel() {

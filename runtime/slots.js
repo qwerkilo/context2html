@@ -708,6 +708,25 @@
       + body + '\n</section>\n';
   }
 
+  /* A swap can land on #26 in a report that ships no ECharts.  The editor
+   * loads the library first; when that fails, the slot shows this instead of
+   * an empty chart. */
+  var LIBRARY_FAILURE = '<div class="ic-empty" role="alert">'
+    + '<span data-lang="zh">ECharts 图表库加载失败，无法显示该组件。'
+    + '检查网络后撤销并重试。</span>'
+    + '<span data-lang="en">The ECharts library failed to load, so this '
+    + 'component cannot render. Check your connection, then undo and try '
+    + 'again.</span>'
+    + '</div>';
+
+  function renderLibraryFailure(componentId, model, slotId) {
+    return {
+      slotId: slotId,
+      componentId: componentId,
+      markup: section(componentId, slotId, model, LIBRARY_FAILURE)
+    };
+  }
+
   function slot(componentId, slotId, body) {
     return '<section class="ic-slot" data-slot="' + slotId + '" '
       + 'data-' + 'component="' + componentId + '">\n'
@@ -1417,6 +1436,7 @@
   return {
     renderSlot: renderSlot,
     renderMarkup: renderMarkup,
+    renderLibraryFailure: renderLibraryFailure,
     parseModel: parseModel,
     parseContentModel: parseModel,
     canonicalJson: canonicalJson,

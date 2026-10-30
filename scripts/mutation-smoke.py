@@ -201,6 +201,13 @@ MUTANTS = [
         '    component_ids = [comp.id for comp in registry.list_components(content_model=True)]',
         'scripts/test_editor_runtime.py',
     ),
+    (
+        'editor: swap skips the on-demand library load',
+        'runtime/editor-core.js',
+        '    if (!library || settings.hasLibrary(library)) {',
+        '    if (true) {',
+        'scripts/test_editor_library.py',
+    ),
 ]
 
 
