@@ -18,12 +18,9 @@ _TEMPLATE_MAP = {
 _CSS_ZONE_MARKER = (
     r'INSERT: 从 components/NN-name\.md 复制 CSS 到这里（组件 CSS 可追加在下方）'
 )
-_RE_CSS_ZONE = re.compile(rf'<!-- {_CSS_ZONE_MARKER} -->')
-# The shipped templates mark the CSS insertion point with a CSS comment, which
-# _RE_CSS_ZONE never matched.  Slot output inserts CSS through this pattern so a
-# generated editable report carries the component styles it needs; slot output
-# off stays byte-identical to the historical behaviour.
-_RE_CSS_ZONE_SLOT = re.compile(rf'<!-- {_CSS_ZONE_MARKER} -->|/\* {_CSS_ZONE_MARKER} \*/')
+# The shipped templates mark the CSS insertion point with a CSS comment. The
+# HTML-comment form is still accepted because hand-edited reports use it.
+_RE_CSS_ZONE = re.compile(rf'<!-- {_CSS_ZONE_MARKER} -->|/\* {_CSS_ZONE_MARKER} \*/')
 _RE_HTML_ZONE = re.compile(
     r'<!-- INSERT: 视觉组件 HTML -->'
 )
@@ -109,8 +106,7 @@ class TemplateRenderer:
                     component_css_parts.append(comp.css)
 
         if component_css_parts:
-            css_zone = _RE_CSS_ZONE_SLOT if (slot_specs or editable) else _RE_CSS_ZONE
-            html = css_zone.sub(
+            html = _RE_CSS_ZONE.sub(
                 _make_inserter('\n'.join(component_css_parts) + '\n'), html, count=1
             )
 

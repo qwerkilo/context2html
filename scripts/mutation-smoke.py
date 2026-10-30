@@ -15,200 +15,35 @@ Each entry is (label, file, original snippet, mutated snippet, test file). The
 snippets must appear verbatim; a missing snippet is reported as STALE rather
 than silently skipped, because a refactor that moves the code invalidates the
 mutant.
+
+Entries live in `scripts/mutants/<area>.py`, one module per area. Parallel work
+on different areas appends to different files, so two implementers never edit
+the same list.
 """
 
+import importlib
 import io
 import os
+import pkgutil
 import subprocess
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+MUTANTS_DIR = os.path.join(ROOT, 'scripts', 'mutants')
 
-MUTANTS = [
-    (
-        'relative-links: absolute check narrowed to "//"',
-        'context2html/validator/common.py',
-        'if href.startswith("/") or href.startswith("http"):',
-        'if href.startswith("//") or href.startswith("http"):',
-        'scripts/test_validate_report.py',
-    ),
-    (
-        'svg containment: escape guard disabled',
-        'context2html/validator/svg.py',
-        '        if os.path.commonpath([base, path]) != base:',
-        '        if False:',
-        'scripts/test_validate_report.py',
-    ),
-    (
-        'D1 short-sentence threshold 10 -> 1',
-        'context2html/validator/report.py',
-        'has_short = any(n <= 10 for n in lengths)',
-        'has_short = any(n <= 1 for n in lengths)',
-        'scripts/test_validate_report.py',
-    ),
-    (
-        'renderer theme-name whitelist removed',
-        'context2html/renderer.py',
-        '        if not _RE_THEME_NAME.fullmatch(theme_name):',
-        '        if False:',
-        'scripts/test_renderer.py',
-    ),
-    (
-        'slot data blocks: missing-block issue suppressed',
-        'context2html/validator/slots.py',
-        '            issues.append(\n'
-        '                f"Slot \'{slot_id}\' (component {component_id}) has no matching data block")',
-        '            pass',
-        'scripts/test_validate_slots.py',
-    ),
-    (
-        'bar chart: empty-state guard disabled',
-        'context2html/slots.py',
-        '    entries, field = _item_entries(model)\n'
-        '    if entries is None:\n'
-        '        return _section(4, slot_id, model, _empty_state())',
-        '    entries, field = _item_entries(model)\n'
-        '    if False:\n'
-        '        return _section(4, slot_id, model, _empty_state())',
-        'scripts/test_chart_slots.py',
-    ),
-    (
-        'registry: content_model flag ignored',
-        'context2html/registry.py',
-        "            content_model=bool(d.get('content_model', False)),",
-        '            content_model=False,',
-        'scripts/test_registry.py',
-    ),
-    (
-        'lesson lang escaping removed',
-        'scripts/validate-lesson.py',
-        '                safe_lang = re.escape(lang)',
-        '                safe_lang = lang',
-        'scripts/test_validate_lesson.py',
-    ),
-    (
-        'structure: empty state body emptied',
-        'context2html/structure.py',
-        '        \'<p class="ic-empty" data-lang="zh">暂无数据</p>\'\n'
-        '        \'<p class="ic-empty" data-lang="en">No data</p>\'',
-        '        \'\'',
-        'scripts/test_structure.py',
-    ),
-    (
-        'structure: model text escaping removed',
-        'context2html/structure.py',
-        '    return html.escape(str(value), quote=True)',
-        '    return str(value)',
-        'scripts/test_structure.py',
-    ),
-    (
-        'structure: unsafe accent accepted',
-        'context2html/structure.py',
-        '    if _SAFE_COLOR.fullmatch(item.accent):',
-        '    if item.accent:',
-        'scripts/test_structure.py',
-    ),
-    (
-        'structure: bilingual fallback disabled',
-        'context2html/structure.py',
-        '    en = en or zh',
-        '    en = en',
-        'scripts/test_structure.py',
-    ),
-    (
-        'renderer: slot components also insert their demo markup',
-        'context2html/renderer.py',
-        '            if comp.html and cid not in slot_component_ids:',
-        '            if comp.html:',
-        'scripts/test_renderer.py',
-    ),
-    (
-        'parity: missing-fixture guard disabled',
-        'scripts/check-js-parity.py',
-        '    if missing:\n'
-        '        return [\n'
-        "            f'{component_label(component_id)}: missing golden fixture: '\n"
-        "            + ', '.join(missing)\n"
-        '        ]',
-        '    if False:\n'
-        '        return []',
-        'scripts/test_js_parity.py',
-    ),
-    (
-        'runtime: script-closer escaping disabled',
-        'runtime/slots.js',
-        "      .split('</').join('<\\\\/')",
-        "      .split('</').join('</')",
-        'scripts/test_js_parity.py',
-    ),
-    (
-        'save: editor UI stripping disabled',
-        'runtime/editor-core.js',
-        '      if (!tag.closing && hasEditorUiMarker(tag.text)) {',
-        '      if (false) {',
-        'scripts/test_editor_save.py',
-    ),
-    (
-        'save: existing doctype duplicated',
-        'runtime/editor-core.js',
-        '    if (DOCTYPE.test(text)) return text;',
-        '    if (false) return text;',
-        'scripts/test_editor_save.py',
-    ),
-    (
-        'save: unknown data-block fields dropped',
-        'runtime/editor-core.js',
-        '    if (!sameJson(original, rebuilt)) return body;',
-        '    if (false) return body;',
-        'scripts/test_editor_save.py',
-    ),
-    (
-        'save: data-block script escaping disabled',
-        'runtime/editor-core.js',
-        '    return api.scriptSafe(canonical);',
-        '    return canonical;',
-        'scripts/test_editor_save.py',
-    ),
-    (
-        'structure: series-only data silently shows an empty state',
-        'context2html/structure.py',
-        '    if model.items:\n'
-        '        return True\n'
-        '    if model.series:\n',
-        '    if model.items:\n'
-        '        return True\n'
-        '    if False:\n',
-        'scripts/test_structure.py',
-    ),
-    (
-        'charts: bilingual pair falls back to Chinese in both slots',
-        'context2html/slots.py',
-        'f\'<span data-lang="en">{_escape(en or zh)}</span>\'',
-        'f\'<span data-lang="en">{_escape(zh)}</span>\'',
-        'scripts/test_chart_slots.py',
-    ),
-    (
-        'preview: title claimed as displayed for every target',
-        'runtime/editor-core.js',
-        '    var titleUse = TITLE_CONSUMPTION[descriptor.id] || false;',
-        '    var titleUse = true;',
-        'scripts/test_editor_core.py',
-    ),
-    (
-        'renderer: editable report preloads every slot library',
-        'context2html/renderer.py',
-        '    component_ids = [cid for cid, _, _ in slot_specs]',
-        '    component_ids = [comp.id for comp in registry.list_components(content_model=True)]',
-        'scripts/test_editor_runtime.py',
-    ),
-    (
-        'editor: swap skips the on-demand library load',
-        'runtime/editor-core.js',
-        '    if (!library || settings.hasLibrary(library)) {',
-        '    if (true) {',
-        'scripts/test_editor_library.py',
-    ),
-]
+sys.path.insert(0, os.path.join(ROOT, 'scripts'))
+
+
+def load_mutants():
+    """Collect every MUTANTS list under scripts/mutants, in module-name order."""
+    entries = []
+    for info in sorted(pkgutil.iter_modules([MUTANTS_DIR]), key=lambda i: i.name):
+        module = importlib.import_module(f'mutants.{info.name}')
+        entries.extend(getattr(module, 'MUTANTS', []))
+    return entries
+
+
+MUTANTS = load_mutants()
 
 
 def _run_tests(test_path):

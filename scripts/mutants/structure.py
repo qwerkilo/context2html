@@ -1,0 +1,28 @@
+"""Mutants for the structure area."""
+
+MUTANTS = [('structure: empty state body emptied',
+  'context2html/structure.py',
+  '        \'<p class="ic-empty" data-lang="zh">暂无数据</p>\'\n'
+  '        \'<p class="ic-empty" data-lang="en">No data</p>\'',
+  "        ''",
+  'scripts/test_structure.py'),
+ ('structure: model text escaping removed',
+  'context2html/structure.py',
+  '    return html.escape(str(value), quote=True)',
+  '    return str(value)',
+  'scripts/test_structure.py'),
+ ('structure: unsafe accent accepted',
+  'context2html/structure.py',
+  '    if _SAFE_COLOR.fullmatch(item.accent):',
+  '    if item.accent:',
+  'scripts/test_structure.py'),
+ ('structure: bilingual fallback disabled',
+  'context2html/structure.py',
+  '    en = en or zh',
+  '    en = en',
+  'scripts/test_structure.py'),
+ ('structure: series-only data silently shows an empty state',
+  'context2html/structure.py',
+  '    if model.items:\n        return True\n    if model.series:\n',
+  '    if model.items:\n        return True\n    if False:\n',
+  'scripts/test_structure.py')]

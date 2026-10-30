@@ -90,7 +90,7 @@ slot = render_slot(26, model, slot_id=None)   # slot_id 省略时按数据派生
 slot.markup, slot.data_block, slot.fragment
 ```
 
-**`slots` 参数（槽位输出开关）** — 默认 `None`，即关闭；关闭时输出与未引入插槽前逐字节一致。传入列表即开启：
+**`slots` 参数（槽位输出开关）** — 默认 `None`，即关闭；关闭时输出与当前基线（`scripts/fixtures/renderer-baseline-report-starter.html`）逐字节一致。传入列表即开启：
 
 - 每个条目是 `(component_id, model)` / `(component_id, model, slot_id)`，或 `{'component', 'model', 'slot_id'}` 映射。
 - 每个插槽渲染成 `<section class="ic-slot" data-slot="…" data-component="N">`，紧跟一个 `<script type="application/json" data-slot="…">` 数据块。

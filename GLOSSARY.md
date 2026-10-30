@@ -70,7 +70,7 @@ The browser-side copy of the swappable components' render functions, inlined int
 _Avoid_: Runtime bundle, client library
 
 **槽位输出 (Slot Output)**:
-The renderer mode that turns swappable components into component slots: rendered markup plus its JSON data block. Off by default — `TemplateRenderer.assemble(..., slots=None)` produces byte-identical output to a report generated before slots existed. When on, the caller passes `(component_id, model)` entries; the renderer emits each slot, merges that component's CSS/JS and loads its libraries synchronously in `<head>` so the inline init script can run. Only the 14 `content_model: true` components can be slots.
+The renderer mode that turns swappable components into component slots: rendered markup plus its JSON data block. Off by default — `TemplateRenderer.assemble(..., slots=None)` matches the committed baseline byte for byte. When on, the caller passes `(component_id, model)` entries; the renderer emits each slot, merges that component's CSS/JS and loads its libraries synchronously in `<head>` so the inline init script can run. Only the 14 `content_model: true` components can be slots.
 _Avoid_: 组件输出, slot markup
 
 **可编辑报告 (Editable Report)**:

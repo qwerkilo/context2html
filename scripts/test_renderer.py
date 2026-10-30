@@ -99,6 +99,19 @@ class TestTemplateRenderer:
         with open(BASELINE, 'r', encoding='utf-8') as fh:
             assert self.r.assemble('report-starter', [26, 17], 'warm') == fh.read()
 
+    def test_default_path_merges_component_css(self):
+        """The framework path is the recommended one; it must carry component CSS.
+
+        Regression: the templates mark the CSS insertion point with a CSS
+        comment while the pattern only matched an HTML comment, so every
+        assembled report shipped component markup without its styles.
+        """
+        for comp_id in (26, 17, 5):
+            comp = self.r._reg.list_components(id=comp_id)[0]
+            assert comp.css, f'component {comp_id} should define CSS'
+            result = self.r.assemble('report-starter', [comp_id], 'warm')
+            assert comp.css.strip() in result, f'component {comp_id} CSS was dropped'
+
     def test_slots_parameter_emits_slot_markup_and_data_block(self):
         result = self.r.assemble('report-starter', [], 'warm', slots=[(26, MODEL)])
         assert 'class="ic-slot"' in result

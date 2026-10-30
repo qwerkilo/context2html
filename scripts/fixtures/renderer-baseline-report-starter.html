@@ -201,6 +201,24 @@ button:active { transform: scale(0.98); }
 /* ===== 🛑 上方为组件示例 CSS，替换报告内容时按需保留/删除 ===== */
 /* ============================================================ */
 /* INSERT: 从 components/NN-name.md 复制 CSS 到这里（组件 CSS 可追加在下方） */
+#chart-bar { background: var(--surface); border-radius: var(--radius); }
+#chart-pie { background: var(--surface); border-radius: var(--radius); }
+#chart-line { background: var(--surface); border-radius: var(--radius); }
+#chart-stacked { background: var(--surface); border-radius: var(--radius); }
+.tag-group { display: flex; flex-wrap: wrap; gap: 0.5em; margin: 1.5rem 0; }
+.tag {
+  display: inline-block; padding: 0.25em 0.7em; border-radius: 999px;
+  font-size: 0.8rem; font-weight: 500; white-space: nowrap;
+  background: var(--tag-bg); color: var(--tag-text);
+  transition: opacity 0.2s ease;
+}
+.tag:hover { opacity: 0.8; }
+.tag-blue { background: color-mix(in srgb, var(--accent) 15%, var(--bg)); color: var(--accent); }
+.tag-red { background: color-mix(in srgb, var(--error) 15%, var(--bg)); color: var(--error); }
+.tag-green { background: color-mix(in srgb, var(--success) 15%, var(--bg)); color: var(--success); }
+.tag-orange { background: color-mix(in srgb, var(--warning) 15%, var(--bg)); color: var(--warning); }
+.tag-purple { background: color-mix(in srgb, var(--accent) 25%, var(--bg)); color: color-mix(in srgb, var(--accent) 80%, #000); }
+
 
 /* ===== Magic UI 装饰效果（同步自 libs/magicui-effects.css，见 libs/ 为最新版） ===== */
 @keyframes bg-spin { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
