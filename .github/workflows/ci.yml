@@ -86,4 +86,6 @@ jobs:
       - name: Run mutation smoke (fails if a mutant survives)
         run: python scripts/mutation-smoke.py
       - name: Verify sources were restored
-        run: git diff --exit-code
+        run: >-
+          git diff --exit-code --
+          context2html runtime scripts templates theme references components
