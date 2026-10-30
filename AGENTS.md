@@ -13,6 +13,7 @@ python scripts/check-js-parity.py            # parity gate (needs node)
 python scripts/mutation-smoke.py             # fails if a mutant survives; -k <area> scopes, --list shows
 python scripts/validate-report.py <report>   # 23 hard checks + 5 humanization warnings
 python scripts/sync-component-index.py --check   # generated component table is fresh
+python scripts/sync-check-table.py --check   # generated checklist matches the validator
 python scripts/generate-theme-css.py         # DESIGN.md -> report-themes.css
 python scripts/sync-template-styles.py       # base-styles.css -> both templates
 powershell -ExecutionPolicy Bypass -File templates/start-server.ps1   # Windows preview

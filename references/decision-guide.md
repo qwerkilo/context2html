@@ -214,6 +214,7 @@ ceil(总字数 / 500) = 报告最少组件数
 
 生成报告 HTML 后，必须通过 `python scripts/validate-report.py path/to/report.html` 验证。以下是验证器检查的 23 项硬性检查 + 5 项人类化警告（warning，不计入失败）：
 
+<!-- CHECK-TABLE:START -->
 | # | 检查项 | 失败时处理 |
 |---|--------|-----------|
 | 1 | SVG 文件存在且 XML 合法 | 修复 SVG 路径或 XML 语法 |
@@ -225,23 +226,33 @@ ceil(总字数 / 500) = 报告最少组件数
 | 7 | 语义 HTML 元素（article/section/nav） | 将 `<div>` 替换为语义元素 |
 | 8 | 外链库（ECharts/Three/D3）本地文件存在 | 确认 `libs/` 目录包含所需文件 |
 | 9 | 中英双语 `data-lang` 配对 + 切换按钮 + L 键 | 补全缺少的 data-lang 属性或监听器 |
-| 10 | `.exec-summary` 存在 | 添加关键发现摘要段 |
-| 11 | `.report-chapter` 至少一个 | 报告必须包含正文章节 |
-| 12 | `.conclusion-page` 存在 | 添加结论与建议段 |
-| 13 | `.report-footer` 存在 | 添加脚注区域 |
-| 14 | `theme/report-themes.css` 被引用且文件存在 | 在 `<head>` 中添加 `<link>` 引用，确认文件复制到目标位置 |
-| 15 | `.bar-fill` width 不超过 100% | 检查条形图数据值，修正超过 100% 的设置 |
-| 16 | `.cmp-table` 在 ≤700px 屏幕下有响应式规则 | 在 `<style>` 中添加 `@media (max-width: 700px)` 规则覆盖 `.cmp-table` |
-| 17 | 英文排版（overflow-wrap + table-layout:fixed） | 在 body 中加 `overflow-wrap: break-word`；`.cmp-table` 加 `table-layout: fixed` |
-| 18 | ECharts 不使用 `var()` 直接设色 | 用 `gv('--xxx')` 辅助函数替代 `var(--xxx)` |
-| 19 | 章节交叉引用使用 `#chN` 锚点 | 把 `href="#chapter-name"` 改为 `#chN` |
-| 20 | GSAP `data-gsap` 模式值有效 | 仅允许 fade/stagger/parallax/flip/zoom |
-| 21 | `data-anim` 语法有效 | 仅允许 fade-up/fade/slide-left/blur |
-| 22 | 内容类型 `data-content-type` 有效 | 使用 report/article/doc/tutorial/note 之一 |
-| 23 | 每个组件插槽有对应 JSON 数据块 | 为 `data-slot` 补上同 id 的 `<script type="application/json">` |
-| — | **D1 句长交替（warning）** | 每段混入 ≤10 字短句 1-2 + ≥35 字长句 1-2 |
-| — | **D4 连接词控制（warning）** | 段落开头禁用"首先/其次/值得注意的是"；≤6 个/千字 |
-| — | **D5 术语变体（warning）** | 每 800 字替换同义术语（"重要"→"关键/绕不开/真正"） |
+| 10 | 内容类型 `data-content-type` 有效 | 使用 report/article/doc/tutorial/note 之一 |
+| 11 | 每个组件插槽有对应 JSON 数据块 | 为 `data-slot` 补上同 id 的 `<script type="application/json">` |
+| 12 | `theme/report-themes.css` 被引用且文件存在 | 在 `<head>` 中添加 `<link>` 引用，确认文件复制到目标位置 |
+| 13 | `.exec-summary` 存在 | 添加关键发现摘要段 |
+| 14 | `.report-chapter` 至少一个 | 报告必须包含正文章节 |
+| 15 | `.conclusion-page` 存在 | 添加结论与建议段 |
+| 16 | `.report-footer` 存在 | 添加脚注区域 |
+| 17 | `.bar-fill` width 不超过 100% | 检查条形图数据值，修正超过 100% 的设置 |
+| 18 | `.cmp-table` 在 ≤700px 屏幕下有响应式规则 | 基础样式已含该规则；手写报告需自行补 `@media (max-width: 700px)` |
+| 19 | 英文排版（overflow-wrap + table-layout:fixed） | 在 body 中加 `overflow-wrap: break-word`；`.cmp-table` 加 `table-layout: fixed` |
+| 20 | ECharts 不使用 `var()` 直接设色 | 用 `gv('--xxx')` 辅助函数替代 `var(--xxx)` |
+| 21 | 章节交叉引用使用 `#chN` 锚点 | 把 `href="#chapter-name"` 改为 `#chN` |
+| 22 | GSAP `data-gsap` 模式值有效 | 仅允许 fade/stagger/parallax/flip/zoom |
+| 23 | `data-anim` 语法有效 | 仅允许 fade-up/fade/slide-left/blur |
+<!-- CHECK-TABLE:END -->
+
+上表按 `report` 内容类型生成。`article` / `doc` / `tutorial` / `note` 会把 report 专属的结构检查换成各自的一条，总数因此变化；具体标签以 `scripts/validate-report.py` 的 `build_checks()` 为准。
+
+<!-- WARNING-TABLE:START -->
+| # | 维度 | 失败时处理 |
+|---|------|-----------|
+| — | **D1 句长交替**（warning） | 每段混入 ≤10 字短句 1-2 + ≥35 字长句 1-2 |
+| — | **D2 段落结构**（warning） | 相邻段落换结构，避免每段都以数据开头或总结句收尾 |
+| — | **D3 信息密度**（warning） | 高密段后接过渡段，避免连续三段同一密度 |
+| — | **D4 连接词控制**（warning） | 段落开头禁用"首先/其次/值得注意的是"；≤6 个/千字 |
+| — | **D5 术语变体**（warning） | 每 800 字替换同义术语（"重要"→"关键/绕不开/真正"） |
+<!-- WARNING-TABLE:END -->
 
 ## 视觉设计纪律
 
