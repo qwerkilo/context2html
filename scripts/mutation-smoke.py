@@ -116,6 +116,13 @@ MUTANTS = [
         'scripts/test_structure.py',
     ),
     (
+        'renderer: slot components also insert their demo markup',
+        'context2html/renderer.py',
+        '            if comp.html and cid not in slot_component_ids:',
+        '            if comp.html:',
+        'scripts/test_renderer.py',
+    ),
+    (
         'parity: missing-fixture guard disabled',
         'scripts/check-js-parity.py',
         '    if missing:\n'

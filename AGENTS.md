@@ -62,6 +62,7 @@ The repo has a local `.codegraph/` index (Python + JS). Prefer it over grep/glob
 - **`docs/` gitignore** — `docs/*` is gitignored except `docs/adr/` and `docs/specs/`. Generated reference docs (`theme-index.md`) live on disk but are not committed.
 - **`examples/report-themes.html` is NOT a valid report** — will fail `validate-report.py`. Use `examples/0001-demo-report.html` for smoke tests.
 - **`ComponentRegistry.get_component()` removed** — use `list_components(id=26)` which returns a list (empty if not found).
+- **Slot output is opt-in** — `TemplateRenderer.assemble(..., slots=None)` is the default and keeps output byte-identical to the pre-slot renderer (baseline: `scripts/fixtures/renderer-baseline-report-starter.html`). Pass `(component_id, model)` entries to emit `data-slot`/`data-component` markup plus its JSON data block; only the 14 `content_model: true` components are accepted.
 - **Validator in framework package** — `from context2html.validator import check_h1_count, check_bilingual, ...` works directly.
 - **Framework package tests** — `test_registry.py`, `test_renderer.py`, `test_theme.py` use direct imports (`from context2html.xxx import ...`). Other tests still use `importlib`.
 - **mutmut does not run on native Windows** — it exits with "please use the WSL". `scripts/mutation-smoke.py` covers the same ground natively: it applies each mutant, runs the targeted test file, restores the source, and exits 1 if any mutant survives. Add an entry to its `MUTANTS` list when you fix a bug that a test should have caught.

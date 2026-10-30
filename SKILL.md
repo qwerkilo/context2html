@@ -32,6 +32,8 @@ argument-hint: "内容描述或文件路径？"
 - **报告类型从 `templates/report-starter.html` 复制作为基础；其他内容类型从 `templates/starter.html` 复制。禁止从零生成 HTML 结构。**
 - 保留模板的完整 CSS 变量系统（`:root` + 20 个 `[data-theme]`）、工具栏（主题/语言/目录）、键盘快捷键（T/L/←→）。
 - 视觉组件在模板预留的 `<!-- INSERT: 视觉组件 HTML -->` 注释处追加。亦可通过 `TemplateRenderer.assemble()` 自动完成。
+- **可换组件走槽位**：14 个 `content_model: true` 的组件可由内容模型渲染成组件插槽（`data-slot` + `data-component` + 旁挂 JSON 数据块）。其余 17 个组件仍按原样手抄代码。
+- **微调后的报告是源**：用户提供已用编辑模式微调过的报告 HTML 时，以该文件为源继续编辑（读它的插槽与数据块），不重新生成整份报告。
 
 ---
 
@@ -67,12 +69,49 @@ renderer = TemplateRenderer()
 html = renderer.assemble(
     template_name='starter',           # 'starter' or 'report-starter'
     components=[26, 17],               # component IDs
-    theme_name='warm'                  # theme for data-theme attribute
+    theme_name='warm',                 # theme for data-theme attribute
+    slots=[                            # optional; slot output is off by default
+        (26, {'title': '销量', 'items': [{'label': '直营', 'value': 120}]}),
+        {'component': 3, 'model': {'title': '里程碑', 'items': []},
+         'slot_id': 'milestones'},
+    ],
 )
 # Returns full HTML with components inserted, CSS merged, JS appended
+
+# 单个插槽（一次拿到标记与数据块）
+from context2html.slots import render_slot
+model = {'title': '销量', 'items': [{'label': '直营', 'value': 120}]}
+slot = render_slot(26, model, slot_id=None)   # slot_id 省略时按数据派生，稳定可复现
+slot.markup, slot.data_block, slot.fragment
 ```
 
+**`slots` 参数（槽位输出开关）** — 默认 `None`，即关闭；关闭时输出与未引入插槽前逐字节一致。传入列表即开启：
+
+- 每个条目是 `(component_id, model)` / `(component_id, model, slot_id)`，或 `{'component', 'model', 'slot_id'}` 映射。
+- 每个插槽渲染成 `<section class="ic-slot" data-slot="…" data-component="N">`，紧跟一个 `<script type="application/json" data-slot="…">` 数据块。
+- 该组件的示例标记不再插入（真实标记来自内容模型）；其 CSS/JS 自动合并，库依赖以同步 `<script src="libs/…">` 写进 `<head>`，保证内联初始化脚本能立即取到库。
+- 只有 14 个可换组件能进 `slots`；其余 17 个组件的行为与关闭时完全一致。
+- 槽位标识重复会在生成时报错，避免产出校验不过的报告。
+
 **使用场景：** agent 可以从调用这些 API 构建自己的生成流程，而不需要严格遵循下方的示例工作流。
+
+### 组件插槽（Slot）约定
+
+报告里的每个可换组件是一个插槽。插槽由渲染器接口一次产出渲染后的标记与内容模型数据：
+
+```html
+<section class="ic-slot" data-slot="ev-sales" data-component="26">
+  …渲染后的标记…
+</section>
+<script type="application/json" data-slot="ev-sales">{"title": "…"}</script>
+```
+
+- `data-slot` 是稳定标识：显式传入则原样使用，省略则按组件 + 内容模型派生（同一份数据总是得到同一个 id）。
+- `data-component` 是组件编号，决定插槽当前由哪个组件渲染。
+- JSON 数据块是互换的唯一数据源；原始内容模型始终保留，换错组件可完整换回。
+- 可换集合（14 个，front matter `content_model: true`）：图表族 #4 #15 #19 #20 #24 #26，结构族 #2 #3 #5 #12 #13 #17 #18 #22。其余 17 个组件不参与互换，标记照旧手抄。
+- 校验器要求每个插槽有且仅有一个对应数据块（计入 23 项硬性检查）。
+- 手动写报告时，也可以在 `<!-- INSERT: 视觉组件 HTML -->` 处粘贴 `render_slot(...).fragment`。
 
 ---
 
@@ -99,6 +138,7 @@ report 类型 → 复制 `report-starter.html`；其他类型 → 复制 `starte
 - 或读取用户提供的文件路径（Markdown/文本文件）
   · 文件路径不存在 → 提示用户检查路径 → 回退到对话内容直接提取
   · 文件格式不是 Markdown/纯文本 → 尝试用 `python -c "import docx"` 读取 .docx → 回退到请用户粘贴文本
+- 用户提供已微调的报告 HTML（含 `data-slot` 插槽与数据块）→ **以该文件为源继续编辑**：读插槽与数据块，只改需要改的部分，不重新生成整份报告
 - 确认以下信息：
   · 报告主题与目标受众
   · 关键数据点数量（影响组件选择策略）
@@ -159,6 +199,12 @@ renderer = TemplateRenderer()
 html = renderer.assemble('report-starter', [26, 17], 'warm')
 # 然后在 html 中填充正文内容（中英双语）、封面元数据
 # 最后保存为文件、运行 validate-report.py
+
+# 需要交付后可微调的报告时，把可换组件交给 slots（默认关闭，开启后组件带插槽与数据块）：
+html = renderer.assemble('report-starter', [5, 17], 'warm', slots=[
+    (26, {'title': '渠道销量', 'items': [{'label': '直营', 'value': 120}]}),
+    (3, {'title': '里程碑', 'items': [{'label': '2026 Q1', 'value': 1}]}),
+])
 ```
 
 **手动方式（备选）：**
@@ -234,6 +280,7 @@ html = renderer.assemble('report-starter', [26, 17], 'warm')
 | 5 | 缺少 PPT 质感（无主题切换/键盘导航） | 交互体验差 | report-starter.html / starter.html 均已内置 |
 | 6 | 图表库只加载部分依赖 | 一种图表空白 | 用到几个库就加载几个 libs 文件 |
 | 7 | 从零写 HTML 而非复制模板 | 丢失 CSS 变量/主题系统 | 始终从对应模板复制（report→report-starter.html，其他→starter.html） |
+| 8 | 用户已微调的报告被重新生成覆盖 | 丢掉用户选好的组件与数据 | 以微调后的 HTML 为源，按插槽增量修改 |
 
 ## 失败模式与异常处理
 

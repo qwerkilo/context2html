@@ -69,9 +69,14 @@ renderer = TemplateRenderer()
 html = renderer.assemble(
     template_name='starter',           # 'starter' 或 'report-starter'
     components=[26, 17],               # 组件 ID 列表
-    theme_name='warm'                  # 主题
+    theme_name='warm',                 # 主题
+    slots=[                            # 可选：槽位输出，默认 None（关闭）
+        (26, {'title': '销量', 'items': [{'label': '直营', 'value': 120}]}),
+    ],
 )
 # 返回完整 HTML，组件已插入、CSS 已合并、JS 已追加
+# 传 slots 时：可换组件渲染成插槽（data-slot + data-component + JSON 数据块），
+# 关闭时输出与未引入插槽前逐字节一致
 ```
 
 ### 主题提供器
