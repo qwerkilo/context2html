@@ -119,6 +119,22 @@ button:active { transform: scale(0.98); }
 .cmp-table .cmp-yes { color: var(--success); font-weight: 700; }
 .cmp-table .cmp-no { color: var(--error); }
 
+/* Narrow screens stack the rows: the base styles ship .cmp-table, so the
+   responsive rule belongs here too, not only in components #5/#22. */
+@media (max-width: 700px) {
+  .cmp-table { font-size: 0.78rem; }
+  .cmp-table thead { display: none; }
+  .cmp-table tr {
+    display: block; margin-bottom: 0.6em;
+    border: 1px solid var(--border); border-radius: 6px; padding: 0.4em;
+  }
+  .cmp-table td {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.4em 0.5em; border-bottom: 1px solid var(--border);
+  }
+  .cmp-table td:last-child { border-bottom: none; }
+}
+
 /* 折叠式分步详解 (#8) */
 .sd-item { margin-bottom: 0.5em; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
 .sd-trigger { display: block; width: 100%; padding: 0.8em 1em; background: var(--surface); border: none; text-align: left; font-size: 0.9rem; font-weight: 600; font-family: inherit; cursor: pointer; color: var(--text); transition: background 0.2s ease; }

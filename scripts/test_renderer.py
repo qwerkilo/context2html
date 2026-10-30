@@ -149,6 +149,25 @@ class TestTemplateRenderer:
         assert failures == {}
         assert len(result.checks) == 23
 
+    def test_report_without_a_comparison_table_component_passes(self, tmp_path):
+        """Base styles ship .cmp-table, so they ship its responsive rule too.
+
+        Regression: the media query lived only inside components #5/#22, so any
+        assembled report without one failed 'Comparison table responsive' even
+        though the template itself renders .cmp-table.
+        """
+        (tmp_path / 'libs').mkdir()
+        (tmp_path / 'libs' / 'echarts.min.js').write_text('', encoding='utf-8')
+        (tmp_path / 'theme').mkdir()
+        (tmp_path / 'theme' / 'report-themes.css').write_text(
+            '/* stub */', encoding='utf-8')
+
+        html = self.r.assemble('report-starter', [], 'warm', slots=[(26, MODEL)])
+
+        result = _vr.run_checks(html, str(tmp_path))
+        failures = {label: issues for label, issues in result.checks if issues}
+        assert failures == {}
+
     def test_the_17_components_outside_the_swappable_set_are_untouched(self):
         swappable = self.r._reg.list_components(content_model=True)
         others = [
