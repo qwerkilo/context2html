@@ -10,7 +10,8 @@
  *     `model` is an object or the raw JSON text of a data block.
  *   renderMarkup(componentId, model, slotId?)
  *   parseModel(text)     parse JSON while preserving int/float number kinds
- *   canonicalJson(model) canonical JSON exactly as Python's slots.py emits it
+ *   canonicalJson(model) canonical JSON exactly as Python's slots.py emits it;
+ *                        accepts an object or the raw JSON text of a data block
  *   normalizeContentModel(model)
  *   componentIds
  *   ContentModelError
@@ -1278,6 +1279,7 @@
    * ------------------------------------------------------------------ */
 
   function canonicalJson(model) {
+    if (typeof model === 'string') model = parseModel(model);
     var normalized = normalizeModel(model);
     return stringifyJson(normalized.model, {
       sortKeys: true,
@@ -1328,6 +1330,7 @@
     renderSlot: renderSlot,
     renderMarkup: renderMarkup,
     parseModel: parseModel,
+    parseContentModel: parseModel,
     canonicalJson: canonicalJson,
     normalizeContentModel: normalizeContentModel,
     componentIds: ids,
