@@ -5,6 +5,7 @@ dependencies: [echarts.min.js]
 compat_types: [report, article, doc, tutorial, note]
 degrade_to: "05"
 requires_3d: false
+content_model: true
 ---
 
 ### 26. ECharts 交互式图表集

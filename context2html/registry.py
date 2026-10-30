@@ -9,13 +9,15 @@ COMPONENTS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__
 
 
 class ComponentMeta:
-    def __init__(self, id, name, dependencies=None, compat_types=None, degrade_to=None, requires_3d=False):
+    def __init__(self, id, name, dependencies=None, compat_types=None, degrade_to=None,
+                 requires_3d=False, content_model=False):
         self.id = id
         self.name = name
         self.dependencies = dependencies or []
         self.compat_types = compat_types or ['report']
         self.degrade_to = degrade_to
         self.requires_3d = requires_3d
+        self.content_model = content_model
 
     @classmethod
     def from_dict(cls, d):
@@ -26,6 +28,7 @@ class ComponentMeta:
             compat_types=d.get('compat_types', ['report']),
             degrade_to=d.get('degrade_to'),
             requires_3d=d.get('requires_3d', False),
+            content_model=bool(d.get('content_model', False)),
         )
 
 
@@ -67,13 +70,15 @@ class ComponentRegistry:
             self._cache.append(Component(metadata, html, css, js))
         return self._cache
 
-    def list_components(self, content_type=None, id=None):
+    def list_components(self, content_type=None, id=None, content_model=None):
         all_components = self._load_all()
         result = all_components
         if content_type is not None:
             result = [c for c in result if content_type in c.metadata.compat_types]
         if id is not None:
             result = [c for c in result if c.metadata.id == id]
+        if content_model is not None:
+            result = [c for c in result if c.metadata.content_model == content_model]
         return result
 
     def resolve_dependencies(self, component_ids):

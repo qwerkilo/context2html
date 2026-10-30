@@ -7,6 +7,7 @@ compat_types:
 - article
 - doc
 requires_3d: false
+content_model: true
 ---
 
 ### 4. CSS 条形图（替换纯文本统计）
