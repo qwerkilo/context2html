@@ -192,7 +192,7 @@ html = renderer.assemble('report-starter', [26, 17], 'warm')
 
 ### Step 4: 验证
 
-运行 `python scripts/validate-report.py report-slug.html` — 自动检查 22 项硬性约束 + 5 项人类化 warning（D1-D5）。加 `--json` 可得到结构化结果（每项检查的 label/pass/issues + summary 计数），便于精确定位待修位置。
+运行 `python scripts/validate-report.py report-slug.html` — 自动检查 22 项硬性检查 + 5 项人类化警告（D1-D5）。加 `--json` 可得到结构化结果（每项检查的 label/pass/issues + summary 计数），便于精确定位待修位置。
 
 · 验证失败 → 对照"失败模式与异常处理"表锁定具体问题 → 修复 → 重新验证
 · **自动修复最多 2 轮**：第 1-2 轮自主修复，第 3 轮仍不通过则列出剩余问题交给用户决定（不静默交付）

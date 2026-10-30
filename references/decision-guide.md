@@ -152,39 +152,44 @@ ceil(总字数 / 500) = 报告最少组件数
 
 ## 组件索引（31 个）
 
-| # | 组件 | 文件 | 说明 |
-|---|---|---|---|
-| 1 | SVG 流程图 | components/01-SVG 流程图.md | 四色语义流程图 |
-| 2 | 角色卡片 | components/02-角色卡片.md | 网格化角色介绍 |
-| 3 | CSS 时间线 | components/03-CSS 时间线.md | 垂直时间轴 |
-| 4 | CSS 条形图 | components/04-CSS 条形图.md | 水平数据条 |
-| 5 | 对比表 | components/05-对比表.md | 多维度 flex 对比 |
-| 6 | SVG Figure | components/06-SVG Figure 包裹.md | 标准图片容器 |
-| 7 | PPT 质感增强 | components/07-PPT 质感增强.md | 主题/动画/导航 |
-| 8 | 折叠式分步详解 | components/08-折叠式分步详解.md | 复杂概念分步折叠 |
-| 9 | Tab 切换面板 | components/09-Tab 切换面板.md | 垂直 Tab 切换 |
-| 10 | 图片对比滑块 | components/10-图片对比滑块.md | before/after 对比 |
-| 11 | 交互式时间线 | components/11-交互式时间线.md | 点击展开事件详情 |
-| 12 | 数据卡片网格 | components/12-数据卡片网格.md | 图标+数值+标签 |
-| 13 | 引用/引文卡片 | components/13-引用引文卡片.md | 左侧竖条+引文 |
-| 14 | 标注式图片 | components/14-标注式图片.md | 图片数字标注 |
-| 15 | 状态链 | components/15-状态链.md | 水平里程碑 |
-| 16 | 数值滚动动画 | components/16-数值滚动动画.md | 0→N 滚动 |
-| 17 | 标签/徽章组 | components/17-标签徽章组.md | 5 色药丸标签 |
-| 18 | 提示框/告警条 | components/18-提示框告警条.md | 4 类型提示 |
-| 19 | 热力图/密度图 | components/19-热力图密度图.md | 5 级矩阵 |
-| 20 | 步骤指示器 | components/20-步骤指示器.md | 水平编号步骤 |
-| 21 | 信息面板 | components/21-信息面板.md | 右侧滑入抽屉 |
-| 22 | 对比表增强版 | components/22-对比表增强版.md | 粘性表头+排序 |
-| 23 | 全屏模态/灯箱 | components/23-全屏模态灯箱.md | 点击放大 |
-| 24 | 数据图表集 | components/24-数据图表集.md | 纯 CSS/SVG 图表 |
-| 25 | 现代浏览器 API | components/25-现代浏览器API组件.md | 原生折叠/模态 |
-| 26 | ECharts 交互式图表 | components/26-ECharts 交互式图表集.md | 柱状/饼图/折线图 |
-| 27 | Three.js 3D 组件 | components/27-Three.js 3D组件.md | 3D 场景/柱状图 |
-| 28 | D3.js 数据可视化 | components/28-D3.js 数据可视化.md | 力导向/旭日/桑基 |
-| 29 | ECharts GL 3D 可视化 | components/29-ECharts GL 3D可视化.md | 3D柱状/散点/地球 |
-| 30 | GSAP 滚动动画集 | components/30-GSAP 滚动动画集.md | 5 模式滚动动画 |
-| 31 | SVG.js 动态图表 | components/31-SVG.js 动态图表.md | 轻量 SVG 动画（78KB）：柱状/折线/流程/进度环 |
+> 下表由 `scripts/sync-component-index.py` 从各组件 front matter 生成，请勿手改。
+> 新增/改名/改标签后运行：`python scripts/sync-component-index.py`
+
+<!-- COMPONENT-INDEX:START -->
+| # | 组件 | 文件 | 适用 content-type | 依赖 | 降级到 | 说明 |
+|---|---|---|---|---|---|---|
+| 1 | SVG 流程图 | components/01-SVG 流程图.md | report, article, doc, tutorial | — | — | 彩色 SVG 流程图，节点带圆角矩形 + 阴影 + 箭头连线，颜色语义统一（蓝=资金流、橙=触发、红=崩溃、绿=恢复），节点内包含图标+标题+副标题，适配主题色。 |
+| 2 | 角色卡片 | components/02-角色卡片.md | report, article, doc, tutorial, note | — | — | 彩色顶栏卡片网格，每张卡片聚焦一个角色，顶栏色块区分角色类型（决策蓝 / 执行橙 / 监督红 / 支持绿），悬停时卡片轻微上浮 + 阴影加深，视觉层次分明。 |
+| 3 | CSS 时间线 | components/03-CSS 时间线.md | report, article, tutorial | — | — | 左侧竖线 + 圆点里程碑 + 日期 + 描述。关键事件放大圆点（22px），悬停时圆点发光放大。纯 CSS，无 JS。 |
+| 4 | CSS 条形图 | components/04-CSS 条形图.md | report, article, doc | — | — | 水平条形图，左侧标签 + 彩色填充条 + 右侧数值。条带圆角（3px），填充色语义化（蓝=正常、橙=触发、红=负面、绿=正面）。条宽动画 `transition: width 1s ease`。 |
+| 5 | 对比表 | components/05-对比表.md | report, article, doc, tutorial | — | — | 响应式 HTML 表格，表头带主题色背景，行悬停高亮，窄屏（<700px）自动折叠为卡片式标签布局（每行显示为独立卡片，`data-label` 属性驱动）。 |
+| 6 | SVG Figure 包裹 | components/06-SVG Figure 包裹.md | report, article, doc, tutorial | — | — | 居中对齐的 SVG 容器，响应式缩放（`max-width: 100%`），8px 圆角。所有内联 SVG 均用此容器包裹。 |
+| 7 | PPT 质感增强 | components/07-PPT 质感增强.md | report, article, doc, tutorial, note | — | — | 20 主题切换（T 键循环 + 工具栏面板 + localStorage 持久化）、滚动入场动画（fade-up / fade / slide-left / blur 四种模式）、← → 键章节导航、浮动 TOC。所有能力内置在 `report-starter.html` 模板中。 |
+| 8 | 折叠式分步详解 | components/08-折叠式分步详解.md | report, article, tutorial | — | — | 分段折叠 UI，每步含圆形数字徽章（主题色）+ 标题 + 展开按钮（+ 旋转 45° 变 ×）。点击切换展开/收起，高度动画 0.3s ease。默认第一项展开，其余折叠。 |
+| 9 | Tab 切换面板 | components/09-Tab 切换面板.md | report, article, doc, tutorial | — | — | 左侧纵向药丸 Tab + 右侧内容区。选中 Tab 主题色填充 + 白色文字，未选中灰色描边。内容切换带 `fadeIn` 动画（0.3s）。窄屏自动折叠为顶部横向 Tab 栏。 |
+| 10 | 图片前后对比滑块 | components/10-图片前后对比滑块.md | report, article, doc, tutorial | — | — | 两张图片叠放，中间白色分割线（3px）+ 圆形手柄。拖拽分割线左右滑动，before/after 图层实时切换。支持鼠标拖拽 + 触摸拖拽。分割线悬停/拖拽时阴影加深。 |
+| 11 | 交互式时间线 | components/11-交互式时间线.md | report, article, tutorial | — | — | 左侧竖线 + 彩色圆点 + 日期（强调色加粗）+ 标题。默认仅显示日期和标题，点击圆点展开详情（+ 旋转 45° 变 ×）。悬停圆点发光环 25% 透明。 |
+| 12 | 数据卡片网格 | components/12-数据卡片网格.md | report, article, doc, tutorial | — | — | CSS Grid 自适应卡片网格，每张卡片包含 emoji 图标 + 大号强调色数值 + 单位 + 标签。悬停时上浮 2px + 阴影加深。多张卡片依次延迟 50ms 错开悬停反馈。 |
+| 13 | 引用引文卡片 | components/13-引用引文卡片.md | report, article, doc, tutorial, note | — | — | 左侧 4px 强调色竖条 + 装饰性装饰引号（`\201C`/`\201D`）+ 引文文本 + 底部署名（姓名 + 来源）。悬停时轻微阴影上浮。 |
+| 14 | 标注式图片 | components/14-标注式图片.md | report, article, doc, tutorial | — | — | 图片上叠加数字标注点（圆形，半透明背景 + 白色数字），点击标注点在图片下方显示说明面板。标注点百分比坐标自适应缩放，悬停缩放 1.15× + 变暗。 |
+| 15 | 状态链进度里程碑 | components/15-状态链进度里程碑.md | report, article, tutorial | — | — | 水平 flex 行，每个阶段等宽。圆点（28px）连接线贯通，三种颜色状态（完成=实心强调色、进行中=描边+发光环、待办=灰色描边）。窄屏转为横向可滚动。 |
+| 16 | 数值滚动动画 | components/16-数值滚动动画.md | report, article, doc | — | — | 数字从 0 滚动到目标值，`ease-out` 缓动，进入视口触发（IntersectionObserver）。配合数据卡片使用效果最佳。 |
+| 17 | 标签徽章组 | components/17-标签徽章组.md | report, article, doc, tutorial, note | — | — | 彩色药丸标签（border-radius: 999px），5 种预定义颜色对应不同类别。flex-wrap 自动换行，带 `#` 前缀。**每章结尾必须使用。** |
+| 18 | 提示框告警条 | components/18-提示框告警条.md | report, article, note | — | — | 左侧 4px 强调色竖条 + emoji 图标 + 彩色浅背景，4 种类型（💡信息蓝、⚠️警告橙、❌错误红、✅成功绿）。纯 CSS，无 JS。 |
+| 19 | 热力图密度图 | components/19-热力图密度图.md | report, article, doc | — | 04 | CSS Grid 彩色矩阵，5 级强度（绿→黄→橙→红信号灯）。单元格数值保留，表头 + 行标签灰色背景。边框圆角 8px。 |
+| 20 | 步骤指示器 | components/20-步骤指示器.md | report, tutorial | — | — | 水平步骤条，已完成实心圆（主题色）+ 白色数字，进行中描边圆 + 发光环，待办灰色描边。圆点间灰色连接线贯通。窄屏转为横向可滚动。 |
+| 21 | 信息面板侧边栏 | components/21-信息面板侧边栏.md | report, article, doc, tutorial | — | — | 右侧抽屉式面板（380px），滑入/滑出动画 0.3s ease。半透明遮罩层 + 粘性标题栏 + 关闭按钮。支持 ESC 关闭、点击遮罩关闭。触发按钮虚线边框 + 主题色。 |
+| 22 | 对比表 增强版 | components/22-对比表 增强版.md | report, article, doc, tutorial | — | 05 | 粘性表头（滚动不消失）、斑马纹交替行、悬停高亮行、点击列头排序（智能识别数值 vs 文本）。`overflow-x: auto` 容器防溢出。响应式 <700px 折叠卡片布局。 |
+| 23 | 全屏模态灯箱 | components/23-全屏模态灯箱.md | report, article, doc, tutorial | — | — | 全屏半透明遮罩 + 内容居中放大，打开/关闭带动画（scale 0.92→1 + opacity 0→1）。支持 ESC 关闭、点击遮罩关闭。图片触发或按钮触发两种方式。 |
+| 24 | 数据图表集 | components/24-数据图表集.md | report, article, doc | — | — | 纯 CSS/SVG 图表，无 JS 绘图依赖。柱状图用 `--h` 自定义属性控制高度，饼图用 `conic-gradient`，折线图用 SVG `<polyline>`，堆叠面积图用 SVG `<path>`。全部使用 `var()` 变量跟随主题切换。 |
+| 25 | 现代浏览器API组件 | components/25-现代浏览器API组件.md | report, article, doc, tutorial, note | — | — | 零 JS 或极少 JS，利用 `<details>/<summary>`、`<dialog>`、CSS `scroll-snap`、Popover API 等原生 HTML5 能力。兼容 Chrome/Edge/Safari/Firefox 现代版本。 |
+| 26 | ECharts 交互式图表集 | components/26-ECharts 交互式图表集.md | report, article, doc, tutorial, note | echarts.min.js | 05 | Apache ECharts 渲染的高质量交互式图表，支持悬浮提示（tooltip）、自适应缩放（resize）、4 种图表——柱状图 / 饼图 / 折线图 / 堆叠面积图。颜色通过 `gv('--accent')` 读取 CSS 变量跟随主题。需 `libs/echarts.min.js`。 |
+| 27 | Three.js 3D组件 | components/27-Three.js 3D组件.md | report, article, doc | three.min.js | — | Three.js r185 WebGPU/WebGL 双后端 3D 渲染，支持地理/贸易网络、三维数据可视化、结构/架构图。自动检测 `navigator.gpu` 决定使用 WebGPU 还是回退 WebGL。 |
+| 28 | D3.js 数据可视化 | components/28-D3.js 数据可视化.md | report, article, doc | d3.min.js, d3-sankey.min.js | — | D3.js 创建自定义数据可视化——力导向图、弦图、旭日图、桑基图等 ECharts 不原生支持的图表类型。交互式悬浮提示 + 动画过渡。 |
+| 29 | ECharts GL 3D可视化 | components/29-ECharts GL 3D可视化.md | report, article, doc | echarts.min.js, echarts-gl.min.js | 26 | WebGL 3D 图表——3D 柱状图、3D 散点图、3D 地球/地图、3D 曲面图。Canvas/JS 渲染，无需 CSS。需 `libs/echarts-gl.min.js`。 |
+| 30 | GSAP 滚动动画集 | components/30-GSAP 滚动动画集.md | report, article, tutorial | gsap.min.js, ScrollTrigger.min.js | — | 基于 GSAP + ScrollTrigger 的 5 种滚动触发动画（fade / stagger / parallax / flip / zoom）。桌面端 `libs/` 离线加载，移动端 CDN 降级。每个模式独立触发，ease-out 缓动。 |
+| 31 | SVG.js 动态图表 | components/31-SVG.js 动态图表.md | report, article, doc, tutorial | svg.min.js | — | 基于 SVG.js v3（78KB minified）的链式 API 动态 SVG 图表——纵向柱状图、多系列折线图、流程图、进度环。内置 `element.animate()` 逐帧缓动动画，CSS 变量继承跟随主题。 |
+<!-- COMPONENT-INDEX:END -->
 
 ## 主题选择指南
 

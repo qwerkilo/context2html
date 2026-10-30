@@ -17,11 +17,14 @@ python -m pytest scripts/ -v --tb=short
 # Single test file
 python -m pytest scripts/test_validate_report.py -v --tb=short
 
-# Validate a report (21 hard checks + 3 humanization warnings)
+# Validate a report (22 hard checks + 5 humanization warnings)
 python scripts/validate-report.py path/to/report.html
 
 # Regenerate theme CSS from theme/*/DESIGN.md
 python scripts/generate-theme-css.py
+
+# Regenerate the component index table in references/decision-guide.md
+python scripts/sync-component-index.py
 
 # Preview server (root-relative paths need same cwd)
 bash templates/start-server.sh
