@@ -59,7 +59,7 @@ The repo has a local `.codegraph/` index (Python + JS). Prefer it over grep/glob
 - **English text overflows on lang toggle** — English is wider than Chinese. Template has `overflow-wrap: break-word`, `.cmp-table` has `table-layout: fixed` + `word-break: break-word`. Do NOT remove.
 - **Heatmap Canvas vmin/vmax** — initialize with `vmin=Infinity, vmax=-Infinity` (not the inverse), or get NaN black cells.
 - **CSS source of truth** — edit `templates/base-styles.css`, then run `python scripts/sync-template-styles.py` to push changes to both `starter.html` and `report-starter.html`.
-- **`docs/` gitignore** — `docs/*` is gitignored. Generated reference docs (`theme-index.md`, ADRs) live on disk but are not committed.
+- **`docs/` gitignore** — `docs/*` is gitignored except `docs/adr/` and `docs/specs/`. Generated reference docs (`theme-index.md`) live on disk but are not committed.
 - **`examples/report-themes.html` is NOT a valid report** — will fail `validate-report.py`. Use `examples/0001-demo-report.html` for smoke tests.
 - **`ComponentRegistry.get_component()` removed** — use `list_components(id=26)` which returns a list (empty if not found).
 - **Validator in framework package** — `from context2html.validator import check_h1_count, check_bilingual, ...` works directly.
@@ -68,4 +68,4 @@ The repo has a local `.codegraph/` index (Python + JS). Prefer it over grep/glob
 
 ## Domain docs
 
-Single-context vocabulary lives in `GLOSSARY.md` at the repo root. Update it when a core term gains a new meaning. Architectural decisions go in `docs/adr/` (the only tracked path under `docs/`).
+Single-context vocabulary lives in `GLOSSARY.md` at the repo root. Update it when a core term gains a new meaning. Architectural decisions go in `docs/adr/`; feature specs go in `docs/specs/` — those two are the only tracked paths under `docs/`.
