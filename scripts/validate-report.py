@@ -1,9 +1,10 @@
 """Validate a report HTML file against the report error checklist.
-Usage: python validate-report.py <path-to-report.html>
+Usage: python validate-report.py <path-to-report.html> [--json]
 """
 
 import sys
 import os
+import json
 from dataclasses import dataclass, field
 
 from context2html.validator import (
@@ -122,7 +123,30 @@ def format_result(result):
     return "\n".join(lines)
 
 
-def run_all(path):
+def result_to_dict(result, path):
+    """Machine-readable result for agents: one entry per check, issues as strings."""
+    return {
+        "file": os.path.basename(path),
+        "content_type": result.content_type,
+        "all_pass": result.all_pass,
+        "summary": {
+            "hard_checks": len(result.checks),
+            "hard_failed": sum(1 for _, issues in result.checks if issues),
+            "warnings": len(result.warnings),
+            "warnings_triggered": sum(1 for _, issues in result.warnings if issues),
+        },
+        "checks": [
+            {"label": label, "pass": not issues, "issues": list(issues)}
+            for label, issues in result.checks
+        ],
+        "warnings": [
+            {"label": label, "pass": not issues, "issues": list(issues)}
+            for label, issues in result.warnings
+        ],
+    }
+
+
+def run_all(path, as_json=False):
     if not os.path.exists(path):
         print(f"{FAIL} File not found: {path}")
         sys.exit(1)
@@ -132,14 +156,19 @@ def run_all(path):
 
     base_dir = os.path.dirname(path)
     result = run_checks(html, base_dir)
-    print(format_result(result))
+    if as_json:
+        print(json.dumps(result_to_dict(result, path), ensure_ascii=False, indent=2))
+    else:
+        print(format_result(result))
 
     if not result.all_pass:
         sys.exit(1)
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print(f"Usage: python {sys.argv[0]} <report.html>")
+    args = [a for a in sys.argv[1:] if a != "--json"]
+    as_json = "--json" in sys.argv[1:]
+    if not args:
+        print(f"Usage: python {sys.argv[0]} <report.html> [--json]")
         sys.exit(1)
-    run_all(sys.argv[1])
+    run_all(args[0], as_json)

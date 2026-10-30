@@ -80,9 +80,11 @@ html = renderer.assemble(
 
 以下 5 步工作流是完整流程的一个示例。新 agent 可跟随此流程；熟练后可改用 Framework API 自由组合。
 
+**检查点策略（仅 2 个阻塞门）**：Step 1（章节大纲）和 Step 4（验证通过）需要等待用户确认。其余节点只输出一行 `📋 PROGRESS` 后继续，用户可随时打断纠正——不要把确认成本转嫁给用户。
+
 ### Step 0: 确定内容类型
 
-询问用户内容类型：
+从用户请求自动判断内容类型（不确定时默认 `report`）：
 - **report** — 调研报告/分析报告（默认，模板：report-starter.html）
 - **article** — 文章/博客/观点
 - **doc** — 文档/规范/说明
@@ -101,7 +103,7 @@ report 类型 → 复制 `report-starter.html`；其他类型 → 复制 `starte
   · 报告主题与目标受众
   · 关键数据点数量（影响组件选择策略）
   · 是否有明确的结论或建议需要突出
-- 🔵 CHECKPOINT：等待用户确认后再继续
+- 📋 PROGRESS：用一行复述已识别的主题/受众/数据点数量，然后直接进入 Step 1（不等待确认；用户可随时打断纠正）
 
 ### Step 1: 可视化结构规划
 
@@ -119,7 +121,7 @@ report 类型 → 复制 `report-starter.html`；其他类型 → 复制 `starte
 - 用 `ComponentRegistry.list_components(content_type='...')` 过滤兼容组件
 - 用 `ComponentRegistry.list_components(id=N)` 读取组件的完整 HTML/CSS/JS
 - 视觉密度根据内容类型调整：报告/教程类型每 500 字至少 1 个视觉元素（数据密集型章节可缩短至 300 字）；文章/笔记类型每 800 字至少 1 个视觉元素
-- 🔵 CHECKPOINT：展示组件选择清单给用户确认
+- 📋 PROGRESS：用一行列出所选组件编号与名称（如 `#26 ECharts / #5 对比表 / #17 标签组`），然后直接进入 Step 2.5（不等待确认）
 
 ### Step 2.5: 人类化写作（warning 级 — 生成内容前阅读）
 
@@ -137,7 +139,7 @@ report 类型 → 复制 `report-starter.html`；其他类型 → 复制 `starte
 
 工具：完成全文后对照 `references/humanize_matrix.md` 中的 20 条案例逐条微调。
 
-- 🟢 CHECKPOINT：逐条输出 D1-D5 自检结果（每维度写一句应用计划）。用户确认后再开始正文写作。
+- 🟢 PROGRESS：用一行汇总 D1-D5 自检结论（如 `D1 已混长短句｜D4 无模板连接词`），然后直接开始正文写作（不等待确认）
 
 ### Step 3: 生成 HTML
 
@@ -163,13 +165,14 @@ html = renderer.assemble('report-starter', [26, 17], 'warm')
 
 1. 根据内容类型复制模板（report→`templates/report-starter.html`，其他→`templates/starter.html`）为 `output-slug.html`
    · 模板路径不存在 → 检查 `templates/` 目录下对应文件名 → 从 teach_more_pic 重新复制
-2. 🎨 **选择并设置主题** — 用 `ThemeProvider.recommend_theme(content_type, topic)` 获取推荐主题
+2. 🎨 **选择并设置主题** — 用 `ThemeProvider.recommend_theme(content_type, topic)` 获取推荐主题，**直接应用推荐结果，不询问用户**
    · 设置 `<html data-theme="xxx">` 为推荐主题
+   · 在 PROGRESS 行说明理由（如 `主题 apple（科技/产品）`；依据 `theme/theme-index.json` 的 `recommend_for` / `recommend_topics`）
    · 确保 `<link href="../theme/report-themes.css">` 路径正确
    · 预览主题：打开 `examples/report-themes.html` 敲 T 键循环对比
 3. 填充封面元数据（标题、日期、作者、数据来源）
 4. 编写摘要 + 每章正文（中英双语 `data-lang="zh"` + `data-lang="en"`）— **写作时全程应用 Step 2.5 的 D1-D5 约束**
-   🔵 CHECKPOINT：展示正文框架 + 逐段 D1-D5 自检结果给用户确认。用户确认后再合并组件。
+   📋 PROGRESS：正文写完后用一行汇报章节数与总字数，然后直接合并组件（不等待确认）
 5. 用 `ComponentRegistry.list_components(id=N)` 获取组件 HTML/CSS/JS，合并到报告中：
    · 组件代码不兼容（缺 JS 依赖）→ 切换到简化版（纯 CSS 变体或文字替代）
    · 每章 2-4 个组件（数据密集型 5+）；同一章避免重复同类组件
@@ -189,12 +192,13 @@ html = renderer.assemble('report-starter', [26, 17], 'warm')
 
 ### Step 4: 验证
 
-运行 `python scripts/validate-report.py report-slug.html` — 自动检查 21 项硬性约束 + 5 项人类化 warning（D1-D5）。
+运行 `python scripts/validate-report.py report-slug.html` — 自动检查 22 项硬性约束 + 5 项人类化 warning（D1-D5）。加 `--json` 可得到结构化结果（每项检查的 label/pass/issues + summary 计数），便于精确定位待修位置。
 
 · 验证失败 → 对照"失败模式与异常处理"表锁定具体问题 → 修复 → 重新验证
-· 连续 3 轮验证仍不通过 → 降级为纯文字报告输出（不附加视觉组件）
+· **自动修复最多 2 轮**：第 1-2 轮自主修复，第 3 轮仍不通过则列出剩余问题交给用户决定（不静默交付）
+· 用户选择降级时 → 输出纯文字报告（不附加视觉组件）
 
-- 🔴 CHECKPOINT：所有验证通过后再继续（阻塞等待，不可跳过）
+- 🔴 CHECKPOINT：所有验证通过（或用户明确接受剩余问题）后再进入 Step 5（阻塞等待，不可跳过）
 
 ### Step 5: 输出
 
